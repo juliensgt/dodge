@@ -1,7 +1,10 @@
 {
   "name": "starter-pack",
   "private": true,
-  "workspaces": ["app", "api"],
+  "workspaces": [
+    "app",
+    "api"
+  ],
   "scripts": {
     "dev": "concurrently \"yarn dev:api\" \"yarn dev:app\"",
     "dev:api": "yarn --cwd api start:dev",
@@ -17,6 +20,7 @@
     "@capacitor/android": "^7.4.3",
     "@capacitor/cli": "^7.4.3",
     "@capacitor/core": "^7.4.3",
-    "@capacitor/ios": "^7.4.3"
+    "@capacitor/ios": "^7.4.3",
+    "api": "^0.0.1"
   }
 }

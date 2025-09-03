@@ -5,5 +5,3 @@ preserve_hierarchy: 1
 files:
   - source: /app/public/locales/fr/*.json
     translation: /app/locales/%two_letters_code%/%original_file_name%
-  - source: /api/src/i18n/fr/*.json
-    translation: /api/src/i18n/%two_letters_code%/%original_file_name%

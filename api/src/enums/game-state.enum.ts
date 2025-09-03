@@ -1,0 +1,9 @@
+export enum GameState {
+  WAITING = 'WAITING',
+  STARTED = 'STARTED',
+  COUP_OEIL = 'COUP_OEIL',
+  IN_GAME = 'IN_GAME',
+  DODGED = 'DODGED',
+  END_ROUND = 'END_ROUND',
+  END_GAME = 'END_GAME',
+}
