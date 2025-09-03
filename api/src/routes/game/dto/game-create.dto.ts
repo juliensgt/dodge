@@ -61,7 +61,7 @@ export const defaultGameCreateDto: GameCreateDto = {
   options: {
     pointsForActionError: 5,
     limitPoints: 150,
-    maxPlayers: 8,
+    maxPlayers: 6,
     nbSeeFirstCards: 2,
     timeToPlay: 5,
     timeToStartGame: 3,

@@ -18,3 +18,12 @@ mobile/android/app/build
 mobile/android/app/release
 mobile/android/app/debug
 mobile/android/app/release
+
+dodgebackjava/*
+dodgebackjava/.idea/*
+dodgebackjava/.idea/
+dodgebackjava/.idea/
+dodgefrontvue/*
+dodgefrontvue/.idea/*
+dodgefrontvue/.idea/
+dodgefrontvue/.idea/

@@ -1,15 +1,46 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'MT';
+  src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'PassionOne';
+  src: url('/fonts/PassionOne-Regular.ttf') format('truetype');
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Thème clair par défaut */
+  --primary-color: #1F1F2E;
+  --secondary-color: #5E53D5;
+  --text-color: #ffffff;
+  --secondary-text-color: #ffffff;
+  --action-chat-background-color: rgba(80, 80, 80, 0.5);
+  --action-chat-primary-text-color: #ffffff;
+  --action-chat-secondary-text-color: #ffffff;
+  --action-chat-border-color: #595959;
+  --action-choice-text-color: #ffffff;
+  --action-choice-active-color: #ffffff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+
+/* Mode light */
+[data-theme="light"] {
+  --primary-color: rgba(228, 199, 164, 0.5);
+  --secondary-color: #3A5D41;
+  --text-color: #3A5D41;
+  --secondary-text-color: #ffffff;
+  --action-chat-background-color: rgba(255, 255, 255, 0.5);
+  --action-chat-primary-text-color: #2e2e2e;
+  --action-chat-secondary-text-color: #2e2e2e;
+  --action-chat-border-color: #595959;
+  --action-choice-text-color: #2e2e2e;
+  --action-choice-active-color: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +53,35 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', serif;
 }
+
+*, :before, :after{
+  -moz-osx-font-smoothing: grayscale;    /* Optimise sur Firefox macOS */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;   /* Améliore la lisibilité */
+  font-synthesis: none !important;
+  box-sizing: border-box;
+}
+
+/* Animation pour les messages de chat */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design pour les onglets */
+@media (max-width: 640px) {
+  .resizable-sidebar {
+    min-width: 280px !important;
+  }
+}
+
+
+h1 {font-family: 'PassionOne';}
