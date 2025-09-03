@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DodgeApp</string>
+    <string name="title_activity_main">DodgeApp</string>
+    <string name="package_name">com.dodge.app</string>
+    <string name="custom_url_scheme">com.dodge.app</string>
+</resources>
