@@ -18,6 +18,7 @@ export default function StartingBoard() {
 
   const openRules = () => {
     // TODO: Implémenter l'ouverture des règles
+    console.log("Règles de la partie");
   };
 
   const leaveGame = () => {
@@ -25,7 +26,7 @@ export default function StartingBoard() {
   };
 
   return (
-    <div className="font-['MT'] relative w-full h-full rounded-5 overflow-hidden select-none bg-[var(--secondary-color)]/15">
+    <div className="font-['MT'] relative w-full h-full rounded-5 overflow-hidden select-none">
       {/* Countdown en header */}
       <Countdown visible={true} title={t("Salle d'attente")} time={time} />
 
@@ -55,7 +56,7 @@ export default function StartingBoard() {
 
           {/* Bouton règles de la partie */}
           <ActionButton
-            onClick={leaveGame}
+            onClick={openRules}
             label="Règles de la partie"
             color={{ color: ColorType.TRANSPARENT }}
             disabled={false}

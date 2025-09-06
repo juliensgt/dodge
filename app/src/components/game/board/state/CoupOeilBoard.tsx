@@ -14,7 +14,6 @@ export default function CoupOeilBoard() {
   const cards = cardStore.cards[playerId] || [];
   const time = countdownStore.time;
 
-  // Générer les cartes et lancer l'animation
   useEffect(() => {
     gameStore.distributionCoupOeil();
   }, [gameStore]);
@@ -28,17 +27,15 @@ export default function CoupOeilBoard() {
   };
 
   return (
-    <div className="coup-oeil-board relative w-full h-full rounded-5 bg-[var(--primary-color)] overflow-hidden select-none">
-      <div className="countdown">
-        <Countdown
-          visible={true}
-          subtitle="Regardez 2 cartes dans votre main et retenez-les !"
-          title="Le Coup d'œil 👁️"
-          time={time}
-        />
-      </div>
+    <div className="relative w-full h-full rounded-5 overflow-hidden select-none">
+      <Countdown
+        visible={true}
+        subtitle="Regardez 2 cartes dans votre main et retenez-les !"
+        title="Coup d'œil"
+        time={time}
+      />
 
-      <div className="coup-oeil-cards relative w-max flex justify-center items-center mx-auto my-[20vh] scale-120">
+      <div className="flex justify-center items-center mx-auto my-[20vh] scale-120">
         <div className="fake-cards-container relative inline-flex flex-row">
           {cards.map((card: Card, index: number) => (
             <CardComponent

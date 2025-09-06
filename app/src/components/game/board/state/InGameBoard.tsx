@@ -7,14 +7,11 @@ import TooltipText from "@/components/utils/buttons/TooltipText";
 import Circle from "@/components/utils/circles/Circle";
 import GameVersion from "@/components/utils/GameVersion";
 
-interface InGameBoardProps {
-  numberOfPlayers: number;
-}
+export default function InGameBoard() {
+  const game = useGameStore();
+  const nbPlayers = game.options.maxPlayers;
 
-export default function InGameBoard({ numberOfPlayers }: InGameBoardProps) {
-  const gameStore = useGameStore();
-
-  const players = gameStore.players;
+  const players = game.players;
   if (players === null) {
     // TODO: afficher une erreur
     return <div>Erreur: Aucun joueur trouvé</div>;
@@ -22,11 +19,11 @@ export default function InGameBoard({ numberOfPlayers }: InGameBoardProps) {
 
   // Récupération des positions des joueurs en fonction du nombre max de joueurs
   const playersCardsPositions =
-    cardsPositions[numberOfPlayers as keyof typeof cardsPositions] ||
-    cardsPositions[8];
+    cardsPositions[nbPlayers as keyof typeof cardsPositions] ||
+    cardsPositions[6];
 
   // On récupère la liste des joueurs de la partie ordonnée pour que le joueur courant soit toujours en position 0
-  const orderedPlayers = reorderedPlayers(players, gameStore.currentPlayerId);
+  const orderedPlayers = reorderedPlayers(players, game.currentPlayerId);
 
   function reorderedPlayers(players: Player[], currentPlayerId: string) {
     // Trouver l'index du joueur courant dans la liste des joueurs
@@ -54,7 +51,7 @@ export default function InGameBoard({ numberOfPlayers }: InGameBoardProps) {
 
   return (
     <div
-      className={`background-board relative h-full w-full bg-[var(--primary-color)] rounded-[1vh] overflow-hidden transform-origin-center max-w-full max-h-full select-none ${gameStore.focusMode ? "focus-mode" : ""}`}
+      className={`background-board relative h-full w-full bg-[var(--primary-color)] rounded-[1vh] overflow-hidden transform-origin-center max-w-full max-h-full select-none ${game.focusMode ? "focus-mode" : ""}`}
     >
       {/* Affichage des cercles dans le background*/}
       <Circle
