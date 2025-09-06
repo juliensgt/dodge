@@ -3,10 +3,13 @@ import Countdown from "@/components/game/countdown/Countdown";
 import PlayerVisitCard from "@/components/utils/players/PlayerVisitCard";
 import PlayerSkeletonCard from "@/components/utils/players/PlayerSkeletonCard";
 import { useTranslation } from "@/hooks/useTranslation";
+import ActionButton from "@/components/utils/buttons/ActionButton";
+import { useGradient } from "@/hooks/useGradient";
 
 export default function StartingBoard() {
   const { t } = useTranslation();
   const game = useGameStore();
+  const { ColorType } = useGradient();
 
   const time = 10;
   const codeGame = "TEST";
@@ -31,18 +34,16 @@ export default function StartingBoard() {
         {/* Affichage des informations du début de la partie */}
         <div className="flex flex-row justify-between items-center mb-4 md:mb-6">
           {/* Bouton quitter la partie */}
-          <div
-            className="flex flex-row justify-center items-center gap-1 p-1.5 px-2 md:p-3 md:px-6 rounded-lg md:rounded-xl text-xs md:text-sm font-medium cursor-pointer text-white bg-red-600/80 backdrop-blur-sm border border-red-500/30 hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/25 transition-all duration-200"
+          <ActionButton
             onClick={leaveGame}
-          >
-            <span className="text-sm md:text-lg">🚪</span>
-            <span className="hidden sm:inline">{t("Quitter la partie")}</span>
-            <span className="sm:hidden">{t("Quitter")}</span>
-          </div>
+            label="Quitter la partie"
+            color={{ color: ColorType.TRANSPARENT }}
+            disabled={true}
+          />
 
           {/* Info de la partie avec design amélioré */}
           <div className="text-center">
-            <div className="bg-[var(--action-chat-background-color)]/40 backdrop-blur-sm rounded-lg md:rounded-xl px-2 py-1.5 md:px-6 md:py-3 border border-[var(--action-chat-border-color)]/30 shadow-lg">
+            <div className="bg-[var(--text-color)]/10 backdrop-blur-sm rounded-lg md:rounded-xl px-2 py-1.5 md:px-6 md:py-3 border border-[var(--text-color)]/5">
               <span className="text-[var(--text-color)] text-xs md:text-sm font-medium uppercase tracking-wide hidden md:block">
                 Code de la partie
               </span>
@@ -53,14 +54,12 @@ export default function StartingBoard() {
           </div>
 
           {/* Bouton règles de la partie */}
-          <div
-            className="flex flex-row justify-center items-center gap-1 p-1.5 px-2 md:p-3 md:px-6 rounded-lg md:rounded-xl text-xs md:text-sm font-medium cursor-pointer text-white bg-gray-600/80 backdrop-blur-sm border border-gray-500/30 hover:bg-gray-600 hover:shadow-lg hover:shadow-gray-500/25 transition-all duration-200"
-            onClick={openRules}
-          >
-            <span className="text-sm md:text-lg">📖</span>
-            <span className="hidden sm:inline">Règles partie</span>
-            <span className="sm:hidden">Règles</span>
-          </div>
+          <ActionButton
+            onClick={leaveGame}
+            label="Règles de la partie"
+            color={{ color: ColorType.TRANSPARENT }}
+            disabled={false}
+          />
         </div>
 
         {/* Affichage des joueurs de la partie */}

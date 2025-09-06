@@ -34,7 +34,7 @@ export default function GameTabs() {
   return (
     <div className="h-full flex flex-col font-['MT'] select-none">
       {/* Navigation des onglets */}
-      <div className="flex border-b border-[var(--action-chat-border-color)] bg-[var(--action-chat-background-color)]/25">
+      <div className="flex border-b border-[var(--action-chat-border-color)]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -55,9 +55,7 @@ export default function GameTabs() {
 
       {/* Contenu des onglets */}
       <div
-        className={`flex-1 p-4 overflow-hidden ${
-          isMobile ? "bg-[var(--primary-color)]/80" : "bg-[var(--text-color)]/5"
-        }`}
+        className={`flex-1 p-4 overflow-hidden ${isMobile && "bg-[var(--primary-color)]/80"}`}
       >
         {renderTabContent()}
       </div>

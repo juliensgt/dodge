@@ -1,11 +1,16 @@
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
+import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
+import ActionButton from "@/components/utils/buttons/ActionButton";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useGradient } from "@/hooks/useGradient";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ColorType } from "@/enums/themes/list/PurpleTheme";
 
 export default function Home() {
   const [playerName, setPlayerName] = useState("");
   const router = useRouter();
+  const { getGradient, GradientType } = useGradient();
 
   const joinGame = (playerName: string, _gameId: string) => {
     if (!playerName.trim()) {
@@ -25,15 +30,20 @@ export default function Home() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-8">
-        <div className="absolute top-4 right-4">
+      <div
+        className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8`}
+      >
+        <div className="absolute top-4 right-4 flex gap-4">
+          <ThemeSelector />
           <LanguageSelector />
         </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md w-full shadow-2xl flex flex-col">
           <div className="text-center mb-4">
-            <h1 className="text-6xl font-bold">DODGE</h1>
-            <p className="text-lg">Rejoignez une partie et défiez vos amis !</p>
+            <h1 className="text-6xl font-bold text-white">DODGE</h1>
+            <p className="text-lg text-white">
+              Rejoignez une partie et défiez vos amis !
+            </p>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -51,19 +61,17 @@ export default function Home() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <button
+              <ActionButton
                 onClick={() => joinGame(playerName, "66c3a1e23c0a6642ee088edc")}
-                className="hover:cursor-pointer w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-              >
-                Rejoindre la partie
-              </button>
+                label="Rejoindre la partie"
+                gradient={{ gradientType: GradientType.PRIMARY }}
+              />
 
-              <button
+              <ActionButton
                 onClick={() => clearGame("66c3a1e23c0a6642ee088edc")}
-                className="hover:cursor-pointer w-full bg-red-600/80 hover:bg-red-700/80 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-              >
-                Reset de la partie
-              </button>
+                label="Reset de la partie"
+                color={{ color: ColorType.TRANSPARENT }}
+              />
             </div>
           </div>
         </div>

@@ -28,7 +28,6 @@ export default function Board() {
 
   return (
     <div className="h-[calc(100vh-20px)] w-full overflow-hidden rounded-lg select-none">
-      <Countdown visible={false} time={0} />
       {renderBoardState()}
     </div>
   );

@@ -1,3 +1,5 @@
+import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
+import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Settings() {
@@ -12,19 +14,15 @@ export default function Settings() {
         <div className="space-y-3">
           <div className="flex justify-between items-center p-2 rounded-lg hover:bg-[var(--action-chat-background-color)]/30 transition-all duration-200">
             <span className="text-[var(--action-chat-primary-text-color)] text-sm">
-              {t("Son")}
+              {t("Langue")}
             </span>
-            <button className="w-12 h-6 bg-[var(--secondary-color)]/80 backdrop-blur-sm rounded-full relative hover:bg-[var(--action-choice-active-color)] transition-all duration-200">
-              <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
-            </button>
+            <LanguageSelector />
           </div>
           <div className="flex justify-between items-center p-2 rounded-lg hover:bg-[var(--action-chat-background-color)]/30 transition-all duration-200">
             <span className="text-[var(--action-chat-primary-text-color)] text-sm">
-              {t("Musique")}
+              {t("Thème")}
             </span>
-            <button className="w-12 h-6 bg-gray-400/60 backdrop-blur-sm rounded-full relative hover:bg-gray-400/80 transition-all duration-200">
-              <div className="w-5 h-5 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
-            </button>
+            <ThemeSelector />
           </div>
         </div>
       </div>
