@@ -6,13 +6,16 @@ import { useGradient } from "@/hooks/useGradient";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import CardSkinSelector from "@/components/utils/selectors/CardSkinSelector";
+import Modal from "@/components/utils/modals/Modal";
 
 export default function Home() {
   const [playerName, setPlayerName] = useState("");
+  const [isSkinSelectorOpen, setIsSkinSelectorOpen] = useState(false);
   const router = useRouter();
   const { getGradient, GradientType } = useGradient();
 
-  const joinGame = (playerName: string, _gameId: string) => {
+  const joinGame = (playerName: string) => {
     if (!playerName.trim()) {
       alert("Veuillez entrer un nom de joueur");
       return;
@@ -28,14 +31,27 @@ export default function Home() {
     console.log("Clear game:", gameId);
   };
 
+  const openSkinSelector = () => {
+    setIsSkinSelectorOpen(true);
+  };
+
+  const closeSkinSelector = () => {
+    setIsSkinSelectorOpen(false);
+  };
+
   return (
     <LanguageProvider>
       <div
-        className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8`}
+        className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
         <div className="absolute top-4 right-4 flex gap-4">
           <ThemeSelector />
           <LanguageSelector />
+          <ActionButton
+            onClick={() => openSkinSelector()}
+            label="Skins"
+            color={{ color: ColorType.SECONDARY }}
+          />
         </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md w-full shadow-2xl flex flex-col">
@@ -62,7 +78,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col gap-2">
               <ActionButton
-                onClick={() => joinGame(playerName, "66c3a1e23c0a6642ee088edc")}
+                onClick={() => joinGame(playerName)}
                 label="Rejoindre la partie"
                 gradient={{ gradientType: GradientType.PRIMARY }}
               />
@@ -75,6 +91,15 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Modal pour le sélecteur de skins */}
+        <Modal
+          isOpen={isSkinSelectorOpen}
+          onClose={closeSkinSelector}
+          title="Sélectionner un skin de carte"
+        >
+          <CardSkinSelector />
+        </Modal>
       </div>
     </LanguageProvider>
   );

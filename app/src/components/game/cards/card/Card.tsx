@@ -1,9 +1,20 @@
+import { useState } from "react";
+import CardBack from "./CardBack";
+import CardFront from "./CardFront";
+
+export enum CardState {
+  CARD_BACK = "CARD_BACK",
+  CARD_FRONT = "CARD_FRONT",
+  CARD_REMOVED = "CARD_REMOVED",
+}
+
 interface CardProps {
-  cardState: string;
-  cardImage: string;
-  cardValue: number;
+  cardState: CardState;
+  cardImage?: string;
+  cardValue?: number;
   cliquable?: boolean;
-  size?: "small" | "medium" | "large";
+  size?: "small" | "medium" | "big";
+  skinId?: string;
   onClick?: () => void;
   className?: string;
 }
@@ -13,24 +24,56 @@ export default function Card({
   cardImage,
   cardValue,
   cliquable = false,
-  size = "medium",
+  size = "small",
+  skinId = "default",
   onClick,
   className = "",
 }: CardProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   const sizeClasses = {
-    small: "w-16 h-24",
-    medium: "w-20 h-32",
-    large: "w-24 h-36",
+    small: "w-16 h-20", // 64px x 80px
+    medium: "w-20 h-28", // 80px x 112px
+    big: "w-24 h-32", // 96px x 128px
   };
+
+  const handleClick = () => {
+    if (cliquable && onClick) {
+      onClick();
+    }
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  if (cardState === CardState.CARD_REMOVED) {
+    return (
+      <div
+        className={`${sizeClasses[size]} ${className} bg-white bg-opacity-25 rounded-lg shadow-none`}
+      />
+    );
+  }
 
   return (
     <div
-      className={`card ${sizeClasses[size]} bg-white rounded-lg shadow-lg cursor-pointer transition-transform duration-200 hover:scale-105 select-none ${className}`}
-      onClick={cliquable ? onClick : undefined}
+      className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none transition-all duration-200 ${
+        isHovered && cliquable ? "transform scale-105" : ""
+      }`}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <div className="card-content w-full h-full flex items-center justify-center">
-        <div className="text-gray-800 font-bold text-lg">{cardValue}</div>
-      </div>
+      {cardState === CardState.CARD_BACK && (
+        <CardBack size={size} skinId={skinId} />
+      )}
+      {cardState === CardState.CARD_FRONT && (
+        <CardFront cardImage={cardImage} cardValue={cardValue} />
+      )}
     </div>
   );
 }

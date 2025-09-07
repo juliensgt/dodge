@@ -37,8 +37,21 @@ export const colors = {
   [ColorType.TRANSPARENT]: "bg-white/10 backdrop-blur-sm border border-white/5",
 };
 
+// Couleurs hexadécimales du thème
+export const hexColors = {
+  primary: "#059669", // emerald-600
+  secondary: "#0d9488", // teal-600
+  background: "#064e3b", // emerald-900
+  text: "#ffffff", // white
+};
+
 export function getColor(color: ColorType): string {
   return colors[color];
+}
+
+// Fonction pour récupérer les couleurs hexadécimales
+export function getHexColors() {
+  return hexColors;
 }
 
 export function getGradient(

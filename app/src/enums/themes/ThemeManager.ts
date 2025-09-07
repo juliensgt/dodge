@@ -1,4 +1,4 @@
-import { Theme, ThemeType } from "./Theme";
+import { Theme, ThemeType, ThemeColors } from "./Theme";
 import * as PurpleTheme from "./list/PurpleTheme";
 import * as OceanTheme from "./list/OceanTheme";
 import * as ForestTheme from "./list/ForestTheme";
@@ -61,4 +61,10 @@ export function getAllThemes() {
 // Fonction pour obtenir le thème par défaut
 export function getDefaultTheme(): ThemeType {
   return ThemeType.PURPLE;
+}
+
+// Fonction pour obtenir les couleurs hexadécimales d'un thème
+export function getThemeColors(themeId: ThemeType): ThemeColors {
+  const theme = getTheme(themeId);
+  return theme.getHexColors();
 }

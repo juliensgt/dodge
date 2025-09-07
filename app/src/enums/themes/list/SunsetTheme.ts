@@ -38,8 +38,21 @@ export const colors = {
   [ColorType.TRANSPARENT]: "bg-white/10 backdrop-blur-sm border border-white/5",
 };
 
+// Couleurs hexadécimales du thème
+export const hexColors = {
+  primary: "#ea580c", // orange-600
+  secondary: "#db2777", // pink-600
+  background: "#9a3412", // orange-900
+  text: "#ffffff", // white
+};
+
 export function getColor(color: ColorType): string {
   return colors[color];
+}
+
+// Fonction pour récupérer les couleurs hexadécimales
+export function getHexColors() {
+  return hexColors;
 }
 
 // Fonction utilitaire pour obtenir les classes CSS complètes

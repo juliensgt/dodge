@@ -13,3 +13,10 @@ export interface Theme {
   description: string;
   preview: string; // Classe CSS pour l'aperçu
 }
+
+export interface ThemeColors {
+  primary: string; // Couleur hexadécimale primaire
+  secondary: string; // Couleur hexadécimale secondaire
+  background: string; // Couleur hexadécimale de fond
+  text: string; // Couleur hexadécimale du texte
+}

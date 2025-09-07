@@ -38,7 +38,7 @@ export default function EndRoundBoard() {
   useEffect(() => {
     const intervalId = startAutoSlide();
     return () => clearInterval(intervalId);
-  }, []);
+  }, [startAutoSlide]);
 
   return (
     <div className="end-round-board font-['MT'] relative w-full h-full rounded-5 bg-[var(--primary-color)] overflow-hidden select-none">

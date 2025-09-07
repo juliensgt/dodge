@@ -1,7 +1,7 @@
 import { useGameStore } from "@/store/game";
 import Countdown from "@/components/game/countdown/Countdown";
 import PlayerVisitCard from "@/components/utils/players/PlayerVisitCard";
-import PlayerSkeletonCard from "@/components/utils/players/PlayerSkeletonCard";
+import PlayerSkeletonCard from "@/components/utils/players/PlayerVisitCardSkeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";

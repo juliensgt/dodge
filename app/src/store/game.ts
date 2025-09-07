@@ -24,7 +24,7 @@ export interface ActionPlayer {
   time: number;
   countdownState: boolean;
   idTimer: number;
-  action: any;
+  action: string | null;
 }
 
 export interface GameState {
@@ -38,7 +38,7 @@ export interface GameState {
     cardId: number;
   }>;
   currentAction: ActionPlayer;
-  actionsHistory: { players: any[]; datas: any[] };
+  actionsHistory: { players: Player[]; datas: unknown[] };
   game: Game;
   options: GameOptions;
   players: Player[];
@@ -49,13 +49,13 @@ export interface GameState {
   addPlayer: (player: Player) => void;
   getPlayerById: (playerId: string) => Player | undefined;
   isCurrentPlayerIsPlaying: () => boolean;
-  initGame: (currentPlayerId: string, game: any) => void;
+  initGame: (currentPlayerId: string, game: Game) => void;
   clear: () => void;
   dodge: () => void;
   distributionCoupOeil: () => void;
   startCountdownActionPlayer: () => void;
-  addPlayerToHistorique: (player: any) => void;
-  addActionToHistorique: (action: any) => void;
+  addPlayerToHistorique: (player: Player) => void;
+  addActionToHistorique: (action: unknown) => void;
   setLastActionToHistorique: (message: string) => void;
 }
 
@@ -76,6 +76,10 @@ const useGameStore = create<GameState>((set, get) => ({
   players: [
     { id: "", name: "jujudeluxe", points: 0, currentTime: 0, skinCards: "" },
     { id: "", name: "maxlamenace", points: 0, currentTime: 0, skinCards: "" },
+    { id: "", name: "Beboudeuse", points: 0, currentTime: 0, skinCards: "" },
+    //{ id: "", name: "Riskoonay", points: 0, currentTime: 0, skinCards: "" },
+    //{ id: "", name: "Dowbe", points: 0, currentTime: 0, skinCards: "" },
+    //{ id: "", name: "VaiMoto", points: 0, currentTime: 0, skinCards: "" },
   ],
 
   setGameState: (state: string) => {
@@ -114,7 +118,7 @@ const useGameStore = create<GameState>((set, get) => ({
     return state.playerIdWhoPlays === state.currentPlayerId;
   },
 
-  initGame: (currentPlayerId: string, game: any) => {
+  initGame: (currentPlayerId: string, game: Game) => {
     set({
       currentPlayerId,
       players: [],
@@ -199,7 +203,7 @@ const useGameStore = create<GameState>((set, get) => ({
     }, state.options.timeToPlay * 1000);
   },
 
-  addPlayerToHistorique: (player: any) => {
+  addPlayerToHistorique: (player: Player) => {
     set((state) => {
       const newPlayers = [...state.actionsHistory.players];
       const newDatas = [...state.actionsHistory.datas];
@@ -224,7 +228,7 @@ const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  addActionToHistorique: (action: any) => {
+  addActionToHistorique: (action: unknown) => {
     set((state) => {
       const newDatas = [...state.actionsHistory.datas];
       const nbPlayers = state.actionsHistory.players.length;
