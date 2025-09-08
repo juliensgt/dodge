@@ -35,7 +35,7 @@ export default function CoupOeilBoard() {
         time={time}
       />
 
-      <div className="flex justify-center items-center mx-auto my-[20vh] scale-120">
+      {/* <div className="flex justify-center items-center mx-auto my-[20vh] scale-120">
         <div className="fake-cards-container relative inline-flex flex-row">
           {cards.map((card: Card, index: number) => (
             <CardComponent
@@ -50,7 +50,7 @@ export default function CoupOeilBoard() {
             />
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

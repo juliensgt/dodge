@@ -1,5 +1,10 @@
+import { useIsMobile } from "@/hooks/useIsMobile";
 import CardSkeleton from "./card/CardSkeleton";
-import { getPlayerClasses } from "@/scripts/references/playerLayouts";
+import {
+  getMainPlayerSizes,
+  getOtherPlayersSizes,
+  getPlayerClasses,
+} from "@/scripts/references/playerLayouts";
 
 interface CardContainerSkeletonProps {
   position: number;
@@ -14,8 +19,13 @@ export default function CardContainerSkeleton({
   style,
   className = "",
 }: CardContainerSkeletonProps) {
-  const playerClasses = getPlayerClasses(maxPlayers, position);
   const isMainPlayer = position === 0;
+  const isMobile = useIsMobile();
+  const playerClasses = getPlayerClasses(maxPlayers, position, isMobile);
+
+  const sizes = isMainPlayer
+    ? getMainPlayerSizes(maxPlayers, isMobile)
+    : getOtherPlayersSizes(maxPlayers, isMobile);
 
   return (
     <div
@@ -29,10 +39,10 @@ export default function CardContainerSkeleton({
             isMainPlayer ? "flex gap-2 w-fit" : "grid grid-cols-2 gap-2 w-fit"
           }
         >
-          <CardSkeleton size={isMainPlayer ? "big" : "small"} />
-          <CardSkeleton size={isMainPlayer ? "big" : "small"} />
-          <CardSkeleton size={isMainPlayer ? "big" : "small"} />
-          <CardSkeleton size={isMainPlayer ? "big" : "small"} />
+          <CardSkeleton size={sizes.card} />
+          <CardSkeleton size={sizes.card} />
+          <CardSkeleton size={sizes.card} />
+          <CardSkeleton size={sizes.card} />
         </div>
 
         {/* Skeleton pour le profil du joueur */}

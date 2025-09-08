@@ -1,8 +1,12 @@
+import { Size } from "@/scripts/references/playerLayouts";
+
 interface NeonSkinProps {
-  size?: "small" | "medium" | "big";
+  size?: Size;
 }
 
 export default function NeonSkin({ size = "small" }: NeonSkinProps) {
+  const isSmall = size === "small" || size === "xsmall";
+
   return (
     <div
       className="card-back w-full h-full relative rounded-lg overflow-hidden shadow-lg"
@@ -46,7 +50,7 @@ export default function NeonSkin({ size = "small" }: NeonSkinProps) {
         <div className="relative">
           {/* Glow externe */}
           <div
-            className={`absolute ${size === "small" ? "text-4xl" : "text-xl"} font-black text-black/75 opacity-50`}
+            className={`absolute ${isSmall ? "text-4xl" : "text-xl"} font-black text-black/75 opacity-50`}
             style={{
               textShadow:
                 "0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff",
@@ -54,18 +58,18 @@ export default function NeonSkin({ size = "small" }: NeonSkinProps) {
               animation: "neonGlow 2s ease-in-out infinite alternate",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${size === "small" ? "text-3xl" : "text-lg"} font-black text-black/75 font-['MT']`}
+            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-black/75 font-['MT']`}
             style={{
               textShadow:
                 "0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff",
               filter: "drop-shadow(0 0 5px #00ffff)",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
         </div>
       </div>

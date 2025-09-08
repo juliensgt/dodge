@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
+import { Size } from "@/scripts/references/playerLayouts";
 
 export enum CardState {
   CARD_BACK = "CARD_BACK",
@@ -13,7 +14,7 @@ interface CardProps {
   cardImage?: string;
   cardValue?: number;
   cliquable?: boolean;
-  size?: "small" | "medium" | "big";
+  size?: Size;
   skinId?: string;
   onClick?: () => void;
   className?: string;
@@ -34,7 +35,8 @@ export default function Card({
   const sizeClasses = {
     small: "w-16 h-20", // 64px x 80px
     medium: "w-20 h-28", // 80px x 112px
-    big: "w-24 h-32", // 96px x 128px
+    large: "w-24 h-32", // 96px x 128px
+    xsmall: "w-10 h-14", // 40px x 56px
   };
 
   const handleClick = () => {

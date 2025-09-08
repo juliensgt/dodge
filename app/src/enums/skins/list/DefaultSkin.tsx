@@ -1,12 +1,15 @@
 import { useTheme } from "@/contexts/ThemeContext";
+import { Size } from "@/scripts/references/playerLayouts";
 
 interface DefaultSkinProps {
-  size?: "small" | "medium" | "big";
+  size?: Size;
 }
 
 export default function DefaultSkin({ size = "small" }: DefaultSkinProps) {
   const theme = useTheme();
   const { getGradient, GradientType } = theme.getCurrentTheme();
+
+  const isSmall = size === "small" || size === "xsmall";
 
   return (
     <div
@@ -17,24 +20,24 @@ export default function DefaultSkin({ size = "small" }: DefaultSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${size === "small" ? "text-3xl" : "text-lg"} font-black text-white opacity-30`}
+            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-white opacity-30`}
             style={{
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
               transform: "translate(2px, 2px)",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${size === "small" ? "text-3xl" : "text-lg"} font-black text-white`}
+            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-white`}
             style={{
               textShadow:
                 "0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3)",
               filter: "drop-shadow(0 0 10px rgba(255,255,255,0.8))",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
         </div>
       </div>

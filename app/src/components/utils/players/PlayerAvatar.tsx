@@ -1,8 +1,9 @@
 import { Player } from "@/store/game";
 import { useGradient } from "@/hooks/useGradient";
+import { Size } from "@/scripts/references/playerLayouts";
 interface PlayerAvatarProps {
   player: Player;
-  size?: "small" | "medium" | "large";
+  size?: Size;
 }
 
 export default function PlayerAvatar({
@@ -15,6 +16,7 @@ export default function PlayerAvatar({
     small: "w-8 h-8 text-sm",
     medium: "w-12 h-12 text-base",
     large: "w-16 h-16 text-lg",
+    xsmall: "w-6 h-6 text-xs",
   };
 
   return (

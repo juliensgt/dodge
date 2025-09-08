@@ -1,8 +1,9 @@
 import { Player } from "@/store/game";
+import { Size } from "@/scripts/references/playerLayouts";
 
 interface PlayerNameProps {
   player: Player;
-  size?: "small" | "medium" | "large";
+  size?: Size;
 }
 
 export default function PlayerName({
@@ -13,6 +14,7 @@ export default function PlayerName({
     small: "text-sm",
     medium: "text-base",
     large: "text-lg",
+    xsmall: "text-xs",
   };
 
   return (

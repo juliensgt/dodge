@@ -77,15 +77,15 @@ const useGameStore = create<GameState>((set, get) => ({
     { id: "", name: "jujudeluxe", points: 0, currentTime: 0, skinCards: "" },
     { id: "", name: "maxlamenace", points: 0, currentTime: 0, skinCards: "" },
     { id: "", name: "Beboudeuse", points: 0, currentTime: 0, skinCards: "" },
-    //{ id: "", name: "Riskoonay", points: 0, currentTime: 0, skinCards: "" },
-    //{ id: "", name: "Dowbe", points: 0, currentTime: 0, skinCards: "" },
-    //{ id: "", name: "VaiMoto", points: 0, currentTime: 0, skinCards: "" },
+    { id: "", name: "Riskoonay", points: 0, currentTime: 0, skinCards: "" },
+    { id: "", name: "Dowbe", points: 0, currentTime: 0, skinCards: "" },
+    { id: "", name: "VaiMoto", points: 0, currentTime: 0, skinCards: "" },
   ],
 
   setGameState: (state: string) => {
-    set((state) => ({
+    /*set((state) => ({
       game: { ...state.game, gameState: state },
-    }));
+    }));*/
 
     switch (state) {
       case "IN_GAME":
@@ -128,12 +128,12 @@ const useGameStore = create<GameState>((set, get) => ({
         round: game.round,
       },
       options: {
-        timeToPlay: game.options.timeToPlay,
-        nbCards: game.options.nbCards,
+        timeToPlay: 0, //game.options.timeToPlay,
+        nbCards: 0, //game.options.nbCards,
         maxPlayers: 6,
       },
       currentAction: {
-        time: game.options.timeToPlay,
+        time: 0, //game.options.timeToPlay,
         countdownState: false,
         idTimer: 0,
         action: null,
@@ -142,9 +142,9 @@ const useGameStore = create<GameState>((set, get) => ({
     });
 
     // Ajouter tous les joueurs
-    game.players.forEach((player: Player) => {
+    /*game.players.forEach((player: Player) => {
       get().addPlayer(player);
-    });
+    });*/
   },
 
   clear: () => {
@@ -161,7 +161,7 @@ const useGameStore = create<GameState>((set, get) => ({
       },
       actionsHistory: { players: [], datas: [] },
       game: { id: 0, gameState: "WAITING", round: 0 },
-      options: { nbCards: 0, timeToPlay: 0, maxPlayers: 8 },
+      options: { nbCards: 0, timeToPlay: 0, maxPlayers: 6 },
       players: [],
     });
   },
@@ -208,13 +208,13 @@ const useGameStore = create<GameState>((set, get) => ({
       const newPlayers = [...state.actionsHistory.players];
       const newDatas = [...state.actionsHistory.datas];
 
-      const lastPlayer = newPlayers.length - 1;
+      /*const lastPlayer = newPlayers.length - 1;
       if (lastPlayer >= 0) {
         newPlayers[lastPlayer] = {
           ...newPlayers[lastPlayer],
           finishTour: true,
         };
-      }
+      }*/
 
       newPlayers.push(player);
       newDatas.push([]);
@@ -233,9 +233,9 @@ const useGameStore = create<GameState>((set, get) => ({
       const newDatas = [...state.actionsHistory.datas];
       const nbPlayers = state.actionsHistory.players.length;
 
-      if (newDatas[nbPlayers - 1]) {
+      /*if (newDatas[nbPlayers - 1]) {
         newDatas[nbPlayers - 1] = [...newDatas[nbPlayers - 1], action];
-      }
+      }*/
 
       return {
         actionsHistory: {
@@ -248,7 +248,7 @@ const useGameStore = create<GameState>((set, get) => ({
 
   setLastActionToHistorique: (message: string) => {
     set((state) => {
-      const newDatas = [...state.actionsHistory.datas];
+      /*const newDatas = [...state.actionsHistory.datas];
       const nbPlayers = state.actionsHistory.players.length;
       const nbActions = newDatas[nbPlayers - 1]?.length || 0;
 
@@ -257,12 +257,12 @@ const useGameStore = create<GameState>((set, get) => ({
           ...newDatas[nbPlayers - 1][nbActions - 1],
           message,
         };
-      }
+      }*/
 
       return {
         actionsHistory: {
           ...state.actionsHistory,
-          datas: newDatas,
+          //datas: newDatas,
         },
       };
     });

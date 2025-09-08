@@ -1,8 +1,12 @@
+import { Size } from "@/scripts/references/playerLayouts";
+
 interface ClassicSkinProps {
-  size?: "small" | "medium" | "big";
+  size?: Size;
 }
 
 export default function ClassicSkin({ size = "small" }: ClassicSkinProps) {
+  const isSmall = size === "small" || size === "xsmall";
+
   return (
     <div
       className="card-back w-full h-full relative rounded-lg overflow-hidden shadow-lg"
@@ -29,24 +33,24 @@ export default function ClassicSkin({ size = "small" }: ClassicSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${size === "small" ? "text-3xl" : "text-lg"} font-black text-yellow-200 opacity-40`}
+            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-200 opacity-40`}
             style={{
               textShadow: "3px 3px 6px rgba(0,0,0,0.5)",
               transform: "translate(3px, 3px)",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${size === "small" ? "text-3xl" : "text-lg"} font-black text-yellow-100`}
+            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-100`}
             style={{
               textShadow:
                 "1px 1px 2px rgba(0,0,0,0.8), 0 0 10px rgba(255,215,0,0.3)",
               filter: "drop-shadow(0 0 5px rgba(255,215,0,0.5))",
             }}
           >
-            {size === "small" ? "D" : "DODGE"}
+            {isSmall ? "D" : "DODGE"}
           </div>
         </div>
       </div>

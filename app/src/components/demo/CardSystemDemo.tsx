@@ -121,7 +121,7 @@ export default function CardSystemDemo() {
             <p className="mt-2 text-sm text-gray-600">Medium skeleton</p>
           </div>
           <div className="text-center">
-            <CardSkeleton size="big" />
+            <CardSkeleton size="large" />
             <p className="mt-2 text-sm text-gray-600">Big skeleton</p>
           </div>
         </div>

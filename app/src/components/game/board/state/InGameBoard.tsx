@@ -2,11 +2,17 @@ import { Player, useGameStore } from "@/store/game";
 import DeckContainer from "@/components/game/cards/DeckContainer";
 import CardContainer from "@/components/game/cards/CardContainer";
 import CardContainerSkeleton from "@/components/game/cards/CardContainerSkeleton";
-import { getPlayerLayout } from "@/scripts/references/playerLayouts";
+import {
+  getPlayerLayout,
+  getDeckContainerClasses,
+} from "@/scripts/references/playerLayouts";
+import { getMobilePlayerLayout } from "@/scripts/references/mobilePlayerLayouts";
 import GameVersion from "@/components/utils/GameVersion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function InGameBoard() {
   const game = useGameStore();
+  const isMobile = useIsMobile();
   const nbPlayers = game.options.maxPlayers;
 
   const players = game.players;
@@ -14,8 +20,12 @@ export default function InGameBoard() {
     return <div>Erreur: Aucun joueur trouvé</div>;
   }
 
-  // Récupération du layout des joueurs en fonction du nombre max de joueurs
-  const playerLayout = getPlayerLayout(nbPlayers);
+  // Récupération du layout des joueurs en fonction du nombre max de joueurs et de la plateforme
+  const playerLayout = isMobile
+    ? getMobilePlayerLayout(nbPlayers)
+    : getPlayerLayout(nbPlayers);
+
+  console.log("isMobile", isMobile);
 
   // On récupère la liste des joueurs de la partie ordonnée pour que le joueur courant soit toujours en position 0
   const orderedPlayers = reorderedPlayers(players, game.currentPlayerId);
@@ -66,7 +76,10 @@ export default function InGameBoard() {
           );
         })}
 
-        <DeckContainer className="flex items-center justify-center gap-4 col-start-2 row-start-2" />
+        <DeckContainer
+          className={getDeckContainerClasses(nbPlayers, isMobile)}
+          maxPlayers={nbPlayers}
+        />
       </div>
 
       {/* Affichage de la version du jeu */}

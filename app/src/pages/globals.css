@@ -10,6 +10,11 @@
   src: url('/fonts/PassionOne-Regular.ttf') format('truetype');
 }
 
+@theme {
+  --font-display: "MT", "sans-serif";
+  --text-xs: 0.65rem;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

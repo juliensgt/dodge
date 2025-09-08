@@ -1,4 +1,5 @@
 import { CapacitorConfig } from "@capacitor/cli";
+import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
   appId: "com.dodge.app",
@@ -9,6 +10,18 @@ const config: CapacitorConfig = {
   },
   android: {
     path: "mobile/android",
+  },
+  plugins: {
+    Keyboard: {
+      resize: KeyboardResize.Native,
+      style: KeyboardStyle.Light,
+      resizeOnFullScreen: true,
+    },
+    StatusBar: {
+      overlaysWebView: false,
+      style: "LIGHT",
+      backgroundColor: "#ffffffff",
+    },
   },
 };
 

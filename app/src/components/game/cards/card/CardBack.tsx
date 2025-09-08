@@ -1,8 +1,9 @@
 import { getCardSkin } from "../../../../enums/skins/SkinManager";
 import { useCardSkin } from "../../../../hooks/useCardSkin";
+import { Size } from "@/scripts/references/playerLayouts";
 
 interface CardBackProps {
-  size?: "small" | "medium" | "big";
+  size?: Size;
   skinId?: string;
 }
 

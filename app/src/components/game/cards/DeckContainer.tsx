@@ -1,10 +1,23 @@
+import { useIsMobile } from "@/hooks/useIsMobile";
 import CardSkeleton from "./card/CardSkeleton";
+import { getDeckSizes } from "@/scripts/references/playerLayouts";
 
-export default function DeckContainer({ className }: { className?: string }) {
+interface DeckContainerProps {
+  className?: string;
+  maxPlayers: number;
+}
+
+export default function DeckContainer({
+  className,
+  maxPlayers,
+}: DeckContainerProps) {
+  const isMobile = useIsMobile();
+  const sizes = getDeckSizes(maxPlayers, isMobile);
+
   return (
     <div className={`${className}`}>
-      <CardSkeleton size="big" />
-      <CardSkeleton size="big" />
+      <CardSkeleton size={sizes.card} />
+      <CardSkeleton size={sizes.card} />
     </div>
   );
 }

@@ -1,5 +1,7 @@
+import { Size } from "@/scripts/references/playerLayouts";
+
 interface CardSkeletonProps {
-  size?: "small" | "medium" | "big";
+  size?: Size;
   className?: string;
 }
 
@@ -10,7 +12,8 @@ export default function CardSkeleton({
   const sizeClasses = {
     small: "w-16 h-20", // 64px x 80px
     medium: "w-20 h-28", // 80px x 112px
-    big: "w-24 h-32", // 96px x 128px
+    large: "w-24 h-32", // 96px x 128px
+    xsmall: "w-10 h-14", // 40px x 56px
   };
 
   return (
