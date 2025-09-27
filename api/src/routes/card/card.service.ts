@@ -20,10 +20,7 @@ export class CardService {
   async findOne(id: string): Promise<Card> {
     const card = await this.cardModel.findById(id);
     if (!card) {
-      throw new NotFoundException(
-        'Card not found',
-        ErrorEnum['card/not-found'],
-      );
+      throw new NotFoundException('Card not found', ErrorEnum['card/not-found']);
     }
     return card;
   }

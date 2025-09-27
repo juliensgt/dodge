@@ -33,10 +33,7 @@ export class GameService {
       .populate('defausse');
 
     if (!game) {
-      throw new NotFoundException(
-        'Game not found',
-        ErrorEnum['game/not-found'],
-      );
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
     }
 
     return game;
@@ -58,10 +55,7 @@ export class GameService {
     const user = await this.userModel.findById(playerCreateDto.userId);
 
     if (!user) {
-      throw new NotFoundException(
-        'User not found',
-        ErrorEnum['user/not-found'],
-      );
+      throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
     }
 
     const player = new this.playerModel({
@@ -85,33 +79,25 @@ export class GameService {
     return savedPlayer;
   }
 
-  async getPlayerByGameAndId(
-    gameId: string,
-    playerId: string,
-  ): Promise<Player> {
+  async getPlayerByGameAndId(gameId: string, playerId: string): Promise<Player> {
     const game = await this.findOne(gameId);
-    const player = game.players.find(
-      (p) => (p as PlayerWithId)._id.toString() === playerId,
-    );
+    const player = game.players.find((p) => (p as PlayerWithId)._id.toString() === playerId);
     if (!player) {
-      throw new NotFoundException(
-        'Player not found',
-        ErrorEnum['player/not-found'],
-      );
+      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
     }
     return player;
   }
 
-  async dodge(gameId: string, playerId: string): Promise<void> {
+  /*async dodge(gameId: string, playerId: string): Promise<void> {
     const game = await this.findOne(gameId);
 
     // TODO: Implement dodge logic here
     game.playerDodge = playerId;
     game.indexLastPlayerWhoPlay = game.indexPlayerWhoPlays;
     await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
-  }
+  }*/
 
-  async isTourOfPlayer(gameId: string, playerId: string): Promise<boolean> {
+  /*async isTourOfPlayer(gameId: string, playerId: string): Promise<boolean> {
     const game = await this.findOne(gameId);
     if (
       game.indexPlayerWhoPlays < 0 ||
@@ -124,7 +110,7 @@ export class GameService {
         game.players[game.indexPlayerWhoPlays] as PlayerWithId
       )._id.toString() === playerId
     );
-  }
+  }*/
 
   async clearGame(gameId: string): Promise<void> {
     const game = await this.findOne(gameId);
@@ -139,30 +125,177 @@ export class GameService {
     await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
   }
 
-  /*async startGameDelayed(gameId: string): Promise<Game> {
+  // ===== TURN MANAGEMENT =====
+  /*async switchWithDeck(
+    gameId: string,
+    playerId: string,
+    action: 'deckToDefausse' | 'deckToPlayer',
+    targetCardId?: string,
+  ): Promise<any> {
     const game = await this.findOne(gameId);
-    // TODO: Emit event for delayed game start
-    // this.eventEmitter.emit('game.start.delayed', game);
-    return game;
+    const player = await this.getPlayerByGameAndId(gameId, playerId);
+
+    if (game.deck.length === 0) {
+      throw new Error('Deck is empty');
+    }
+
+    const drawnCard = game.deck.pop();
+    if (!drawnCard) {
+      throw new Error('No card to draw from deck');
+    }
+
+    if (action === 'deckToDefausse') {
+      game.defausse.push(drawnCard);
+    } else if (action === 'deckToPlayer') {
+      if (!targetCardId) {
+        throw new Error('Target card ID required for deckToPlayer action');
+      }
+      // Remove target card from player's hand
+      const targetCardIndex = player.main.findIndex(
+        (card) => (card as CardWithId)._id.toString() === targetCardId,
+      );
+      if (targetCardIndex === -1) {
+        throw new Error('Target card not found in player hand');
+      }
+      const targetCard = player.main.splice(targetCardIndex, 1)[0];
+      game.defausse.push(targetCard);
+      player.main.push(drawnCard);
+    }
+
+    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
+    await this.playerModel.findByIdAndUpdate(
+      (player as PlayerWithId)._id,
+      player,
+    );
+
+    return {
+      drawnCard,
+      action,
+      gameState: game.gameState,
+    };
+  }*/
+
+  /*async switchWithDefausse(
+    gameId: string,
+    playerId: string,
+    targetCardId: string,
+  ): Promise<any> {
+    const game = await this.findOne(gameId);
+    const player = await this.getPlayerByGameAndId(gameId, playerId);
+
+    if (game.defausse.length === 0) {
+      throw new Error('Defausse is empty');
+    }
+
+    const drawnCard = game.defausse.pop();
+    if (!drawnCard) {
+      throw new Error('No card to draw from defausse');
+    }
+
+    // Remove target card from player's hand
+    const targetCardIndex = player.main.findIndex(
+      (card) => (card as CardWithId)._id.toString() === targetCardId,
+    );
+    if (targetCardIndex === -1) {
+      throw new Error('Target card not found in player hand');
+    }
+    const targetCard = player.main.splice(targetCardIndex, 1)[0];
+    game.defausse.push(targetCard);
+    player.main.push(drawnCard);
+
+    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
+    await this.playerModel.findByIdAndUpdate(
+      (player as PlayerWithId)._id,
+      player,
+    );
+
+    return {
+      drawnCard,
+      targetCard,
+      gameState: game.gameState,
+    };
+  }*/
+
+  /*async endTurn(gameId: string): Promise<string> {
+    const game = await this.findOne(gameId);
+
+    // Move to next player
+    game.indexPlayerWhoPlays =
+      (game.indexPlayerWhoPlays + 1) % game.players.length;
+
+    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
+
+    return (
+      game.players[game.indexPlayerWhoPlays] as PlayerWithId
+    )._id.toString();
+  }*/
+
+  // ===== CARD ACTIONS =====
+  /*async playCard(
+    gameId: string,
+    playerId: string,
+    cardId: string,
+  ): Promise<any> {
+    const game = await this.findOne(gameId);
+    const player = await this.getPlayerByGameAndId(gameId, playerId);
+
+    const cardIndex = player.main.findIndex(
+      (card) => (card as CardWithId)._id.toString() === cardId,
+    );
+    if (cardIndex === -1) {
+      throw new Error('Card not found in player hand');
+    }
+
+    const playedCard = player.main.splice(cardIndex, 1)[0];
+    game.defausse.push(playedCard);
+
+    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
+    await this.playerModel.findByIdAndUpdate(
+      (player as PlayerWithId)._id,
+      player,
+    );
+
+    return {
+      playedCard,
+      gameState: game.gameState,
+    };
+  }*/
+
+  /*async handleSpecialCard(
+    gameId: string,
+    playerId: string,
+    cardId: string,
+    specialAction: string,
+  ): Promise<any> {
+    // TODO: Implement special card logic based on card type
+    return { specialAction, cardId };
+  }*/
+
+  // ===== INTERVENTION ACTIONS =====
+  /*async handleIntervention(
+    gameId: string,
+    playerId: string,
+    targetPlayerId: string,
+    interventionType: string,
+    cardId: string,
+  ): Promise<any> {
+    // TODO: Implement intervention logic
+    return { interventionType, targetPlayerId, cardId };
+  }*/
+
+  /*async handleInterventionResponse(
+    gameId: string,
+    playerId: string,
+    interventionId: string,
+    response: 'accept' | 'decline',
+  ): Promise<any> {
+    // TODO: Implement intervention response logic
+    return { interventionId, response };
   }
 
-  // Event listeners
-  async handleStartGame(gameId: string): Promise<void> {
-    // Initialize deck
-    // Start game logic
-    // TODO: Emit event for game start
-    // this.eventEmitter.emit('game.start', game);
-  }
-
-  async handleStartRound(gameId: string): Promise<void> {
-    // Next round logic
-    // TODO: Emit event for game round start
-    // this.eventEmitter.emit('game.round.start', game);
-  }
-
-  async handleStartTour(gameId: string): Promise<void> {
-    // Next turn logic
-    // TODO: Emit event for game turn start
-    // this.eventEmitter.emit('game.turn.start', gameId);
+  /*async endInterventionPhase(gameId: string): Promise<any> {
+    const game = await this.findOne(gameId);
+    // TODO: Implement intervention phase end logic
+    return { gameState: game.gameState };
   }*/
 }

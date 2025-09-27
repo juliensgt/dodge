@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { ActionType } from '../../enums/action-type.enum';
 
+export type CardWithId = Card & { _id: Types.ObjectId };
 export type CardDocument = HydratedDocument<Card>;
 
 @Schema({ collection: 'cards' })

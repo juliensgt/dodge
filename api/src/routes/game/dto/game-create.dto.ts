@@ -2,14 +2,7 @@ import { GameState } from '../../../enums/game-state.enum';
 import { Player } from '../../players/player.schema';
 import { Card } from '../../card/card.schema';
 import type { GameOptionsBo } from '../game.schema';
-import {
-  IsOptional,
-  IsArray,
-  IsEnum,
-  IsObject,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsOptional, IsArray, IsEnum, IsObject, IsNumber, IsString } from 'class-validator';
 
 export class GameCreateDto {
   @IsOptional()

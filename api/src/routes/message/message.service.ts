@@ -6,9 +6,7 @@ import { ErrorEnum } from '../../enums/errors/error.enum';
 
 @Injectable()
 export class MessageService {
-  constructor(
-    @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
-  ) {}
+  constructor(@InjectModel(Message.name) private messageModel: Model<MessageDocument>) {}
 
   async findAll(): Promise<Message[]> {
     return this.messageModel.find();
@@ -17,10 +15,7 @@ export class MessageService {
   async findOne(id: string): Promise<Message> {
     const message = await this.messageModel.findById(id);
     if (!message) {
-      throw new NotFoundException(
-        'Message not found',
-        ErrorEnum['message/not-found'],
-      );
+      throw new NotFoundException('Message not found', ErrorEnum['message/not-found']);
     }
     return message;
   }

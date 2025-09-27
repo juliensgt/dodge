@@ -22,10 +22,7 @@ export class UserService {
   async findOne(id: string): Promise<User> {
     const user = await this.userModel.findById(id);
     if (!user) {
-      throw new NotFoundException(
-        'User not found',
-        ErrorEnum['user/not-found'],
-      );
+      throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
     }
     return user;
   }

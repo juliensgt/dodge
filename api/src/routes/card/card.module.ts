@@ -5,9 +5,7 @@ import { CardService } from './card.service';
 import { Card, CardSchema } from './card.schema';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }])],
   controllers: [CardController],
   providers: [CardService],
   exports: [CardService],
