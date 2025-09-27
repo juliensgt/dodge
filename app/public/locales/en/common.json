@@ -1,14 +1,10 @@
 {
-    "welcome": "Welcome to Dodge App",
-    "getStarted": "Get started by editing",
-    "saveAndSee": "Save and see your changes instantly",
-    "deployNow": "Deploy now",
-    "readDocs": "Read our docs",
-    "learn": "Learn",
-    "examples": "Examples",
-    "goToNextjs": "Go to nextjs.org →",
-    "language": "Language",
-    "hello": "Hello",
-    "goodbye": "Goodbye",
-    "thankYou": "Thank you"
+    "Nom du joueur": "Player name",
+    "Rejoignez une partie et défiez vos amis !": "Join a game and challenge your friends!",
+    "Entrez votre nom": "Enter your name",
+    "Rejoindre la partie": "Join the game",
+    "Reset de la partie": "Reset the game",
+    "Sélectionner un skin de carte": "Select a card skin",
+    "Skins": "Skins",
+    "Veuillez entrer un nom de joueur": "Please enter a player name"
 }
