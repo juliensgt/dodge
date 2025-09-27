@@ -1,8 +1,6 @@
-import { useEffect } from "react";
-import CardComponent from "@/components/game/cards/card/Card";
-import { useGameStore } from "@/store/game";
+import { useGameStore } from "@/store/game/game";
 import Countdown from "@/components/game/countdown/Countdown";
-import { useCardStore, Card } from "@/store/card";
+import { useCardStore } from "@/store/card";
 import { useCountdownStore } from "@/store/countdown";
 
 export default function CoupOeilBoard() {
@@ -11,23 +9,10 @@ export default function CoupOeilBoard() {
   const countdownStore = useCountdownStore();
 
   const playerId = gameStore.currentPlayerId;
-  const cards = cardStore.cards[playerId] || [];
   const time = countdownStore.time;
 
-  useEffect(() => {
-    gameStore.distributionCoupOeil();
-  }, [gameStore]);
-
-  const handleCardClick = (cardIndex: number) => {
-    const success = cardStore.flipCardPlayer(playerId, cardIndex);
-    if (!success) {
-      // TODO: Implémenter le système de notifications
-      console.error("Une erreur est survenue. Veuillez contacter le support.");
-    }
-  };
-
   return (
-    <div className="relative w-full h-full rounded-5 overflow-hidden select-none">
+    <div className="relative w-full h-full rounded-5 overflow-hidden">
       <Countdown
         visible={true}
         subtitle="Regardez 2 cartes dans votre main et retenez-les !"

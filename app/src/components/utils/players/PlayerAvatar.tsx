@@ -1,4 +1,4 @@
-import { Player } from "@/store/game";
+import { Player } from "@/store/game/player";
 import { useGradient } from "@/hooks/useGradient";
 import { Size } from "@/scripts/references/playerLayouts";
 interface PlayerAvatarProps {

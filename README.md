@@ -161,7 +161,6 @@ npx cap open android
 
 - **Port**: 3001 (default NestJS port)
 - **Build output**: `api/dist/`
-- **Testing**: Jest with coverage reports
 
 ### Mobile Configuration
 

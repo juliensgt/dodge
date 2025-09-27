@@ -4,19 +4,17 @@ import GameTabs from "@/components/game/tabs/GameTabs";
 import ResizableSidebar from "@/components/utils/sidebar/ResizableSidebar";
 import MobileSidebarButton from "@/components/utils/sidebar/MobileSidebarButton";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useGameStore } from "@/store/game";
 
 export default function BoardGame() {
   const [sidebarWidth, setSidebarWidth] = useState(25);
   const isMobile = useIsMobile();
-  const game = useGameStore();
 
   const handleSidebarToggle = () => {
     setSidebarWidth(sidebarWidth > 0 ? 0 : 25);
   };
 
   return (
-    <div className="h-screen w-full select-none">
+    <div className="h-screen w-full">
       {isMobile && (
         <MobileSidebarButton isOpen={false} onToggle={handleSidebarToggle} />
       )}

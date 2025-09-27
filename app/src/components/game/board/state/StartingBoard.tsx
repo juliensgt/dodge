@@ -1,4 +1,4 @@
-import { useGameStore } from "@/store/game";
+import { useGameStore } from "@/store/game/game";
 import Countdown from "@/components/game/countdown/Countdown";
 import PlayerVisitCard from "@/components/utils/players/PlayerVisitCard";
 import PlayerSkeletonCard from "@/components/utils/players/PlayerVisitCardSkeleton";
@@ -26,15 +26,11 @@ export default function StartingBoard() {
   };
 
   return (
-    <div className="font-['MT'] relative w-full h-full rounded-5 overflow-hidden select-none">
-      {/* Countdown en header */}
+    <div className="relative w-full h-full rounded-5 overflow-hidden">
       <Countdown visible={true} title={t("Salle d'attente")} time={time} />
 
-      {/* Contenu principal avec espacement amélioré */}
       <div className="flex flex-col justify-center h-[calc(100%-20vh)] md:h-[calc(100%-25vh)] px-2 md:px-4">
-        {/* Affichage des informations du début de la partie */}
         <div className="flex flex-row justify-between items-center mb-4 md:mb-6">
-          {/* Bouton quitter la partie */}
           <ActionButton
             onClick={leaveGame}
             label="Quitter la partie"
@@ -42,7 +38,6 @@ export default function StartingBoard() {
             disabled={true}
           />
 
-          {/* Info de la partie avec design amélioré */}
           <div className="text-center">
             <div className="bg-[var(--text-color)]/10 backdrop-blur-sm rounded-lg md:rounded-xl px-2 py-1.5 md:px-6 md:py-3 border border-[var(--text-color)]/5">
               <span className="text-[var(--text-color)] text-xs md:text-sm font-medium uppercase tracking-wide hidden md:block">
@@ -54,7 +49,6 @@ export default function StartingBoard() {
             </div>
           </div>
 
-          {/* Bouton règles de la partie */}
           <ActionButton
             onClick={openRules}
             label="Règles de la partie"
@@ -63,7 +57,6 @@ export default function StartingBoard() {
           />
         </div>
 
-        {/* Affichage des joueurs de la partie */}
         <div className="mx-2 md:mx-[10%] gap-2 md:gap-2.5 flex flex-row flex-wrap justify-center md:justify-start content-around">
           {Array.from({ length: maxPlayers }, (_, index) => {
             const player = game.players[index];
@@ -81,7 +74,6 @@ export default function StartingBoard() {
             );
           })}
         </div>
-        {/* Compteur de joueurs avec design amélioré */}
         <div className="text-center mt-4 md:mt-6">
           <div className="inline-flex items-center gap-2 md:gap-3 bg-[var(--action-chat-background-color)]/30 backdrop-blur-sm rounded-full px-4 py-2 md:px-6 md:py-3 border border-[var(--action-chat-border-color)]/20 shadow-lg">
             <div className="flex items-center gap-1.5 md:gap-2">

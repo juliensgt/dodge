@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Countdown from "@/components/game/countdown/Countdown";
-import { useGameStore, Player } from "@/store/game";
 import PlayerRankEndRound from "@/components/utils/rank/PlayerRankEndRound";
 import ProgressRank from "@/components/utils/rank/ProgressRank";
 import PlayerEvolutionEndRound from "@/components/utils/rank/PlayerEvolutionEndRound";
+import { useGameStore } from "@/store/game/game";
+import { Player } from "@/store/game/player";
 
 export default function EndRoundBoard() {
   const game = useGameStore();
@@ -41,7 +42,7 @@ export default function EndRoundBoard() {
   }, [startAutoSlide]);
 
   return (
-    <div className="end-round-board font-['MT'] relative w-full h-full rounded-5 bg-[var(--primary-color)] overflow-hidden select-none">
+    <div className="end-round-board relative w-full h-full rounded-5 bg-[var(--primary-color)] overflow-hidden select-none">
       {/* HEADER */}
       <Countdown visible={true} title="Fin de la manche" time={0} />
 

@@ -1,4 +1,4 @@
-import { useGameStore } from "@/store/game";
+import { useGameStore } from "@/store/game/game";
 import StartingBoard from "./state/StartingBoard";
 import CoupOeilBoard from "./state/CoupOeilBoard";
 import InGameBoard from "./state/InGameBoard";
@@ -23,7 +23,7 @@ export default function Board() {
   };
 
   return (
-    <div className="h-[calc(100vh-20px)] w-full overflow-hidden rounded-lg select-none">
+    <div className="h-[calc(100vh-20px)] w-full overflow-hidden rounded-lg select-none font-['MT']">
       {renderBoardState()}
     </div>
   );

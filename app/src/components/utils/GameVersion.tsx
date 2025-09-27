@@ -1,4 +1,4 @@
-import { useGameStore } from "@/store/game";
+import { useGameStore } from "@/store/game/game";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function GameVersion() {

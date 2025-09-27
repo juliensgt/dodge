@@ -62,7 +62,7 @@ export default function NeonSkin({ size = "small" }: NeonSkinProps) {
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-black/75 font-['MT']`}
+            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-black/75`}
             style={{
               textShadow:
                 "0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff",
