@@ -75,6 +75,7 @@ export default function Dashboard() {
         className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
         <SocketStatus />
+        <AuthTest />
         <div className="absolute top-4 right-4 flex gap-4">
           <ThemeSelector />
           <LanguageSelector />
