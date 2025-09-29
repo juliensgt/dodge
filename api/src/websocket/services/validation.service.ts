@@ -1,21 +1,25 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { GameService } from '../../routes/game/game.service';
 import { ErrorEnum } from '../../enums/errors/error.enum';
-import { PlayerWithId } from 'src/routes/players/player.schema';
+//import { PlayerWithId } from 'src/routes/players/player.schema';
 import { GameState } from 'src/enums/game-state.enum';
+import { UserService } from '../../routes/user/user.service';
 
 @Injectable()
 export class ValidationService {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UserService,
+  ) {}
 
-  async validatePlayerTurn(gameId: string, playerId: string): Promise<void> {
+  /*async validatePlayerTurn(gameId: string, playerId: string): Promise<void> {
     const isPlayerTurn = await this.gameService.isTourOfPlayer(gameId, playerId);
     if (!isPlayerTurn) {
       throw new BadRequestException('Not your turn', ErrorEnum['game/not-your-turn']);
     }
-  }
+  }*/
 
-  async validateIntervention(
+  /*async validateIntervention(
     gameId: string,
     playerId: string,
     targetPlayerId: string,
@@ -39,7 +43,7 @@ export class ValidationService {
     if (!targetPlayer) {
       throw new BadRequestException('Target player not found', ErrorEnum['player/not-found']);
     }
-  }
+  }*/
 
   async validateInterventionResponse() //gameId: string,
   //playerId: string,
@@ -58,6 +62,20 @@ export class ValidationService {
         `Game must be in ${requiredState} state`,
         ErrorEnum['game/invalid-state'],
       );
+    }
+  }
+
+  async validateGameId(gameId: string): Promise<void> {
+    const game = await this.gameService.findOne(gameId);
+    if (!game) {
+      throw new BadRequestException('Game not found', ErrorEnum['game/not-found']);
+    }
+  }
+
+  async validateUserId(userId: string): Promise<void> {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new BadRequestException('User not found', ErrorEnum['user/not-found']);
     }
   }
 }

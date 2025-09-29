@@ -1,7 +1,29 @@
+import { IsString, IsOptional, IsEmail, IsObject } from 'class-validator';
+
 export class UserCreateDto {
+  @IsString()
+  supabaseId: string;
+
+  @IsString()
   name: string;
-  email: string;
-  password: string;
-  language: string;
-  skinCards: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  language?: string;
+
+  @IsOptional()
+  @IsString()
+  skinCards?: string;
+
+  @IsOptional()
+  @IsObject()
+  userMetadata?: Record<string, any>;
+
+  @IsOptional()
+  @IsObject()
+  appMetadata?: Record<string, any>;
 }

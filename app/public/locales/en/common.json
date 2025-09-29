@@ -6,5 +6,6 @@
     "Reset de la partie": "Reset the game",
     "Sélectionner un skin de carte": "Select a card skin",
     "Skins": "Skins",
-    "Veuillez entrer un nom de joueur": "Please enter a player name"
+    "Veuillez entrer un nom de joueur": "Please enter a player name",
+    "Erreur lors de la connexion au jeu": "Error connecting to the game"
 }

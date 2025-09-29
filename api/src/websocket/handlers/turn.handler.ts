@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GameService } from '../../routes/game/game.service';
 import { BroadcastService } from '../services/broadcast.service';
 import { ValidationService } from '../services/validation.service';
-import { TurnEvents } from '../events/turn.events';
+//import { TurnEvents } from '../events/turn.events';
 
 @Injectable()
 export class TurnHandler {
@@ -20,7 +20,7 @@ export class TurnHandler {
    * @param playerId - ID du joueur qui fait l'action
    * @param choice - Choix du joueur: 'deck' ou 'defausse'
    */
-  async handleGetCardInDeckOrDefausse(
+  /*async handleGetCardInDeckOrDefausse(
     gameId: string,
     playerId: string,
     choice: 'deck' | 'defausse',
@@ -39,7 +39,7 @@ export class TurnHandler {
     });
 
     return { success: true, choice };
-  }
+  }*/
 
   /**
    * WORKFLOW ÉTAPE 3A: SWITCH_WITH_DECK
@@ -52,7 +52,7 @@ export class TurnHandler {
    * @param action - Type d'action: 'deckToDefausse' ou 'deckToPlayer'
    * @param targetCardId - ID de la carte à échanger (requis pour deckToPlayer)
    */
-  async handleSwitchWithDeck(
+  /*async handleSwitchWithDeck(
     gameId: string,
     playerId: string,
     //action: 'deckToDefausse' | 'deckToPlayer',
@@ -62,15 +62,15 @@ export class TurnHandler {
     await this.validationService.validatePlayerTurn(gameId, playerId);
 
     // Logique métier: effectuer l'échange avec le deck
-    /*const result: any = await this.gameService.switchWithDeck(
+    const result: any = await this.gameService.switchWithDeck(
       gameId,
       playerId,
       action,
       targetCardId,
-    );*/
+    );
 
     // Broadcast: notifier tous les joueurs de l'échange effectué
-    /*this.broadcastService.broadcastToGame(
+    this.broadcastService.broadcastToGame(
       gameId,
       TurnEvents.CARD_SWITCHED as string,
       {
@@ -78,10 +78,10 @@ export class TurnHandler {
         action,
         result,
       },
-    );*/
+    );
 
     return { success: true, result: null };
-  }
+  }*/
 
   /**
    * WORKFLOW ÉTAPE 3B: SWITCH_WITH_DEFAUSSE
@@ -91,7 +91,7 @@ export class TurnHandler {
    * @param playerId - ID du joueur qui fait l'action
    * @param targetCardId - ID de la carte de sa main à échanger
    */
-  async handleSwitchWithDefausse(
+  /*async handleSwitchWithDefausse(
     gameId: string,
     playerId: string,
     //targetCardId: string,
@@ -100,11 +100,11 @@ export class TurnHandler {
     await this.validationService.validatePlayerTurn(gameId, playerId);
 
     // Logique métier: effectuer l'échange avec la défausse
-    /*const result: any = await this.gameService.switchWithDefausse(
+    const result: any = await this.gameService.switchWithDefausse(
       gameId,
       playerId,
       targetCardId,
-    );*/
+    );
 
     // Broadcast: notifier tous les joueurs de l'échange effectué
     /*  this.broadcastService.broadcastToGame(
@@ -115,10 +115,10 @@ export class TurnHandler {
         action: 'defausseToPlayer',
         result,
       },
-    );*/
+    );
 
     return { success: true, result: null };
-  }
+  }*/
 
   /**
    * WORKFLOW ÉTAPE 7: FIN DU TOUR
@@ -127,23 +127,23 @@ export class TurnHandler {
    * @param gameId - ID de la partie
    * @param playerId - ID du joueur qui termine son tour
    */
-  async handleEndTurn(gameId: string, playerId: string) {
+  /*async handleEndTurn(gameId: string, playerId: string) {
     // Validation: vérifier que c'est bien le tour du joueur
     await this.validationService.validatePlayerTurn(gameId, playerId);
 
     // Logique métier: passer au joueur suivant
-    //const nextPlayer: string = await this.gameService.endTurn(gameId, playerId);
+    const nextPlayer: string = await this.gameService.endTurn(gameId, playerId);
 
     // Broadcast: notifier tous les joueurs du changement de tour
-    /*this.broadcastService.broadcastToGame(
+    this.broadcastService.broadcastToGame(
       gameId,
       TurnEvents.TURN_ENDED as string,
       {
         previousPlayerId: playerId,
         nextPlayerId: nextPlayer,
       },
-    );*/
+    );
 
     return { success: true, nextPlayer: null };
-  }
+  } */
 }

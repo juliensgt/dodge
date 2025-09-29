@@ -9,8 +9,7 @@
     "dev": "concurrently \"yarn dev:api\" \"yarn dev:app\"",
     "dev:api": "yarn --cwd api start:dev",
     "dev:app": "yarn --cwd app dev",
-    "build": "yarn --cwd app build && echo 'Backend build si nécessaire'",
-    "install:all": "yarn install"
+    "build": "yarn --cwd app build && echo 'Backend build si nécessaire'"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

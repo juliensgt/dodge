@@ -4,19 +4,20 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameService } from '../routes/game/game.service';
 import { MessageService } from '../routes/message/message.service';
-import { PlayerWithId } from '../routes/players/player.schema';
 import { TurnHandler } from './handlers/turn.handler';
 import { CardHandler } from './handlers/card.handler';
 import { InterventionHandler } from './handlers/intervention.handler';
 import { BroadcastService } from './services/broadcast.service';
 import { GameEvents } from './events/game.events';
+import { ValidationService } from './services/validation.service';
+import { UserService } from '../routes/user/user.service';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -33,40 +34,51 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private readonly cardHandler: CardHandler,
     private readonly interventionHandler: InterventionHandler,
     private readonly broadcastService: BroadcastService,
+    private readonly validationService: ValidationService,
+    private readonly userService: UserService,
   ) {}
 
   afterInit(server: Server) {
     this.broadcastService.setServer(server);
   }
 
-  handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
-  }
-
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('joinGame')
-  async handleJoinGame(
-    @MessageBody() data: { gameId: string; userId: string },
-    @ConnectedSocket() client: Socket,
-  ) {
+  handleConnection(client: Socket) {
+    console.log(`Client connected: ${client.id}`);
+  }
+
+  /*@SubscribeMessage('joinGame')
+  async handleJoinGame(@MessageBody() data: JoinGameRequestDto, @ConnectedSocket() client: Socket) {
+    await this.validationService.validateGameId(data.gameId);
+
+    // Use userId from socket connection if available, otherwise use the one from data
+    const userId = (client as any).user?.id || data.userId;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    await this.validationService.validateUserId(userId);
+
+    const user = await this.userService.findOne(userId);
+
     const player = await this.gameService.addPlayer({
       gameId: data.gameId,
-      userId: data.userId,
+      userId: userId,
       sessionId: client.id,
     });
     await client.join(data.gameId);
 
     // Notify all players in the game
     this.broadcastService.broadcastToGame(data.gameId, GameEvents.PLAYER_JOINED, {
-      playerId: (player as PlayerWithId)._id,
-      userId: data.userId,
+      playerId: (player as PlayerWithId)._id.toString(),
+      userId: userId,
     });
 
-    return { success: true, playerId: (player as PlayerWithId)._id };
-  }
+    return { success: true, player: player };
+  }*/
 
   @SubscribeMessage('leaveGame')
   async handleLeaveGame(
@@ -94,7 +106,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     });
 
     // Broadcast message to all players in the game
-    this.server.to(data.gameId).emit('newMessage', message);
+    this.server.to(data.gameId).emit('chat:new-message', message);
 
     return { success: true, message };
   }
