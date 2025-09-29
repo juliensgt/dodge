@@ -1,19 +1,13 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { AuthLevel } from "@/types/auth/auth";
-
-interface AuthGuardProps {
-  children: React.ReactNode;
-  level: AuthLevel;
-  fallback?: React.ReactNode;
-}
+import { AuthLevel, AuthGuardProps } from "@/types/auth/auth";
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({
   children,
   level,
   fallback = null,
 }) => {
-  const { isUserConnected, isGameReady, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -29,9 +23,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       case AuthLevel.PUBLIC:
         return true;
       case AuthLevel.USER:
-        return isUserConnected;
-      case AuthLevel.GAME:
-        return isGameReady;
+        return isAuthenticated;
       default:
         return false;
     }

@@ -1,7 +1,6 @@
 export enum AuthLevel {
   PUBLIC = "public",
   USER = "user",
-  GAME = "game",
 }
 
 export interface AuthConfig {
@@ -11,9 +10,17 @@ export interface AuthConfig {
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  isUserConnected: boolean;
-  isGameReady: boolean;
-  socketId: string | null;
   loading: boolean;
   logout: () => Promise<void>;
+}
+
+export interface AuthProviderProps {
+  children: React.ReactNode;
+  requiredLevel?: AuthLevel;
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  level: AuthLevel;
+  fallback?: React.ReactNode;
 }

@@ -25,7 +25,7 @@ export default function Login() {
     const checkAuth = async () => {
       const isAuthenticated = await authService.isAuthenticated();
       if (isAuthenticated) {
-        router.push("/dashboard");
+        router.push("/app");
       }
     };
     checkAuth();
@@ -44,7 +44,7 @@ export default function Login() {
       } else {
         await authService.signInWithEmail(email, password);
       }
-      router.push("/dashboard");
+      router.push("/app");
     } catch {
       setError(t("Une erreur est survenue"));
     } finally {

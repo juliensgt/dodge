@@ -1,16 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { socketService } from "@/services/socket.service";
+import { socketService } from "@/services/sockets/socket.service";
 import { authService } from "@/services/auth.service";
 import { useGameStore } from "@/store/game/game";
-
-interface SocketContextType {
-  isSocketConnected: boolean;
-  socketId: string | null;
-  connect: () => Promise<void>;
-  disconnect: () => void;
-  updateUser: (userId: string, userName?: string) => void;
-  initializeUser: () => Promise<string | null>;
-}
+import {
+  SocketContextType,
+  SocketProviderProps,
+} from "@/types/socket/socket.type";
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
@@ -22,19 +17,10 @@ export const useSocket = () => {
   return context;
 };
 
-interface SocketProviderProps {
-  children: React.ReactNode;
-  autoConnect?: boolean;
-}
-
-export const SocketProvider: React.FC<SocketProviderProps> = ({
-  children,
-  autoConnect = false,
-}) => {
+export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
-  const { setupSocketListeners, cleanupSocketListeners, setSocketConnected } =
-    useGameStore();
+  const { setSocketConnected } = useGameStore();
 
   const connect = async () => {
     if (!socketService.isSocketConnected()) {
@@ -69,18 +55,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   };
 
   useEffect(() => {
-    // Only auto-connect if enabled
-    if (autoConnect) {
-      const initializeAndConnect = async () => {
-        await initializeUser();
-        await connect();
-      };
-      initializeAndConnect();
-    }
-
-    // Setup socket listeners when provider mounts
-    setupSocketListeners();
-
     // Listen for connection status changes
     const checkConnection = () => {
       const connected = socketService.isSocketConnected();
@@ -99,14 +73,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
     // Cleanup on unmount
     return () => {
       clearInterval(interval);
-      cleanupSocketListeners();
     };
-  }, [
-    autoConnect,
-    setupSocketListeners,
-    cleanupSocketListeners,
-    setSocketConnected,
-  ]);
+  }, [setSocketConnected]);
 
   const value: SocketContextType = {
     isSocketConnected,

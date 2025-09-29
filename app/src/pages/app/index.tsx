@@ -2,59 +2,34 @@ import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
 import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import CardSkinSelector from "@/components/utils/selectors/CardSkinSelector";
 import Modal from "@/components/utils/modals/Modal";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useGameConnection } from "@/hooks/useGameConnection";
-import { useSocket } from "@/contexts/SocketProvider";
+import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
-import SocketStatus from "@/components/utils/SocketStatus";
-import { AuthTest } from "@/components/auth/AuthTest";
+import { AuthStatus } from "@/components/auth/AuthStatus";
 
 export default function Dashboard() {
   const [playerName, setPlayerName] = useState("");
   const [isSkinSelectorOpen, setIsSkinSelectorOpen] = useState(false);
   const { t } = useTranslation();
   const { getGradient, GradientType } = useGradient();
-  const { joinGame } = useGameConnection();
-  const { connect, initializeUser } = useSocket();
   const { logout } = useAuth();
+  const router = useRouter();
 
-  // Initialize user and connect when component mounts
-  useEffect(() => {
-    const initUserAndConnect = async () => {
-      const userId = await initializeUser();
-      if (userId) {
-        await connect();
-      }
-    };
-    initUserAndConnect();
-  }, [initializeUser, connect]);
-
-  const handleJoinGame = async (playerName: string) => {
+  const handleJoinGame = (playerName: string) => {
     if (!playerName.trim()) {
       alert(t("Veuillez entrer un nom de joueur"));
       return;
     }
 
-    try {
-      await joinGame(undefined, playerName);
-    } catch (error) {
-      console.error("Failed to join game:", error);
-      alert(t("Erreur lors de la connexion au jeu"));
-    }
-  };
-
-  const clearGame = () => {
-    // Clear stored game data
-    localStorage.removeItem("gameId");
-    localStorage.removeItem("playerId");
-    localStorage.removeItem("playerName");
-    console.log("Game data cleared");
+    // Redirect to game page - the game will handle player creation via WebSocket
+    const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
+    router.push(`/app/game/${gameId}`);
   };
 
   const openSkinSelector = () => {
@@ -74,8 +49,7 @@ export default function Dashboard() {
       <div
         className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
-        <SocketStatus />
-        <AuthTest />
+        <AuthStatus />
         <div className="absolute top-4 right-4 flex gap-4">
           <ThemeSelector />
           <LanguageSelector />
@@ -118,12 +92,6 @@ export default function Dashboard() {
                 onClick={() => handleJoinGame(playerName)}
                 label={t("Rejoindre la partie")}
                 gradient={{ gradientType: GradientType.PRIMARY }}
-              />
-
-              <ActionButton
-                onClick={() => clearGame()}
-                label={t("Reset de la partie")}
-                color={{ color: ColorType.TRANSPARENT }}
               />
             </div>
           </div>

@@ -14,7 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <LanguageProvider>
       <ThemeProvider>
-        <SocketProvider autoConnect={false}>
+        <SocketProvider>
           <AuthProvider requiredLevel={AuthLevel.PUBLIC}>
             <Head>
               <link rel="icon" href="/favicon.ico" />

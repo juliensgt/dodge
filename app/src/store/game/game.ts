@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { GameState } from "./types";
 import { createGameActions, GameActions } from "./actions";
-import { createSocketActions, SocketActions } from "./socket-actions";
 
 // Export types for external use
 export type {
@@ -14,11 +13,10 @@ export type {
 } from "./types";
 
 // Combined store type
-type GameStore = GameState & GameActions & SocketActions;
+type GameStore = GameState & GameActions;
 
 const useGameStore = create<GameStore>((set, get, store) => {
   const gameActions = createGameActions(set, get, store);
-  const socketActions = createSocketActions(set, get, store);
 
   return {
     // Initial state
@@ -41,9 +39,6 @@ const useGameStore = create<GameStore>((set, get, store) => {
 
     // Game actions
     ...gameActions,
-
-    // Socket actions
-    ...socketActions,
   };
 });
 

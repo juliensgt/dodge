@@ -5,7 +5,7 @@ import { useGradient } from "@/hooks/useGradient";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/router";
-import { AuthTest } from "@/components/auth/AuthTest";
+import { AuthStatus } from "@/components/auth/AuthStatus";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { AuthGuard } from "@/components/auth/AuthGuard";
@@ -20,7 +20,7 @@ export default function Welcome() {
   useEffect(() => {
     if (!loading) {
       if (isAuthenticated) {
-        // User is authenticated, redirect to dashboard
+        // User is authenticated, redirect to app
         router.push("/app");
       }
     }
@@ -39,7 +39,7 @@ export default function Welcome() {
       <div
         className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
-        <AuthTest />
+        <AuthStatus />
         <div className="absolute top-4 right-4 flex gap-4">
           <ThemeSelector />
           <LanguageSelector />
