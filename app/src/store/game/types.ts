@@ -4,12 +4,6 @@ export interface GameOptions {
   maxPlayers: number;
 }
 
-export interface Game {
-  id: string;
-  gameState: string;
-  round: number;
-}
-
 export interface ActionPlayer {
   time: number;
   countdownState: boolean;
@@ -37,16 +31,16 @@ export interface Player {
   skinCards: string;
 }
 
-export interface GameState {
+export interface Game {
+  id: string;
+  state: string;
+  round: number;
+  players: Player[];
   currentPlayerId: string;
   playerIdWhoPlays: string;
   focusMode: boolean;
   actionQueue: ActionQueueItem[];
   currentAction: ActionPlayer;
   actionsHistory: ActionsHistory;
-  game: Game;
   options: GameOptions;
-  players: Player[];
-  gameId: string;
-  socketConnected: boolean;
 }

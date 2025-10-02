@@ -1,31 +1,35 @@
 import { StateCreator } from "zustand";
-import { GameState, Player, Game } from "./types";
+import { Game, Player } from "./types";
 
 export interface GameActions {
   // Game state management
-  setGameState: (state: string) => void;
-  setFocusMode: (state: boolean) => void;
-  setGameId: (gameId: string) => void;
-  setSocketConnected: (connected: boolean) => void;
+  setGame: (game: Game, playerCurrentId?: string) => void;
 
   // Player management
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
   getPlayerById: (playerId: string) => Player | undefined;
 
-  // Game initialization
-  initGame: (currentPlayerId: string, game: Game) => void;
-
   // Utility functions
   isCurrentPlayerIsPlaying: () => boolean;
   getReorderedPlayers: (currentPlayerId: string) => Player[];
 }
 
-export const createGameActions: StateCreator<GameState, [], [], GameActions> = (
+export const createGameActions: StateCreator<Game, [], [], GameActions> = (
   set,
   get,
   store
 ) => ({
+  setGame: (game: Game, playerCurrentId?: string) => {
+    set({
+      id: game.id,
+      state: game.state,
+      round: game.round,
+      players: game.players,
+      currentPlayerId: playerCurrentId,
+    });
+  },
+
   setGameState: (state: string) => {
     switch (state) {
       case "IN_GAME":
@@ -35,18 +39,6 @@ export const createGameActions: StateCreator<GameState, [], [], GameActions> = (
       default:
         break;
     }
-  },
-
-  setFocusMode: (state: boolean) => {
-    set({ focusMode: state });
-  },
-
-  setGameId: (gameId: string) => {
-    set({ gameId });
-  },
-
-  setSocketConnected: (connected: boolean) => {
-    set({ socketConnected: connected });
   },
 
   addPlayer: (player: Player) => {
@@ -82,11 +74,9 @@ export const createGameActions: StateCreator<GameState, [], [], GameActions> = (
     set({
       currentPlayerId,
       players: [],
-      game: {
-        id: game.id,
-        gameState: game.gameState,
-        round: game.round,
-      },
+      id: game.id,
+      state: game.state,
+      round: game.round,
       options: {
         timeToPlay: 0, //game.options.timeToPlay,
         nbCards: 0, //game.options.nbCards,
@@ -102,9 +92,12 @@ export const createGameActions: StateCreator<GameState, [], [], GameActions> = (
     });
 
     // Ajouter tous les joueurs
-    /*game.players.forEach((player: Player) => {
-      get().addPlayer(player);
-    });*/
+    game.players.forEach((player: Player) => {
+      set((state) => {
+        const newPlayers = [...state.players, player];
+        return { players: newPlayers };
+      });
+    });
   },
 
   getReorderedPlayers: (currentPlayerId: string) => {

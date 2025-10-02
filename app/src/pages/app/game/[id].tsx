@@ -14,7 +14,7 @@ export default function Game() {
   const router = useRouter();
   const { id: gameId } = router.query;
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     gameService

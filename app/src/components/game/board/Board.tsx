@@ -5,10 +5,10 @@ import InGameBoard from "./state/InGameBoard";
 import EndRoundBoard from "./state/EndRoundBoard";
 
 export default function Board() {
-  const { game } = useGameStore();
+  const { state } = useGameStore();
 
   const renderBoardState = () => {
-    switch (game.gameState) {
+    switch (state) {
       case "WAITING":
         return <InGameBoard />;
       case "COUP_OEIL":

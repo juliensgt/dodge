@@ -6,10 +6,16 @@ import { GameWithId } from './game.schema';
 import { GameState } from '../../enums/game-state.enum';
 import { defaultGameCreateDto, GameCreateDto } from './dto/game-create.dto';
 import { ErrorEnum } from '../../enums/errors/error.enum';
+import { JoinGameResponse } from 'src/websocket/types/game.types';
+import { PlayerService } from '../players/player.service';
+import { PlayerCreateDto } from '../players/dto/player-create.dto';
 
 @Injectable()
 export class GameService {
-  constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
+  constructor(
+    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
+    private playerService: PlayerService,
+  ) {}
 
   async create(gameCreateDto: GameCreateDto): Promise<Game> {
     const game = new this.gameModel(gameCreateDto || defaultGameCreateDto);
@@ -41,18 +47,23 @@ export class GameService {
     return games;
   }
 
-  async addPlayer(gameId: string) {
+  async addPlayer(gameId: string, userId: string): Promise<JoinGameResponse> {
     // TODO :Verify if can add player
+    const playerCreateDto: PlayerCreateDto = {
+      gameId: gameId,
+      userId: userId,
+    };
 
     // Create the player
-    const playerData = undefined;
-
-    // TODO : Broadcast to the player : game data
+    const playerData = await this.playerService.create(playerCreateDto);
     const gameData = await this.findOne(gameId);
+
+    if (!playerData || !gameData) {
+      throw new Error('Failed to add player to game');
+    }
 
     // Return the response
     return {
-      success: true,
       gameData,
       playerData,
     };

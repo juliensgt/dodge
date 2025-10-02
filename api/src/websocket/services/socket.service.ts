@@ -78,23 +78,28 @@ class SocketService {
   }
 
   // Broadcast à un joueur spécifique
-  broadcastToPlayer(gameId: string, playerId: string, event: string, data: BroadcastData): void {
+  broadcastToPlayer(gameId: string, userId: string, event: string, data: BroadcastData): void {
     if (!this.server) {
       throw new Error('WebSocket server not initialized');
     }
 
+    console.log('Broadcast to player: ', this.connections);
+    console.log('Game ID: ', gameId);
+    console.log('User ID: ', userId);
+
     // Trouver le socket du joueur spécifique
     const playerSocket = this.connections.find(
-      (conn) =>
-        conn.gameId === gameId && conn.type === ConnectionType.PLAYER && conn.playerId === playerId,
+      (c) => c.gameId === gameId && c.type === ConnectionType.PLAYER && c.userId === userId,
     );
+
+    console.log('Player socket: ', playerSocket);
 
     if (playerSocket) {
       const socket = this.server.sockets.sockets.get(playerSocket.socketId.toString());
       if (socket) {
         socket.emit(event, {
           ...data,
-          targetPlayerId: playerId,
+          targetUserId: userId,
           timestamp: Date.now(),
         });
       }

@@ -3,12 +3,12 @@ import {
   WebSocketServer,
   OnGatewayDisconnect,
   OnGatewayConnection,
+  OnGatewayInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Types } from 'mongoose';
 import { socketService } from './services/socket.service';
 import { GameService } from 'src/routes/game/game.service';
-import { ConnectionType, GameConnection } from './types/connection.types';
+import { ConnectionType } from './types/connection.types';
 import { GameEvents } from './events/game.events';
 
 @WebSocketGateway({
@@ -16,12 +16,15 @@ import { GameEvents } from './events/game.events';
     origin: '*',
   },
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly gameService: GameService) {
-    socketService.setServer(this.server);
+  constructor(private readonly gameService: GameService) {}
+
+  afterInit(server: Server) {
+    console.log('WebSocket Gateway initialized');
+    socketService.setServer(server);
   }
 
   handleDisconnect(client: Socket) {
@@ -30,25 +33,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleConnection(client: Socket) {
-    const userId = new Types.ObjectId(client.handshake.query.userId as string);
+    const userId = client.handshake.query.userId as string;
     const gameId = client.handshake.query.gameId as string;
 
-    const { playerData } = await this.gameService.addPlayer(gameId);
+    const response = await this.gameService.addPlayer(gameId, userId);
 
-    const gameConnection: GameConnection = {
+    // Register the connection
+    socketService.registerConnection({
       socketId: client.id,
       type: ConnectionType.PLAYER,
       gameId: gameId,
       userId: userId,
-    };
+    });
 
-    console.log(`User joined game: ${userId.toString()}`);
-
-    // Register the connection
-    socketService.registerConnection(gameConnection);
-
-    // Broadcast to all players the join game
-    socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, { playerData });
+    // Send the player data to the client
+    socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, response);
   }
 
   /*@SubscribeMessage('leaveGame')

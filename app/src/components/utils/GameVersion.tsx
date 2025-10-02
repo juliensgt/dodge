@@ -3,7 +3,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { useSocketsStore } from "@/store/sockets/sockets.store";
 
 export default function GameVersion() {
-  const { game, players, options } = useGameStore();
+  const { round, players, options } = useGameStore();
   const isMobile = useIsMobile();
   const { isConnected } = useSocketsStore();
 
@@ -15,7 +15,7 @@ export default function GameVersion() {
           Socket: {isConnected ? "Connected" : "Disconnected"}
         </div>
         <div className="text-xs">
-          Round {game.round} ({players.length}/{options.maxPlayers})
+          Round {round} ({players.length}/{options.maxPlayers})
         </div>
       </div>
     );
@@ -27,7 +27,7 @@ export default function GameVersion() {
         Socket: {isConnected ? "Connected" : "Disconnected"}
       </div>
       <div className="text-xs">
-        Round {game.round} ({players.length}/{options.maxPlayers})
+        Round {round} ({players.length}/{options.maxPlayers})
       </div>
       <div className="text-sm font-bold">DODGE-GAME.NET</div>
     </div>

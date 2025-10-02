@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 export interface BroadcastData {
   [key: string]: any;
 }
@@ -13,6 +11,6 @@ export interface GameConnection {
   socketId: string;
   type: ConnectionType;
   gameId: string;
-  userId: Types.ObjectId;
+  userId: string;
   playerId?: string;
 }

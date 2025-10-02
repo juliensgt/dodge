@@ -1,42 +1,63 @@
+import { GameEvents } from "@/types/events/game.events";
 import { socketService } from "../sockets/socket.service";
+import { Socket } from "socket.io-client";
+import { ChatEvents } from "@/types/events/chat.events";
+import { JoinGameResponse } from "@/types/game/game.types";
+import { useGameStore } from "@/store/game/game";
+import { authService } from "../auth.service";
 
 class GameService {
   constructor() {}
 
   async initializeGame(gameId: string) {
-    if (!gameId) throw new Error("Invalid gameId");
-
     console.log("Initializing game for gameId:", gameId);
+    if (!gameId) throw new Error("Invalid gameId");
 
     await socketService.joinGame(gameId);
   }
 
-  setupGameEventListeners() {
+  setupGameEventListeners(client: Socket) {
+    console.log("Client setup game event listeners");
     // Écouter les événements de la partie
-    /*socketService.on(GameEvents.PLAYER_JOINED, (data) => {
-      console.log("Player joined:", data);
+    client.on(GameEvents.PLAYER_JOINED, async (data: JoinGameResponse) => {
+      const currentUserId = await authService.getUserId();
+      const game = useGameStore.getState();
+
+      console.log("Current user id:", currentUserId);
+      console.log("Player data:", data.playerData);
+      console.log("Game data:", data.gameData);
+
+      // if current user is player, initialize game or add player to game
+      if (data.playerData?.id === currentUserId) {
+        game.setGame(data.gameData!);
+        console.log("Player joined and game initialized:", data);
+      } else {
+        game.addPlayer(data.playerData!);
+        console.log("Player added to game:", data);
+      }
+
       // Mettre à jour l'UI si nécessaire
     });
 
-    socketService.on(GameEvents.PLAYER_LEFT, (data) => {
+    client.on(GameEvents.PLAYER_LEFT, (data) => {
       console.log("Player left:", data);
       // Mettre à jour l'UI si nécessaire
     });
 
-    socketService.on(GameEvents.GAME_STARTED, (data) => {
+    client.on(GameEvents.GAME_STARTED, (data) => {
       console.log("Game started:", data);
       // Mettre à jour l'UI si nécessaire
     });
 
-    socketService.on(GameEvents.GAME_ENDED, (data) => {
+    client.on(GameEvents.GAME_ENDED, (data) => {
       console.log("Game ended:", data);
       // Mettre à jour l'UI si nécessaire
     });
 
-    socketService.on(ChatEvents.CHAT_MESSAGE_SENT, (data) => {
+    client.on(ChatEvents.CHAT_MESSAGE_SENT, (data) => {
       console.log("New message:", data);
       // Mettre à jour l'UI si nécessaire
-    });*/
+    });
   }
 }
 

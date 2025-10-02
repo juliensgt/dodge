@@ -6,6 +6,7 @@ import { Game, GameSchema } from './game.schema';
 import { Player, PlayerSchema } from '../players/player.schema';
 import { Card, CardSchema } from '../card/card.schema';
 import { User, UserSchema } from '../user/user.schema';
+import { PlayerService } from '../players/player.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { User, UserSchema } from '../user/user.schema';
     ]),
   ],
   controllers: [GameController],
-  providers: [GameService],
+  providers: [GameService, PlayerService],
   exports: [GameService],
 })
 export class GameModule {}

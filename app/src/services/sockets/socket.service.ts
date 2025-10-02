@@ -2,6 +2,7 @@
 import { io, Socket } from "socket.io-client";
 import { useSocketsStore } from "@/store/sockets/sockets.store";
 import authService from "../auth.service";
+import { gameService } from "@/services/game/game.service";
 
 class SocketService {
   private static instance: SocketService;
@@ -46,13 +47,14 @@ class SocketService {
 
     // setup listeners
     socket.on("connect", () => {
-      socket.emit("joinGame", { gameId });
       this.connect(socket, gameId);
     });
 
     socket.on("disconnect", () => {
       this.disconnect();
     });
+
+    gameService.setupGameEventListeners(socket);
   }
 
   connect(socket: Socket, gameId: string) {
@@ -61,9 +63,6 @@ class SocketService {
     setSocket(socket);
     setIsConnected(true);
     setCurrentGameId(gameId);
-
-    //TODO : set game data
-    console.log("Socket connected");
   }
 
   disconnect() {

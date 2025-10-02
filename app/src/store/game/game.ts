@@ -1,24 +1,27 @@
 import { create } from "zustand";
-import { GameState } from "./types";
+import { Game } from "./types";
 import { createGameActions, GameActions } from "./actions";
 
 // Export types for external use
 export type {
-  GameState,
-  Player,
   Game,
+  Player,
   GameOptions,
   ActionPlayer,
   ActionQueueItem,
 } from "./types";
 
 // Combined store type
-type GameStore = GameState & GameActions;
+type GameStore = Game & GameActions;
 
 const useGameStore = create<GameStore>((set, get, store) => {
   const gameActions = createGameActions(set, get, store);
 
   return {
+    id: "",
+    state: "WAITING",
+    round: 0,
+    players: [],
     currentPlayerId: "",
     playerIdWhoPlays: "",
     focusMode: false,
@@ -30,11 +33,7 @@ const useGameStore = create<GameStore>((set, get, store) => {
       action: null,
     },
     actionsHistory: { players: [], datas: [] },
-    game: { id: "", gameState: "WAITING", round: 0 },
     options: { nbCards: 0, timeToPlay: 0, maxPlayers: 6 },
-    players: [],
-    gameId: "",
-    socketConnected: false,
 
     // Game actions
     ...gameActions,

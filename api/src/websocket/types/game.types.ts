@@ -1,4 +1,6 @@
 import { ConnectionType } from './connection.types';
+import { PlayerWithId } from 'src/routes/players/player.schema';
+import { GameWithId } from 'src/routes/game/game.schema';
 
 export interface JoinGameRequest {
   gameId: string;
@@ -6,8 +8,6 @@ export interface JoinGameRequest {
 }
 
 export interface JoinGameResponse {
-  success: boolean;
-  gameData?: any;
-  playerData?: any;
-  error?: string;
+  gameData?: GameWithId;
+  playerData?: PlayerWithId;
 }

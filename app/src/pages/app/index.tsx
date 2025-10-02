@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
-import { AuthStatus } from "@/components/auth/AuthStatus";
 
 export default function Dashboard() {
   const [playerName, setPlayerName] = useState("");
@@ -49,7 +48,6 @@ export default function Dashboard() {
       <div
         className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
-        <AuthStatus />
         <div className="absolute top-4 right-4 flex gap-4">
           <ThemeSelector />
           <LanguageSelector />
