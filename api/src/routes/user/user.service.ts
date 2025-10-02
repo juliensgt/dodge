@@ -6,7 +6,6 @@ import { ErrorEnum } from '../../enums/errors/error.enum';
 import { Player } from '../players/player.schema';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
-import { UserDetailsDto } from './dto/user-details.dto';
 
 @Injectable()
 export class UserService {
@@ -25,22 +24,13 @@ export class UserService {
     return this.userModel.find();
   }
 
-  async findOne(id: string): Promise<UserDetailsDto> {
+  async findOne(id: string): Promise<UserWithId> {
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
     }
 
-    return {
-      _id: user._id.toString(),
-      supabaseId: user.supabaseId,
-      name: user.name,
-      email: user.email,
-      skinCards: user.skinCards,
-      language: user.language,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+    return user;
   }
 
   async update(id: string, updateData: UserUpdateDto): Promise<User> {

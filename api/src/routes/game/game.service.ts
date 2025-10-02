@@ -1,31 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Game, GameDocument } from './game.schema';
-import { Player, PlayerDocument } from '../players/player.schema';
-import { User, UserDocument } from '../user/user.schema';
+import { GameWithId } from './game.schema';
 import { GameState } from '../../enums/game-state.enum';
 import { defaultGameCreateDto, GameCreateDto } from './dto/game-create.dto';
 import { ErrorEnum } from '../../enums/errors/error.enum';
-import { PlayerCreateDto } from '../players/dto/player-create.dto';
-
-type GameWithId = Game & { _id: Types.ObjectId };
-type PlayerWithId = Player & { _id: Types.ObjectId };
 
 @Injectable()
 export class GameService {
-  constructor(
-    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
-    @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {}
+  constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
 
   async create(gameCreateDto: GameCreateDto): Promise<Game> {
     const game = new this.gameModel(gameCreateDto || defaultGameCreateDto);
     return game.save();
   }
 
-  async findOne(id: string): Promise<Game> {
+  async findOne(id: string): Promise<GameWithId> {
     const game = await this.gameModel
       .findById(id)
       .populate('players')
@@ -50,42 +41,21 @@ export class GameService {
     return games;
   }
 
-  async addPlayer(playerCreateDto: PlayerCreateDto): Promise<Player> {
-    const game = await this.findOne(playerCreateDto.gameId);
-    const user = await this.userModel.findById(playerCreateDto.userId);
+  async addPlayer(gameId: string) {
+    // TODO :Verify if can add player
 
-    if (!user) {
-      throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
-    }
+    // Create the player
+    const playerData = undefined;
 
-    const player = new this.playerModel({
-      game: playerCreateDto.gameId,
-      user: playerCreateDto.userId,
-      sessionId: playerCreateDto.sessionId,
-      main: [],
-      points: 0,
-      keyMappings: [],
-    });
+    // TODO : Broadcast to the player : game data
+    const gameData = await this.findOne(gameId);
 
-    const savedPlayer = await player.save();
-    game.players.push(savedPlayer);
-    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
-
-    // TODO: Implement game full logic
-    if (game.players.length >= game.options.maxPlayers) {
-      //this.startGameDelayed(gameId);
-    }
-
-    return savedPlayer;
-  }
-
-  async getPlayerByGameAndId(gameId: string, playerId: string): Promise<Player> {
-    const game = await this.findOne(gameId);
-    const player = game.players.find((p) => (p as PlayerWithId)._id.toString() === playerId);
-    if (!player) {
-      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
-    }
-    return player;
+    // Return the response
+    return {
+      success: true,
+      gameData,
+      playerData,
+    };
   }
 
   /*async dodge(gameId: string, playerId: string): Promise<void> {
@@ -122,7 +92,7 @@ export class GameService {
     game.tour = 0;
     game.indexPlayerWhoPlays = -1;
     game.playerDodge = '';
-    await this.gameModel.findByIdAndUpdate((game as GameWithId)._id, game);
+    await this.gameModel.findByIdAndUpdate(game._id, game);
   }
 
   // ===== TURN MANAGEMENT =====

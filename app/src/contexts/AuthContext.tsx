@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { authService } from "@/services/auth.service";
-import { useSocket } from "./SocketProvider";
 import {
   AuthContextType,
   AuthLevel,
   AuthProviderProps,
 } from "@/types/auth/auth";
+import { useSocketsStore } from "@/store/sockets/sockets.store";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { socketId, isSocketConnected, disconnect } = useSocket();
+  const { socket, isConnected, getSocket } = useSocketsStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -45,11 +45,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     };
 
     checkAuthStatus();
-  }, [socketId, isSocketConnected, requiredLevel, router]);
+  }, [socket, isConnected, requiredLevel, router]);
 
   const logout = async () => {
     await authService.signOut();
-    disconnect();
+    getSocket()?.disconnect();
     setIsAuthenticated(false);
     router.push("/");
   };

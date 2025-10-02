@@ -1,235 +1,142 @@
 import {
   WebSocketGateway,
   WebSocketServer,
-  SubscribeMessage,
-  MessageBody,
-  ConnectedSocket,
   OnGatewayDisconnect,
-  OnGatewayInit,
   OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService } from '../routes/game/game.service';
-import { MessageService } from '../routes/message/message.service';
-import { TurnHandler } from './handlers/turn.handler';
-import { CardHandler } from './handlers/card.handler';
-import { InterventionHandler } from './handlers/intervention.handler';
-import { BroadcastService } from './services/broadcast.service';
+import { Types } from 'mongoose';
+import { socketService } from './services/socket.service';
+import { GameService } from 'src/routes/game/game.service';
+import { ConnectionType, GameConnection } from './types/connection.types';
 import { GameEvents } from './events/game.events';
-import { ValidationService } from './services/validation.service';
-import { UserService } from '../routes/user/user.service';
+
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    private readonly gameService: GameService,
-    private readonly messageService: MessageService,
-    private readonly turnHandler: TurnHandler,
-    private readonly cardHandler: CardHandler,
-    private readonly interventionHandler: InterventionHandler,
-    private readonly broadcastService: BroadcastService,
-    private readonly validationService: ValidationService,
-    private readonly userService: UserService,
-  ) {}
-
-  afterInit(server: Server) {
-    this.broadcastService.setServer(server);
+  constructor(private readonly gameService: GameService) {
+    socketService.setServer(this.server);
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+    socketService.unregisterConnection(client.id);
   }
 
-  handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+  async handleConnection(client: Socket) {
+    const userId = new Types.ObjectId(client.handshake.query.userId as string);
+    const gameId = client.handshake.query.gameId as string;
+
+    const { playerData } = await this.gameService.addPlayer(gameId);
+
+    const gameConnection: GameConnection = {
+      socketId: client.id,
+      type: ConnectionType.PLAYER,
+      gameId: gameId,
+      userId: userId,
+    };
+
+    console.log(`User joined game: ${userId.toString()}`);
+
+    // Register the connection
+    socketService.registerConnection(gameConnection);
+
+    // Broadcast to all players the join game
+    socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, { playerData });
   }
 
-  /*@SubscribeMessage('joinGame')
-  async handleJoinGame(@MessageBody() data: JoinGameRequestDto, @ConnectedSocket() client: Socket) {
-    await this.validationService.validateGameId(data.gameId);
-
-    // Use userId from socket connection if available, otherwise use the one from data
-    const userId = (client as any).user?.id || data.userId;
-    if (!userId) {
-      throw new Error('User not authenticated');
-    }
-
-    await this.validationService.validateUserId(userId);
-
-    const user = await this.userService.findOne(userId);
-
-    const player = await this.gameService.addPlayer({
-      gameId: data.gameId,
-      userId: userId,
-      sessionId: client.id,
-    });
-    await client.join(data.gameId);
-
-    // Notify all players in the game
-    this.broadcastService.broadcastToGame(data.gameId, GameEvents.PLAYER_JOINED, {
-      playerId: (player as PlayerWithId)._id.toString(),
-      userId: userId,
-    });
-
-    return { success: true, player: player };
-  }*/
-
-  @SubscribeMessage('leaveGame')
-  async handleLeaveGame(
-    @MessageBody() data: { gameId: string; playerId: string },
+  /*@SubscribeMessage('leaveGame')
+  @UseGuards(WsAuthGuard)
+  handleLeaveGame(
+    @MessageBody() data: { gameId: string },
     @ConnectedSocket() client: Socket,
+    @AuthenticatedUser() user: any,
   ) {
-    await client.leave(data.gameId);
+    try {
+      const connection = this.connectionManager.getConnection(client.id);
+      if (!connection || !connection.gameId) {
+        return { success: false, error: 'Not connected to any game' };
+      }
 
-    // Notify all players in the game
-    this.broadcastService.broadcastToGame(data.gameId, GameEvents.PLAYER_LEFT, {
-      playerId: data.playerId,
-    });
+      // Quitter la partie
+      this.connectionManager.leaveGame(client.id, data.gameId);
 
-    return { success: true };
+      // Notifier les autres joueurs
+      this.connectionManager.broadcastToGame(data.gameId, 'playerLeft', {
+        gameId: data.gameId,
+        userId: (user as any).supabaseId,
+        gameStats: this.gameManager.getGameStats(data.gameId),
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error in handleLeaveGame:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @MessageBody() data: { gameId: string; playerId: string; message: string },
+  @SubscribeMessage('getGameStats')
+  @UseGuards(WsAuthGuard)
+  handleGetGameStats(
+    @MessageBody() data: { gameId: string },
+    @ConnectedSocket() client: Socket,
+    @AuthenticatedUser() user: any,
   ) {
-    const message = await this.messageService.create({
-      gameId: data.gameId,
-      playerId: data.playerId,
-      message: data.message,
-    });
+    try {
+      const stats = this.gameManager.getGameStats(data.gameId);
+      if (!stats) {
+        return { success: false, error: 'Game not found' };
+      }
 
-    // Broadcast message to all players in the game
-    this.server.to(data.gameId).emit('chat:new-message', message);
-
-    return { success: true, message };
+      return { success: true, stats };
+    } catch (error) {
+      console.error('Error in handleGetGameStats:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
-  // ===== TURN EVENTS =====
-  // WORKFLOW ÉTAPE 2: GET_CARD_IN_DECK_OR_DEFAUSSE
-  /*@SubscribeMessage('getCardInDeckOrDefausse')
-  async handleGetCardInDeckOrDefausse(
-    @MessageBody()
-    data: {
-      gameId: string;
-      playerId: string;
-      choice: 'deck' | 'defausse';
-    },
-  ) {
-    return this.turnHandler.handleGetCardInDeckOrDefausse(
-      data.gameId,
-      data.playerId,
-      data.choice,
-    );
-  }*/
+  @SubscribeMessage('getUserGames')
+  @UseGuards(WsAuthGuard)
+  handleGetUserGames(@ConnectedSocket() client: Socket, @AuthenticatedUser() user: any) {
+    try {
+      const userGames = this.gameManager.getUserGames((user as any).supabaseId);
 
-  // WORKFLOW ÉTAPE 3A: SWITCH_WITH_DECK
-  /*@SubscribeMessage('switchWithDeck')
-  async handleSwitchWithDeck(
-    @MessageBody()
-    data: {
-      gameId: string;
-      playerId: string;
-      action: 'deckToDefausse' | 'deckToPlayer';
-      targetCardId?: string;
-    },
-  ) {
-    return this.turnHandler.handleSwitchWithDeck(
-      data.gameId,
-      data.playerId,
-      data.action,
-      data.targetCardId,
-    );
-  }*/
+      const gamesData = userGames.map((game) => ({
+        id: game.id,
+        state: game.state,
+        round: game.round,
+        currentPlayerIndex: game.currentPlayerIndex,
+        activePlayers: this.gameManager.getActivePlayers(game.id).length,
+        spectators: game.spectators.size,
+        createdAt: game.createdAt,
+        lastActivity: game.lastActivity,
+      }));
 
-  // WORKFLOW ÉTAPE 3B: SWITCH_WITH_DEFAUSSE
-  /*@SubscribeMessage('switchWithDefausse')
-  async handleSwitchWithDefausse(
-    @MessageBody()
-    data: {
-      gameId: string;
-      playerId: string;
-      targetCardId: string;
-    },
-  ) {
-    return this.turnHandler.handleSwitchWithDefausse(
-      data.gameId,
-      data.playerId,
-      data.targetCardId,
-    );
-  }*/
-
-  // WORKFLOW ÉTAPE 7: FIN DU TOUR
-  /*@SubscribeMessage('endTurn')
-  async handleEndTurn(
-    @MessageBody() data: { gameId: string; playerId: string },
-  ) {
-    return this.turnHandler.handleEndTurn(data.gameId, data.playerId);
-  }*/
-
-  // ===== CARD EVENTS =====
-  // Actions sur les cartes (peuvent être utilisées pendant les interventions)
-  /*@SubscribeMessage('playCard')
-  async handlePlayCard(
-    @MessageBody() data: { gameId: string; playerId: string; cardId: string },
-  ) {
-    return this.cardHandler.handlePlayCard(
-      data.gameId,
-      data.playerId,
-      data.cardId,
-    );
-  }*/
-
-  // Action de défense (esquive)
-  /*@SubscribeMessage('dodge')
-  async handleDodge(@MessageBody() data: { gameId: string; playerId: string }) {
-    return this.cardHandler.handleDodge(data.gameId, data.playerId);
-  }*/
-
-  // ===== INTERVENTION EVENTS =====
-  // WORKFLOW ÉTAPE 5: OUVERTURE DES INTERVENTIONS
-  // Les autres joueurs peuvent intervenir pendant la phase d'interventions
-  /*@SubscribeMessage('intervention')
-  async handleIntervention(
-    @MessageBody()
-    data: {
-      gameId: string;
-      playerId: string;
-      targetPlayerId: string;
-      interventionType: string;
-      cardId: string;
-    },
-  ) {
-    return this.interventionHandler.handleIntervention(
-      data.gameId,
-      data.playerId,
-      data.targetPlayerId,
-      data.interventionType,
-      data.cardId,
-    );
+      return { success: true, games: gamesData };
+    } catch (error) {
+      console.error('Error in handleGetUserGames:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
-  @SubscribeMessage('interventionResponse')
-  async handleInterventionResponse(
-    @MessageBody()
-    data: {
-      gameId: string;
-      playerId: string;
-      interventionId: string;
-      response: 'accept' | 'decline';
-    },
-  ) {
-    return this.interventionHandler.handleInterventionResponse(
-      data.gameId,
-      data.playerId,
-      data.interventionId,
-      data.response,
-    );
-  }*/
+  // ===== GAME ACTIONS =====
+  // Les actions de jeu seront implémentées dans les handlers spécialisés
+  // et utiliseront les nouveaux services GameManager et ConnectionManager
+
+  */
 }

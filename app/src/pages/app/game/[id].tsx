@@ -1,0 +1,53 @@
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import BoardGame from "@/components/game/BoardGame";
+import { useGradient } from "@/hooks/useGradient";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { AuthLevel } from "@/types/auth/auth";
+import { useTranslation } from "@/hooks/useTranslation";
+import { gameService } from "@/services/game/game.service";
+
+export default function Game() {
+  const { t } = useTranslation();
+  const { getGradient, GradientType } = useGradient();
+
+  const router = useRouter();
+  const { id: gameId } = router.query;
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    gameService
+      .initializeGame(gameId as string)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        //router.push("/app");
+      });
+  }, [gameId, router]);
+
+  // Show loading state while joining or if there's an error
+  if (isLoading) {
+    return (
+      <div
+        className={`w-full min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center`}
+      >
+        <div className="text-white text-xl">
+          {t("Connexion à la partie...")}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AuthGuard level={AuthLevel.USER}>
+      <div
+        className={`w-full min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} relative`}
+      >
+        <BoardGame />
+      </div>
+    </AuthGuard>
+  );
+}

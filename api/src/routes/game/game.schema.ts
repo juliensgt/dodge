@@ -6,6 +6,8 @@ import { Card } from '../card/card.schema';
 
 export type GameDocument = HydratedDocument<Game>;
 
+export type GameWithId = Game & { _id: Types.ObjectId };
+
 @Schema({ collection: 'games' })
 export class Game {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })

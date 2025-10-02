@@ -19,7 +19,6 @@ const useGameStore = create<GameStore>((set, get, store) => {
   const gameActions = createGameActions(set, get, store);
 
   return {
-    // Initial state
     currentPlayerId: "",
     playerIdWhoPlays: "",
     focusMode: false,
