@@ -73,15 +73,6 @@ class SocketService {
     setCurrentGameId(gameId);
   }
 
-  disconnect() {
-    const { getSocket, setIsConnected } = useSocketsStore.getState();
-    const socket = getSocket();
-    if (socket) {
-      socket.disconnect();
-      setIsConnected(false);
-    }
-  }
-
   emit(event: string, data?: unknown) {
     const { getSocket } = useSocketsStore.getState();
     const socket = getSocket();
@@ -95,6 +86,17 @@ class SocketService {
     const socket = getSocket();
     if (socket) {
       socket.on(event, callback);
+    }
+  }
+
+  disconnect() {
+    const { socket, setSocket, setIsConnected, setCurrentGameId } =
+      useSocketsStore.getState();
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      setIsConnected(false);
+      setCurrentGameId(null);
     }
   }
 }

@@ -6,10 +6,13 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { gameService } from "@/services/game/game.service";
+import { useGameStore } from "@/store/game/game";
+import { socketService } from "@/services/sockets/socket.service";
 
 export default function Game() {
   const { t } = useTranslation();
   const { getGradient, GradientType } = useGradient();
+  const { resetGame } = useGameStore();
 
   const router = useRouter();
   const { id: gameId } = router.query;
@@ -18,11 +21,14 @@ export default function Game() {
 
   useEffect(() => {
     if (gameId) {
+      resetGame();
+      socketService.disconnect();
+
       gameService.initializeGame(gameId as string).then(() => {
         setIsLoading(false);
       });
     }
-  }, [gameId, router]);
+  }, [gameId, resetGame]);
 
   // Show loading state while joining or if there's an error
   if (isLoading) {

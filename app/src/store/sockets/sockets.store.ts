@@ -11,9 +11,9 @@ export interface SocketState {
 
 // actions pour manipuler le state
 export interface SocketActions {
-  setSocket: (socket: Socket) => void;
+  setSocket: (socket: Socket | null) => void;
   setIsConnected: (isConnected: boolean) => void;
-  setCurrentGameId: (currentGameId: string) => void;
+  setCurrentGameId: (currentGameId: string | null) => void;
 
   getSocket: () => Socket | null;
   getConnectionType: () => ConnectionType | null;
@@ -32,13 +32,13 @@ const useSocketsStore = create<SocketsStore>((set, get) => {
     currentGameId: null,
 
     // Socket actions
-    setSocket: (socket: Socket) => {
+    setSocket: (socket: Socket | null) => {
       set({ socket });
     },
     setIsConnected: (isConnected: boolean) => {
       set({ isConnected });
     },
-    setCurrentGameId: (currentGameId: string) => {
+    setCurrentGameId: (currentGameId: string | null) => {
       set({ currentGameId });
     },
     getSocket: () => {

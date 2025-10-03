@@ -4,6 +4,7 @@ import { Game, Player } from "./types";
 export interface GameActions {
   // Game state management
   setGame: (game: Game, playerCurrentId?: string) => void;
+  resetGame: () => void;
 
   // Player management
   addPlayer: (player: Player) => void;
@@ -17,8 +18,7 @@ export interface GameActions {
 
 export const createGameActions: StateCreator<Game, [], [], GameActions> = (
   set,
-  get,
-  store
+  get
 ) => ({
   setGame: (game: Game, playerCurrentId?: string) => {
     set({
@@ -27,6 +27,27 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       round: game.round,
       players: game.players,
       currentPlayerId: playerCurrentId,
+    });
+  },
+
+  resetGame: () => {
+    set({
+      id: "",
+      state: "WAITING",
+      round: 0,
+      players: [],
+      currentPlayerId: "",
+      playerIdWhoPlays: "",
+      focusMode: false,
+      actionQueue: [],
+      currentAction: {
+        time: 0,
+        countdownState: false,
+        idTimer: 0,
+        action: null,
+      },
+      actionsHistory: { players: [], datas: [] },
+      options: { nbCards: 0, timeToPlay: 0, maxPlayers: 6 },
     });
   },
 
