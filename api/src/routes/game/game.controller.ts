@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpStatus } from '@nestjs/common';
 import { GameService } from './game.service';
 import { Game } from './game.schema';
 import { GameCreateDto } from './dto/game-create.dto';
@@ -23,7 +23,8 @@ export class GameController {
   }
 
   @Post(':id/reset')
-  async reset(@Param('id') id: string): Promise<void> {
-    return this.gameService.clearGame(id);
+  async reset(@Param('id') id: string): Promise<HttpStatus> {
+    await this.gameService.clearGame(id);
+    return HttpStatus.OK;
   }
 }

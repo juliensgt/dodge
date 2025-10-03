@@ -6,7 +6,7 @@ import MobileSidebarButton from "@/components/utils/sidebar/MobileSidebarButton"
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function BoardGame() {
-  const [sidebarWidth, setSidebarWidth] = useState(25);
+  const [sidebarWidth, setSidebarWidth] = useState(0);
   const isMobile = useIsMobile();
 
   const handleSidebarToggle = () => {

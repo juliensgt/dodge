@@ -4,6 +4,7 @@ import { Socket } from "socket.io-client";
 import { ChatEvents } from "@/types/events/chat.events";
 import { JoinGameResponse } from "@/types/game/game.types";
 import { useGameStore } from "@/store/game/game";
+import { errorService } from "../error/error.service";
 
 class GameService {
   constructor() {}
@@ -47,6 +48,12 @@ class GameService {
     client.on(ChatEvents.CHAT_MESSAGE_SENT, (data) => {
       console.log("New message:", data);
       // Mettre à jour l'UI si nécessaire
+    });
+
+    // Intercepter les erreurs WebSocket
+    client.on("error", (error) => {
+      console.error("WebSocket error:", error);
+      errorService.handleWebSocketError(error);
     });
   }
 }

@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
+import { httpService } from "@/services/http/http.service";
 
 export default function Dashboard() {
   const [playerName, setPlayerName] = useState("");
@@ -31,12 +32,10 @@ export default function Dashboard() {
     router.push(`/app/game/${gameId}`);
   };
 
-  const resetGame = () => {
+  const resetGame = async () => {
     const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
 
-    fetch(process.env.NEXT_PUBLIC_API_URL + `/games/${gameId}/reset`, {
-      method: "POST",
-    });
+    await httpService.post(`/games/${gameId}/reset`);
   };
 
   const openSkinSelector = () => {

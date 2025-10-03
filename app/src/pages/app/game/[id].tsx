@@ -17,15 +17,11 @@ export default function Game() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    gameService
-      .initializeGame(gameId as string)
-      .then(() => {
+    if (gameId) {
+      gameService.initializeGame(gameId as string).then(() => {
         setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        //router.push("/app");
       });
+    }
   }, [gameId, router]);
 
   // Show loading state while joining or if there's an error

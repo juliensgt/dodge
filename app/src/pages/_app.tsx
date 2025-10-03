@@ -6,6 +6,8 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ToastProvider } from "@/contexts/ToastContext";
+import ToastContainer from "@/components/utils/toast/ToastContainer";
 import { AuthLevel } from "@/types/auth/auth";
 config.autoAddCss = false;
 
@@ -14,10 +16,13 @@ export default function App({ Component, pageProps }: AppProps) {
     <LanguageProvider>
       <ThemeProvider>
         <AuthProvider requiredLevel={AuthLevel.PUBLIC}>
-          <Head>
-            <link rel="icon" href="/favicon.ico" />
-          </Head>
-          <Component {...pageProps} />
+          <ToastProvider>
+            <Head>
+              <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <Component {...pageProps} />
+            <ToastContainer />
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </LanguageProvider>

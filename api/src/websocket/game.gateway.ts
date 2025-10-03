@@ -4,8 +4,6 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   OnGatewayInit,
-  SubscribeMessage,
-  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
@@ -15,8 +13,6 @@ import { ConnectionType } from './types/connection.types';
 import { GameEvents } from './events/game.events';
 import { UserService } from 'src/routes/user/user.service';
 import { PlayerDto } from 'src/routes/players/dto/player.dto';
-import { WsAuthGuard } from './guards/ws-auth.guard';
-import { UseGuards } from '@nestjs/common';
 import { GameDto } from 'src/routes/game/dto/game.dto';
 
 @WebSocketGateway({
@@ -73,16 +69,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         });
       })
       .catch((error: WsException) => {
-        console.error('Error in handleConnection:', error);
         client.emit('error', { message: error.message || 'Connection failed' });
         client.disconnect();
       });
-  }
-
-  @SubscribeMessage(GameEvents.RESET_GAME)
-  @UseGuards(WsAuthGuard)
-  async handleResetGame(@MessageBody() data: { gameId: string }) {
-    await this.gameService.clearGame(data.gameId);
   }
 
   /*@SubscribeMessage('leaveGame')

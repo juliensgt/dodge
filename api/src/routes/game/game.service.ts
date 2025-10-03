@@ -44,29 +44,26 @@ export class GameService {
   }
 
   async addPlayer(game: GameWithId, user: UserWithId): Promise<JoinGameResponse> {
-    // Check if player already exists in this game by querying the player directly
-    const existingPlayer = await this.playerService.findByGameAndUser(
+    const playerCreateDto: PlayerCreateDto = { game, user };
+
+    let player = await this.playerService.findByGameAndUser(
       game._id.toString(),
       user._id.toString(),
     );
-
-    if (existingPlayer) {
-      throw new NotFoundException(
-        'Player already in game',
-        ErrorEnum['game/player-already-in-game'],
-      );
+    let gameData = await this.findOne(game._id.toString(), ['players']);
+    if (gameData.gameState !== GameState.WAITING && !player) {
+      throw new NotFoundException('Game is not in waiting state', ErrorEnum['game/invalid-state']);
+    } else if (gameData.players.length >= gameData.options.maxPlayers && !player) {
+      throw new NotFoundException('Game is full', ErrorEnum['game/game-full']);
     }
 
-    const playerCreateDto: PlayerCreateDto = { game, user };
-
-    // Create the player
-    const playerData = await this.playerService.create(playerCreateDto);
-
-    // Add player ID to game and save
-    const gameData = await this.update(game._id.toString(), { players: playerData._id });
-
+    // Create the player if it doesn't exist for this game and user
+    if (!player) {
+      player = await this.playerService.create(playerCreateDto);
+      gameData = await this.update(game._id.toString(), { players: player._id });
+    }
     // Return the response
-    return { playerData, gameData };
+    return { playerData: player, gameData: gameData };
   }
 
   async update(gameId: string, updateData: object): Promise<GameWithId> {

@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { useSocketsStore } from "@/store/sockets/sockets.store";
 import authService from "../auth.service";
 import { gameService } from "@/services/game/game.service";
-import { GameEvents } from "@/types/events/game.events";
+import { errorService } from "../error/error.service";
 
 class SocketService {
   private static instance: SocketService;
@@ -54,6 +54,12 @@ class SocketService {
 
     socket.on("disconnect", () => {
       this.disconnect();
+    });
+
+    // Intercepte r les erreurs WebSocket
+    socket.on("error", (error) => {
+      console.error("WebSocket error:", error);
+      errorService.handleWebSocketError(error);
     });
 
     gameService.setupGameEventListeners(socket);

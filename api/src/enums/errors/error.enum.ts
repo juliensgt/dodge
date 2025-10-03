@@ -8,4 +8,5 @@ export enum ErrorEnum {
   'game/not-your-turn' = 'game/not-your-turn',
   'game/cannot-intervene-own-turn' = 'game/cannot-intervene-own-turn',
   'game/player-already-in-game' = 'game/player-already-in-game',
+  'game/game-full' = 'game/game-full',
 }
