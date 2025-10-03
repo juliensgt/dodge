@@ -25,7 +25,7 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<UserWithId> {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findOne({ _id: id });
     if (!user) {
       throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
     }
@@ -45,7 +45,7 @@ export class UserService {
       });
   }
 
-  async findByPlayer(player: Player): Promise<User> {
+  async findByPlayer(player: Player): Promise<UserWithId> {
     return this.findOne((player.user as UserWithId)._id.toString());
   }
 
@@ -67,7 +67,7 @@ export class UserService {
     }
   }
 
-  async findBySupabaseId(supabaseId: string): Promise<User> {
+  async findBySupabaseId(supabaseId: string): Promise<UserWithId> {
     const user = await this.userModel.findOne({ supabaseId });
     if (!user) {
       throw new NotFoundException('User not found', ErrorEnum['user/not-found']);

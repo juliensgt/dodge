@@ -102,6 +102,9 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
 
   getReorderedPlayers: (currentPlayerId: string) => {
     const players = get().players;
+
+    console.log("players", players);
+
     const currentPlayerIndex = players.findIndex(
       (player) => player.id === currentPlayerId
     );

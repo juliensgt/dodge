@@ -20,13 +20,7 @@ export class Player {
   main: Card[];
 
   @Prop()
-  sessionId: string;
-
-  @Prop()
   points: number;
-
-  @Prop([String])
-  keyMappings: string[];
 }
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);

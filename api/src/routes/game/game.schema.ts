@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { GameState } from '../../enums/game-state.enum';
-import { Player } from '../players/player.schema';
 import { Card } from '../card/card.schema';
 
 export type GameDocument = HydratedDocument<Game>;
@@ -11,7 +10,7 @@ export type GameWithId = Game & { _id: Types.ObjectId };
 @Schema({ collection: 'games' })
 export class Game {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
-  players: Player[];
+  players: Types.ObjectId[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Card' }] })
   deck: Card[];

@@ -4,12 +4,20 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   OnGatewayInit,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
 import { socketService } from './services/socket.service';
 import { GameService } from 'src/routes/game/game.service';
 import { ConnectionType } from './types/connection.types';
 import { GameEvents } from './events/game.events';
+import { UserService } from 'src/routes/user/user.service';
+import { PlayerDto } from 'src/routes/players/dto/player.dto';
+import { WsAuthGuard } from './guards/ws-auth.guard';
+import { UseGuards } from '@nestjs/common';
+import { GameDto } from 'src/routes/game/dto/game.dto';
 
 @WebSocketGateway({
   cors: {
@@ -20,7 +28,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UserService,
+  ) {}
 
   afterInit(server: Server) {
     console.log('WebSocket Gateway initialized');
@@ -36,18 +47,42 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const userId = client.handshake.query.userId as string;
     const gameId = client.handshake.query.gameId as string;
 
-    const response = await this.gameService.addPlayer(gameId, userId);
+    if (!userId || !gameId) {
+      throw new WsException('Missing userId or gameId');
+    }
 
-    // Register the connection
-    socketService.registerConnection({
-      socketId: client.id,
-      type: ConnectionType.PLAYER,
-      gameId: gameId,
-      userId: userId,
-    });
+    const game = await this.gameService.findOne(gameId, ['players']);
+    const user = await this.userService.findBySupabaseId(userId);
 
-    // Send the player data to the client
-    socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, response);
+    this.gameService
+      .addPlayer(game, user)
+      .then(async (response) => {
+        // Register the connection
+        socketService.registerConnection({
+          socketId: client.id,
+          type: ConnectionType.PLAYER,
+          gameId: gameId,
+          userId: userId,
+        });
+        await client.join('dgd-' + gameId);
+
+        // Send the player data to the client
+        socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
+          gameData: GameDto.fromGame(response.gameData!),
+          playerData: PlayerDto.fromPlayer(response.playerData!, user),
+        });
+      })
+      .catch((error: WsException) => {
+        console.error('Error in handleConnection:', error);
+        client.emit('error', { message: error.message || 'Connection failed' });
+        client.disconnect();
+      });
+  }
+
+  @SubscribeMessage(GameEvents.RESET_GAME)
+  @UseGuards(WsAuthGuard)
+  async handleResetGame(@MessageBody() data: { gameId: string }) {
+    await this.gameService.clearGame(data.gameId);
   }
 
   /*@SubscribeMessage('leaveGame')

@@ -21,4 +21,9 @@ export class GameController {
   async findOne(@Param('id') id: string): Promise<Game> {
     return this.gameService.findOne(id);
   }
+
+  @Post(':id/reset')
+  async reset(@Param('id') id: string): Promise<void> {
+    return this.gameService.clearGame(id);
+  }
 }

@@ -9,7 +9,7 @@ import { ErrorEnum } from '../../enums/errors/error.enum';
 import { JoinGameResponse } from 'src/websocket/types/game.types';
 import { PlayerService } from '../players/player.service';
 import { PlayerCreateDto } from '../players/dto/player-create.dto';
-
+import { UserWithId } from '../user/user.schema';
 @Injectable()
 export class GameService {
   constructor(
@@ -22,12 +22,8 @@ export class GameService {
     return game.save();
   }
 
-  async findOne(id: string): Promise<GameWithId> {
-    const game = await this.gameModel
-      .findById(id)
-      .populate('players')
-      .populate('deck')
-      .populate('defausse');
+  async findOne(id: string, populateStrings: string[] = []): Promise<GameWithId> {
+    const game = await this.gameModel.findById(id).populate(populateStrings);
 
     if (!game) {
       throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
@@ -47,26 +43,40 @@ export class GameService {
     return games;
   }
 
-  async addPlayer(gameId: string, userId: string): Promise<JoinGameResponse> {
-    // TODO :Verify if can add player
-    const playerCreateDto: PlayerCreateDto = {
-      gameId: gameId,
-      userId: userId,
-    };
+  async addPlayer(game: GameWithId, user: UserWithId): Promise<JoinGameResponse> {
+    // Check if player already exists in this game by querying the player directly
+    const existingPlayer = await this.playerService.findByGameAndUser(
+      game._id.toString(),
+      user._id.toString(),
+    );
+
+    if (existingPlayer) {
+      throw new NotFoundException(
+        'Player already in game',
+        ErrorEnum['game/player-already-in-game'],
+      );
+    }
+
+    const playerCreateDto: PlayerCreateDto = { game, user };
 
     // Create the player
     const playerData = await this.playerService.create(playerCreateDto);
-    const gameData = await this.findOne(gameId);
 
-    if (!playerData || !gameData) {
-      throw new Error('Failed to add player to game');
-    }
+    // Add player ID to game and save
+    const gameData = await this.update(game._id.toString(), { players: playerData._id });
 
     // Return the response
-    return {
-      gameData,
-      playerData,
-    };
+    return { playerData, gameData };
+  }
+
+  async update(gameId: string, updateData: object): Promise<GameWithId> {
+    return (await this.gameModel.findByIdAndUpdate(
+      gameId,
+      {
+        $push: updateData,
+      },
+      { new: true },
+    )) as GameWithId;
   }
 
   /*async dodge(gameId: string, playerId: string): Promise<void> {
@@ -104,6 +114,8 @@ export class GameService {
     game.indexPlayerWhoPlays = -1;
     game.playerDodge = '';
     await this.gameModel.findByIdAndUpdate(game._id, game);
+
+    await this.playerService.deleteAllByGame(gameId);
   }
 
   // ===== TURN MANAGEMENT =====

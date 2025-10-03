@@ -12,10 +12,9 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import AnimatedBanner from "@/components/utils/animations/AnimatedBanner";
 
 export default function InGameBoard() {
-  const game = useGameStore();
+  const { currentPlayerId, getReorderedPlayers, options } = useGameStore();
   const isMobile = useIsMobile();
-  const nbPlayers = game.options.maxPlayers;
-  const players = game.players;
+  const nbPlayers = options.maxPlayers;
 
   const deckRef = useRef<HTMLDivElement>(null);
   const playerRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
@@ -24,10 +23,7 @@ export default function InGameBoard() {
     ? getMobilePlayerLayout(nbPlayers)
     : getPlayerLayout(nbPlayers);
 
-  const orderedPlayers = game.getReorderedPlayers(
-    players,
-    game.currentPlayerId
-  );
+  const orderedPlayers = getReorderedPlayers(currentPlayerId);
 
   return (
     <div className="relative h-full w-full rounded-[1vh] overflow-hidden max-w-full max-h-full">

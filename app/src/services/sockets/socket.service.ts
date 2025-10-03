@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { useSocketsStore } from "@/store/sockets/sockets.store";
 import authService from "../auth.service";
 import { gameService } from "@/services/game/game.service";
+import { GameEvents } from "@/types/events/game.events";
 
 class SocketService {
   private static instance: SocketService;
@@ -29,6 +30,7 @@ class SocketService {
       },
       query: {
         gameId,
+        userId: user.id,
       },
     });
     return socket;

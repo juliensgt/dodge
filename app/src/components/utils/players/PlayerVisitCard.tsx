@@ -1,4 +1,4 @@
-import { Player } from "@/store/game/player";
+import { Player } from "@/store/game/types";
 import PlayerAvatar from "./PlayerAvatar";
 interface PlayerVisitCardProps {
   player: Player;

@@ -10,7 +10,7 @@ export default function Board() {
   const renderBoardState = () => {
     switch (state) {
       case "WAITING":
-        return <InGameBoard />;
+        return <StartingBoard />;
       case "COUP_OEIL":
         return <CoupOeilBoard />;
       case "IN_GAME":

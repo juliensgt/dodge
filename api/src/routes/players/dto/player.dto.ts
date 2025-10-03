@@ -1,4 +1,4 @@
-import { Player } from '../player.schema';
+import { PlayerWithId } from '../player.schema';
 import { User } from '../../user/user.schema';
 
 export class PlayerDto {
@@ -8,9 +8,9 @@ export class PlayerDto {
   currentTime: number;
   skinCards: string;
 
-  static fromPlayer(player: Player & { _id: string }, user: User): PlayerDto {
+  static fromPlayer(player: PlayerWithId, user: User): PlayerDto {
     const dto = new PlayerDto();
-    dto.id = player._id;
+    dto.id = player._id.toString();
     dto.name = user.name;
     dto.points = player.points;
     dto.currentTime = 0;

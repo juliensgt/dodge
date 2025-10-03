@@ -8,13 +8,13 @@ import { useGradient } from "@/hooks/useGradient";
 
 export default function StartingBoard() {
   const { t } = useTranslation();
-  const game = useGameStore();
+  const { players, options } = useGameStore();
   const { ColorType } = useGradient();
 
   const time = 10;
   const codeGame = "TEST";
-  const nbPlayersInGame = game.players.length;
-  const maxPlayers = game.options.maxPlayers;
+  const nbPlayersInGame = players.length;
+  const maxPlayers = options.maxPlayers;
 
   const openRules = () => {
     // TODO: Implémenter l'ouverture des règles
@@ -59,13 +59,13 @@ export default function StartingBoard() {
 
         <div className="mx-2 md:mx-[10%] gap-2 md:gap-2.5 flex flex-row flex-wrap justify-center md:justify-start content-around">
           {Array.from({ length: maxPlayers }, (_, index) => {
-            const player = game.players[index];
+            const player = players[index];
             return (
               <div
                 key={index}
                 className="w-[calc(50%-4px)] md:w-[calc(50%-10px)]"
               >
-                {player && player.name ? (
+                {player ? (
                   <PlayerVisitCard player={player} />
                 ) : (
                   <PlayerSkeletonCard />

@@ -31,6 +31,14 @@ export default function Dashboard() {
     router.push(`/app/game/${gameId}`);
   };
 
+  const resetGame = () => {
+    const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
+
+    fetch(process.env.NEXT_PUBLIC_API_URL + `/games/${gameId}/reset`, {
+      method: "POST",
+    });
+  };
+
   const openSkinSelector = () => {
     setIsSkinSelectorOpen(true);
   };
@@ -90,6 +98,11 @@ export default function Dashboard() {
                 onClick={() => handleJoinGame(playerName)}
                 label={t("Rejoindre la partie")}
                 gradient={{ gradientType: GradientType.PRIMARY }}
+              />
+              <ActionButton
+                onClick={resetGame}
+                label={t("Reset la partie")}
+                color={{ color: ColorType.TRANSPARENT }}
               />
             </div>
           </div>

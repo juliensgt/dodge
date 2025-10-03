@@ -4,7 +4,6 @@ import { Socket } from "socket.io-client";
 import { ChatEvents } from "@/types/events/chat.events";
 import { JoinGameResponse } from "@/types/game/game.types";
 import { useGameStore } from "@/store/game/game";
-import { authService } from "../auth.service";
 
 class GameService {
   constructor() {}
@@ -20,21 +19,12 @@ class GameService {
     console.log("Client setup game event listeners");
     // Écouter les événements de la partie
     client.on(GameEvents.PLAYER_JOINED, async (data: JoinGameResponse) => {
-      const currentUserId = await authService.getUserId();
       const game = useGameStore.getState();
 
-      console.log("Current user id:", currentUserId);
-      console.log("Player data:", data.playerData);
-      console.log("Game data:", data.gameData);
+      console.log("Player joined:", data);
 
-      // if current user is player, initialize game or add player to game
-      if (data.playerData?.id === currentUserId) {
-        game.setGame(data.gameData!);
-        console.log("Player joined and game initialized:", data);
-      } else {
-        game.addPlayer(data.playerData!);
-        console.log("Player added to game:", data);
-      }
+      // update game
+      game.setGame(data.gameData!);
 
       // Mettre à jour l'UI si nécessaire
     });

@@ -22,4 +22,7 @@ export enum GameEvents {
   // Changement d'état de jeu (WAITING → STARTED → IN_GAME → etc.)
   // TODO : look at this
   GAME_STATE_CHANGED = 'game:state-changed',
+
+  // Reset la partie
+  RESET_GAME = 'game:reset',
 }
