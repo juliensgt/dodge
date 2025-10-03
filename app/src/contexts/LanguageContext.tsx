@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Locale, locales, defaultLocale } from "@/i18n/config";
-import { httpService } from "@/services/http/http.service";
 
 interface LanguageContextType {
   locale: Locale;
@@ -21,10 +20,31 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLocale = async (newLocale: Locale) => {
     setIsLoading(true);
     try {
-      const data = await httpService.get(`/locales/${newLocale}/common.json`);
+      const response = await fetch(`/locales/${newLocale}/common.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load translations for ${newLocale}`);
+      }
+      const data = await response.json();
       setTranslations(data as Record<string, string>);
       setLocaleState(newLocale);
       localStorage.setItem("preferred-locale", newLocale);
+    } catch (error) {
+      console.error(`Error loading translations for ${newLocale}:`, error);
+      // Fallback to default locale if the requested locale fails
+      if (newLocale !== defaultLocale) {
+        try {
+          const fallbackResponse = await fetch(
+            `/locales/${defaultLocale}/common.json`
+          );
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            setTranslations(fallbackData as Record<string, string>);
+            setLocaleState(defaultLocale);
+          }
+        } catch (fallbackError) {
+          console.error(`Error loading fallback translations:`, fallbackError);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -39,11 +59,36 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           : defaultLocale;
 
       try {
-        const response = await httpService.get(
-          `/locales/${initialLocale}/common.json`
-        );
-        setTranslations(response as Record<string, string>);
+        const response = await fetch(`/locales/${initialLocale}/common.json`);
+        if (!response.ok) {
+          throw new Error(`Failed to load translations for ${initialLocale}`);
+        }
+        const data = await response.json();
+        setTranslations(data as Record<string, string>);
         setLocaleState(initialLocale);
+      } catch (error) {
+        console.error(
+          `Error loading initial translations for ${initialLocale}:`,
+          error
+        );
+        // Try to load default locale as fallback
+        if (initialLocale !== defaultLocale) {
+          try {
+            const fallbackResponse = await fetch(
+              `/locales/${defaultLocale}/common.json`
+            );
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              setTranslations(fallbackData as Record<string, string>);
+              setLocaleState(defaultLocale);
+            }
+          } catch (fallbackError) {
+            console.error(
+              `Error loading fallback translations:`,
+              fallbackError
+            );
+          }
+        }
       } finally {
         setIsLoading(false);
       }
