@@ -4,6 +4,8 @@ import Chat from "./chat/Chat";
 import Settings from "./settings/Settings";
 import Ranking from "./ranking/Ranking";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { faGear, faMessage, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type TabType = "chat" | "settings" | "ranking";
 
@@ -13,9 +15,21 @@ export default function GameTabs() {
   const isMobile = useIsMobile();
 
   const tabs = [
-    { id: "chat" as TabType, label: t("Chat"), icon: "💬" },
-    { id: "settings" as TabType, label: t("Paramètres"), icon: "⚙️" },
-    { id: "ranking" as TabType, label: t("Classement"), icon: "🏆" },
+    {
+      id: "chat" as TabType,
+      label: "",
+      icon: <FontAwesomeIcon icon={faMessage} size="xl" color="#ffffff" />,
+    },
+    {
+      id: "settings" as TabType,
+      label: "",
+      icon: <FontAwesomeIcon icon={faGear} size="xl" color="#ffffff" />,
+    },
+    {
+      id: "ranking" as TabType,
+      label: "",
+      icon: <FontAwesomeIcon icon={faTrophy} size="xl" color="#ffffff" />,
+    },
   ];
 
   const renderTabContent = () => {
@@ -34,15 +48,15 @@ export default function GameTabs() {
   return (
     <div className="h-full flex flex-col font-['MT'] select-none">
       {/* Navigation des onglets */}
-      <div className="flex border-b border-[var(--action-chat-border-color)]">
+      <div className="flex border-b border-[var(--text-color)]/10">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 px-3 py-3 text-sm font-medium relative ${
               activeTab === tab.id
-                ? "text-[var(--action-choice-active-color)] border-b-2 border-[var(--action-choice-active-color)] bg-[var(--action-chat-background-color)]/30"
-                : "text-[var(--action-chat-secondary-text-color)] hover:text-[var(--action-chat-primary-text-color)] hover:bg-[var(--action-chat-background-color)]/20"
+                ? "text-[var(--action-choice-active-color)] border-b-2 border-[var(--action-choice-active-color)]"
+                : "text-[var(--action-chat-secondary-text-color)] hover:text-[var(--action-chat-primary-text-color)]"
             }`}
           >
             <div className="flex items-center justify-center gap-1">

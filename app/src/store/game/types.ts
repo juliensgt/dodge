@@ -36,11 +36,11 @@ export interface Game {
   state: string;
   round: number;
   players: Player[];
+  options: GameOptions;
   currentPlayerId: string;
-  playerIdWhoPlays: string;
+  playerWhoPlays: Player;
   focusMode: boolean;
   actionQueue: ActionQueueItem[];
   currentAction: ActionPlayer;
   actionsHistory: ActionsHistory;
-  options: GameOptions;
 }

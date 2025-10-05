@@ -13,14 +13,10 @@ import { WebSocketModule } from './websocket/websocket.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRootAsync({
-      useFactory: () => ({
-        uri: process.env.MONGODB_URI || 'mongodb://localhost/nest',
-      }),
-    }),
-    GameModule,
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost/nest'),
     UserModule,
     CardModule,
+    GameModule,
     MessageModule,
     WebSocketModule,
   ],

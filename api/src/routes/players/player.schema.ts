@@ -1,17 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { Card } from '../card/card.schema';
-import { Game } from '../game/game.schema';
 import { User } from '../user/user.schema';
 
-export type PlayerWithId = Player & { _id: Types.ObjectId };
-
-export type PlayerDocument = HydratedDocument<Player>;
-
-@Schema({ collection: 'players' })
+@Schema()
 export class Player {
+  _id: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: 'Game' })
-  game: Game;
+  game: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: User;

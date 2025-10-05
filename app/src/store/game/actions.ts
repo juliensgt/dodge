@@ -21,6 +21,7 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
   get
 ) => ({
   setGame: (game: Game, playerCurrentId?: string) => {
+    console.log("Setting game", game);
     set({
       id: game.id,
       state: game.state,

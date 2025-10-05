@@ -4,6 +4,8 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   OnGatewayInit,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
@@ -14,6 +16,14 @@ import { GameEvents } from './events/game.events';
 import { UserService } from 'src/routes/user/user.service';
 import { PlayerDto } from 'src/routes/players/dto/player.dto';
 import { GameDto } from 'src/routes/game/dto/game.dto';
+import { ChatEvents } from './events/chat.events';
+import { WsAuthGuard } from './guards/ws-auth.guard';
+import { UseGuards } from '@nestjs/common';
+import { GameInfo } from './decorators/game-info.decorator';
+import { MessageService } from 'src/routes/message/message.service';
+import { MessageDto } from 'src/routes/message/dto/message.dto';
+import { PlayerService } from 'src/routes/players/player.service';
+import { GameState } from 'src/enums/game-state.enum';
 
 @WebSocketGateway({
   cors: {
@@ -27,6 +37,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   constructor(
     private readonly gameService: GameService,
     private readonly userService: UserService,
+    private readonly messageService: MessageService,
+    private readonly playerService: PlayerService,
   ) {}
 
   afterInit(server: Server) {
@@ -34,9 +46,34 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     socketService.setServer(server);
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+  async handleDisconnect(client: Socket) {
+    const supabaseId = client.handshake.query.userId as string;
+    const gameId = client.handshake.query.gameId as string;
+
+    if (!supabaseId || !gameId) {
+      throw new WsException('Missing supabaseId or gameId');
+    }
+
+    const game = await this.gameService.findOne(gameId);
+    if (!game) {
+      throw new WsException('Game not found');
+    }
+
+    if (game.state === GameState.WAITING) {
+      await this.gameService
+        .removePlayer(gameId, supabaseId)
+        .then((response) => {
+          socketService.broadcastToGame(gameId, GameEvents.PLAYER_LEFT, {
+            gameData: GameDto.fromGame(response.gameData!),
+            playerData: PlayerDto.fromPlayer(response.playerData!, response.playerData!.user),
+          });
+        })
+        .catch((error) => {
+          console.error('error', error);
+        });
+    }
     socketService.unregisterConnection(client.id);
+    console.log('handleDisconnect');
   }
 
   async handleConnection(client: Socket) {
@@ -47,11 +84,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       throw new WsException('Missing userId or gameId');
     }
 
-    const game = await this.gameService.findOne(gameId, ['players']);
     const user = await this.userService.findBySupabaseId(userId);
 
     this.gameService
-      .addPlayer(game, user)
+      .addPlayer(gameId, user)
       .then(async (response) => {
         // Register the connection
         socketService.registerConnection({
@@ -61,6 +97,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
           userId: userId,
         });
         await client.join('dgd-' + gameId);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        client.data.gameId = gameId;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        client.data.playerId = response.playerData!._id.toString();
 
         // Send the player data to the client
         socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
@@ -69,9 +109,30 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         });
       })
       .catch((error: WsException) => {
+        console.error('error', error);
         client.emit('error', { message: error.message || 'Connection failed' });
         client.disconnect();
       });
+    console.log('handleConnection');
+  }
+
+  @SubscribeMessage(ChatEvents.CHAT_MESSAGE_SENT)
+  @UseGuards(WsAuthGuard)
+  async handleSendMessage(
+    @MessageBody() data: { message: string },
+    @GameInfo() gameInfo: GameInfo,
+  ) {
+    const player = await this.playerService.findOne(gameInfo.playerId);
+
+    const message = await this.messageService.create({
+      gameId: gameInfo.gameId,
+      player,
+      message: data.message,
+    });
+
+    const messageDto = MessageDto.fromMessage(message);
+
+    this.server.to(`dgd-${gameInfo.gameId}`).emit(ChatEvents.CHAT_MESSAGE_SENT, messageDto);
   }
 
   /*@SubscribeMessage('leaveGame')

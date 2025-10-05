@@ -1,38 +1,53 @@
+import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { locales, localeNames, Locale } from "@/i18n/config";
+import Selector, { SelectorOption } from "./Selector";
+import { useTranslation } from "@/hooks/useTranslation";
 
-export default function LanguageSelector() {
+interface LanguageSelectorProps {
+  className?: string;
+}
+
+// Fonction utilitaire pour obtenir l'emoji du drapeau
+function getFlagEmoji(locale: Locale): string {
+  const flagMap: Record<Locale, string> = {
+    en: "🇺🇸",
+    fr: "🇫🇷",
+    de: "🇩🇪",
+    es: "🇪🇸",
+    it: "🇮🇹",
+    pt: "🇵🇹",
+  };
+  return flagMap[locale] || "🌐";
+}
+
+export default function LanguageSelector({
+  className = "",
+}: LanguageSelectorProps) {
   const { locale, setLocale, isLoading } = useLanguage();
+  const { t } = useTranslation();
+  const languageOptions: SelectorOption<Locale>[] = locales.map((loc) => ({
+    id: loc,
+    name: localeNames[loc],
+    icon: <span className="text-lg">{getFlagEmoji(loc)}</span>,
+  }));
 
   return (
-    <div className="relative">
-      <select
-        value={locale}
-        onChange={(e) => setLocale(e.target.value as Locale)}
-        disabled={isLoading}
-        className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {locales.map((loc) => (
-          <option key={loc} value={loc}>
-            {localeNames[loc]}
-          </option>
-        ))}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-        <svg
-          className="w-4 h-4 text-gray-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </div>
-    </div>
+    <Selector
+      className={className}
+      options={languageOptions}
+      value={locale}
+      onChange={setLocale}
+      placeholder={t("Choisir une langue")}
+      disabled={isLoading}
+      renderOption={(option) => (
+        <>
+          <span className="text-lg">{getFlagEmoji(option.id)}</span>
+          <div className="flex-1 text-left">
+            <div className="text-white text-sm">{option.name}</div>
+          </div>
+        </>
+      )}
+    />
   );
 }

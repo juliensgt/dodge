@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument, UserWithId } from './user.schema';
+import { User, UserDocument } from './user.schema';
 import { ErrorEnum } from '../../enums/errors/error.enum';
-import { Player } from '../players/player.schema';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
 
@@ -24,7 +23,7 @@ export class UserService {
     return this.userModel.find();
   }
 
-  async findOne(id: string): Promise<UserWithId> {
+  async findOne(id: string): Promise<User> {
     const user = await this.userModel.findOne({ _id: id });
     if (!user) {
       throw new NotFoundException('User not found', ErrorEnum['user/not-found']);
@@ -45,10 +44,6 @@ export class UserService {
       });
   }
 
-  async findByPlayer(player: Player): Promise<UserWithId> {
-    return this.findOne((player.user as UserWithId)._id.toString());
-  }
-
   async findOrCreate(supabaseId: string, userData?: Partial<UserCreateDto>): Promise<User> {
     try {
       return await this.findBySupabaseId(supabaseId);
@@ -67,7 +62,7 @@ export class UserService {
     }
   }
 
-  async findBySupabaseId(supabaseId: string): Promise<UserWithId> {
+  async findBySupabaseId(supabaseId: string): Promise<User> {
     const user = await this.userModel.findOne({ supabaseId });
     if (!user) {
       throw new NotFoundException('User not found', ErrorEnum['user/not-found']);

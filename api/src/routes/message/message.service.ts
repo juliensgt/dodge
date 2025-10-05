@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Message, MessageDocument } from './message.schema';
 import { ErrorEnum } from '../../enums/errors/error.enum';
+import { MessageDto } from './dto/message.dto';
+import { Player } from '../players/player.schema';
+import { User } from '../user/user.schema';
 
 @Injectable()
 export class MessageService {
@@ -20,14 +23,25 @@ export class MessageService {
     return message;
   }
 
-  async findByGame(gameId: string): Promise<Message[]> {
-    return this.messageModel.find({ gameId });
+  async findByGame(gameId: string): Promise<MessageDto[]> {
+    const messages = await this.messageModel
+      .find({ gameId })
+      .populate({
+        path: 'player',
+        model: Player.name,
+        populate: {
+          path: 'user',
+          model: User.name,
+        },
+      })
+      .exec();
+    return messages.map((message) => MessageDto.fromMessage(message));
   }
 
   async create(messageData: Partial<Message>): Promise<Message> {
     const message = new this.messageModel({
       ...messageData,
-      date: Date.now(),
+      date: new Date(),
     });
     return message.save();
   }

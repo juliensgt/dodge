@@ -1,20 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Game, GameDocument } from './game.schema';
-import { GameWithId } from './game.schema';
+import { Model, Types } from 'mongoose';
+import { Game } from './game.schema';
 import { GameState } from '../../enums/game-state.enum';
 import { defaultGameCreateDto, GameCreateDto } from './dto/game-create.dto';
 import { ErrorEnum } from '../../enums/errors/error.enum';
-import { JoinGameResponse } from 'src/websocket/types/game.types';
+import { GameStateWithPlayer } from 'src/websocket/types/game.types';
 import { PlayerService } from '../players/player.service';
 import { PlayerCreateDto } from '../players/dto/player-create.dto';
-import { UserWithId } from '../user/user.schema';
+import { User } from '../user/user.schema';
+import { Player } from '../players/player.schema';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class GameService {
   constructor(
-    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
+    @InjectModel(Game.name) private gameModel: Model<Game>,
     private playerService: PlayerService,
+    private userService: UserService,
   ) {}
 
   async create(gameCreateDto: GameCreateDto): Promise<Game> {
@@ -22,7 +24,7 @@ export class GameService {
     return game.save();
   }
 
-  async findOne(id: string, populateStrings: string[] = []): Promise<GameWithId> {
+  async findOne(id: string, populateStrings: string[] = []): Promise<Game> {
     const game = await this.gameModel.findById(id).populate(populateStrings);
 
     if (!game) {
@@ -33,47 +35,96 @@ export class GameService {
   }
 
   async findAll(): Promise<Game[]> {
-    const games = await this.gameModel
-      .find()
-      .populate('players')
-      .populate('deck')
-      .populate('defausse')
-      .exec();
+    const games = await this.gameModel.find().exec();
 
     return games;
   }
 
-  async addPlayer(game: GameWithId, user: UserWithId): Promise<JoinGameResponse> {
-    const playerCreateDto: PlayerCreateDto = { game, user };
+  async findOnePopulated(id: string): Promise<Game | null> {
+    const gameData = await this.gameModel
+      .findById(id)
+      .populate({
+        path: 'players',
+        model: Player.name,
+        populate: {
+          path: 'user',
+          model: User.name,
+        },
+      })
+      .exec();
+    return gameData;
+  }
 
-    let player = await this.playerService.findByGameAndUser(
-      game._id.toString(),
-      user._id.toString(),
-    );
-    let gameData = await this.findOne(game._id.toString(), ['players']);
-    if (gameData.gameState !== GameState.WAITING && !player) {
+  async addPlayer(gameId: string, user: User): Promise<GameStateWithPlayer> {
+    let player = await this.playerService.findByGameAndUser(gameId, user._id.toString());
+    let gameData = await this.findOnePopulated(gameId);
+    if (gameData === null) {
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
+    } else if (gameData.state !== GameState.WAITING && !player) {
       throw new NotFoundException('Game is not in waiting state', ErrorEnum['game/invalid-state']);
     } else if (gameData.players.length >= gameData.options.maxPlayers && !player) {
       throw new NotFoundException('Game is full', ErrorEnum['game/game-full']);
     }
 
-    // Create the player if it doesn't exist for this game and user
     if (!player) {
+      const playerCreateDto: PlayerCreateDto = { game: gameData, user };
       player = await this.playerService.create(playerCreateDto);
-      gameData = await this.update(game._id.toString(), { players: player._id });
+      gameData = await this.addPlayerToGame(gameId, player._id);
     }
-    // Return the response
+
     return { playerData: player, gameData: gameData };
   }
 
-  async update(gameId: string, updateData: object): Promise<GameWithId> {
-    return (await this.gameModel.findByIdAndUpdate(
-      gameId,
-      {
-        $push: updateData,
-      },
-      { new: true },
-    )) as GameWithId;
+  async removePlayer(gameId: string, supabaseId: string): Promise<GameStateWithPlayer> {
+    const user = await this.userService.findBySupabaseId(supabaseId);
+    const player = await this.playerService.findByGameAndUser(gameId, user?._id.toString());
+    let gameData = await this.findOnePopulated(gameId);
+
+    if (!gameData) {
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
+    } else if (!player) {
+      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
+    } else if (!gameData.players.some((p) => p._id.toString() === player?._id.toString())) {
+      throw new NotFoundException('Player not found in game', ErrorEnum['game/player-not-in-game']);
+    }
+
+    await this.playerService.delete(gameId, player._id.toString());
+    gameData = await this.update(gameId, {
+      players: gameData.players.filter((p) => p._id.toString() !== player._id.toString()),
+    });
+    return { playerData: player, gameData };
+  }
+
+  async update(gameId: string, updateData: object): Promise<Game> {
+    return (await this.gameModel
+      .findByIdAndUpdate(
+        gameId,
+        {
+          $set: updateData,
+        },
+        { new: true },
+      )
+      .populate({
+        path: 'players',
+        model: Player.name,
+        populate: { path: 'user', model: User.name },
+      })) as Game;
+  }
+
+  async addPlayerToGame(gameId: string, playerId: Types.ObjectId): Promise<Game> {
+    return (await this.gameModel
+      .findByIdAndUpdate(
+        gameId,
+        {
+          $addToSet: { players: playerId },
+        },
+        { new: true },
+      )
+      .populate({
+        path: 'players',
+        model: Player.name,
+        populate: { path: 'user', model: User.name },
+      })) as Game;
   }
 
   /*async dodge(gameId: string, playerId: string): Promise<void> {
@@ -105,12 +156,12 @@ export class GameService {
     game.deck = [];
     game.defausse = [];
     game.players = [];
-    game.gameState = GameState.WAITING;
+    game.state = GameState.WAITING;
     game.round = 0;
     game.tour = 0;
-    game.indexPlayerWhoPlays = -1;
+    game.playerWhoPlays = null;
     game.playerDodge = '';
-    await this.gameModel.findByIdAndUpdate(game._id, game);
+    await this.gameModel.findByIdAndUpdate(gameId, game);
 
     await this.playerService.deleteAllByGame(gameId);
   }

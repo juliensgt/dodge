@@ -1,40 +1,39 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { GameState } from '../../enums/game-state.enum';
 import { Card } from '../card/card.schema';
+import { Player } from '../players/player.schema';
 
-export type GameDocument = HydratedDocument<Game>;
-
-export type GameWithId = Game & { _id: Types.ObjectId };
-
-@Schema({ collection: 'games' })
+@Schema()
 export class Game {
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
-  players: Types.ObjectId[];
-
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Card' }] })
-  deck: Card[];
-
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Card' }] })
-  defausse: Card[];
+  _id: Types.ObjectId;
 
   @Prop({ type: String, enum: GameState, default: GameState.WAITING })
-  gameState: GameState;
+  state: GameState;
+
+  @Prop()
+  round: number;
+
+  @Prop({ type: [{ type: Types.ObjectId }] })
+  players: Player[];
 
   @Prop({ type: Object })
   options: GameOptionsBo;
+
+  @Prop({ type: Types.ObjectId, ref: 'Player' })
+  playerWhoPlays: Player | null;
+
+  @Prop({ type: [{ type: Types.ObjectId }] })
+  deck: Card[];
+
+  @Prop({ type: [{ type: Types.ObjectId }] })
+  defausse: Card[];
 
   @Prop()
   indexLastPlayerWhoPlay: number;
 
   @Prop()
-  indexPlayerWhoPlays: number;
-
-  @Prop()
   playerDodge: string;
-
-  @Prop()
-  round: number;
 
   @Prop()
   tour: number;

@@ -5,10 +5,12 @@ import PlayerSkeletonCard from "@/components/utils/players/PlayerVisitCardSkelet
 import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
+import { useRouter } from "next/navigation";
 
 export default function StartingBoard() {
   const { t } = useTranslation();
   const { players, options } = useGameStore();
+  const router = useRouter();
   const { ColorType } = useGradient();
 
   const time = 10;
@@ -22,7 +24,7 @@ export default function StartingBoard() {
   };
 
   const leaveGame = () => {
-    // TODO: Implémenter la sortie de partie
+    router.push("/app");
   };
 
   return (
@@ -33,9 +35,8 @@ export default function StartingBoard() {
         <div className="flex flex-row justify-between items-center mb-4 md:mb-6">
           <ActionButton
             onClick={leaveGame}
-            label="Quitter la partie"
+            label={t("Quitter la partie")}
             color={{ color: ColorType.TRANSPARENT }}
-            disabled={true}
           />
 
           <div className="text-center">
@@ -75,7 +76,7 @@ export default function StartingBoard() {
           })}
         </div>
         <div className="text-center mt-4 md:mt-6">
-          <div className="inline-flex items-center gap-2 md:gap-3 bg-[var(--action-chat-background-color)]/30 backdrop-blur-sm rounded-full px-4 py-2 md:px-6 md:py-3 border border-[var(--action-chat-border-color)]/20 shadow-lg">
+          <div className="inline-flex items-center gap-2 md:gap-3 bg-[var(--text-color)]/10 backdrop-blur-sm rounded-full px-4 py-2 md:px-6 md:py-3 border border-[var(--action-chat-border-color)]/20 shadow-lg">
             <div className="flex items-center gap-1.5 md:gap-2">
               <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-green-500 rounded-full animate-pulse" />
               <span className="text-[var(--text-color)] text-xs md:text-sm font-medium">

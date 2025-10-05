@@ -28,7 +28,33 @@ export default function Game() {
         setIsLoading(false);
       });
     }
+
+    // Cleanup function to disconnect socket when component unmounts
+    return () => {
+      socketService.disconnect();
+    };
   }, [gameId, resetGame]);
+
+  // Handle browser navigation (back/forward buttons)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      socketService.disconnect();
+    };
+
+    const handleRouteChange = () => {
+      socketService.disconnect();
+    };
+
+    // Listen for browser navigation events
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    router.events.on("routeChangeStart", handleRouteChange);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      router.events.off("routeChangeStart", handleRouteChange);
+    };
+  }, [router.events]);
 
   // Show loading state while joining or if there's an error
   if (isLoading) {

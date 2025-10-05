@@ -1,8 +1,16 @@
-import { Game, Player } from "@/store/game/game";
+import { Game, Player } from "@/store/game/types";
 
 export enum ConnectionType {
   SPECTATOR = "spectator",
   PLAYER = "player",
+}
+
+export interface GameMessage {
+  id: string;
+  gameId: string;
+  player: Player;
+  message: string;
+  date: Date;
 }
 
 export interface JoinGameRequest {
@@ -10,7 +18,7 @@ export interface JoinGameRequest {
   type: ConnectionType;
 }
 
-export interface JoinGameResponse {
+export interface GameAndPlayerResponse {
   gameData?: Game;
   playerData?: Player;
 }

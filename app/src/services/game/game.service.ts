@@ -2,9 +2,10 @@ import { GameEvents } from "@/types/events/game.events";
 import { socketService } from "../sockets/socket.service";
 import { Socket } from "socket.io-client";
 import { ChatEvents } from "@/types/events/chat.events";
-import { JoinGameResponse } from "@/types/game/game.types";
+import { GameMessage, GameAndPlayerResponse } from "@/types/game/game.types";
 import { useGameStore } from "@/store/game/game";
-import { errorService } from "../error/error.service";
+import { httpService } from "../http/http.service";
+import { useMessagesStore } from "@/store/messages/messages.store";
 
 class GameService {
   constructor() {}
@@ -19,7 +20,7 @@ class GameService {
   setupGameEventListeners(client: Socket) {
     console.log("Client setup game event listeners");
     // Écouter les événements de la partie
-    client.on(GameEvents.PLAYER_JOINED, async (data: JoinGameResponse) => {
+    client.on(GameEvents.PLAYER_JOINED, async (data: GameAndPlayerResponse) => {
       const game = useGameStore.getState();
 
       console.log("Player joined:", data);
@@ -30,8 +31,12 @@ class GameService {
       // Mettre à jour l'UI si nécessaire
     });
 
-    client.on(GameEvents.PLAYER_LEFT, (data) => {
+    client.on(GameEvents.PLAYER_LEFT, (data: GameAndPlayerResponse) => {
+      const game = useGameStore.getState();
       console.log("Player left:", data);
+
+      // update game
+      game.setGame(data.gameData!);
       // Mettre à jour l'UI si nécessaire
     });
 
@@ -45,16 +50,21 @@ class GameService {
       // Mettre à jour l'UI si nécessaire
     });
 
-    client.on(ChatEvents.CHAT_MESSAGE_SENT, (data) => {
-      console.log("New message:", data);
-      // Mettre à jour l'UI si nécessaire
+    client.on(ChatEvents.CHAT_MESSAGE_SENT, (data: GameMessage) => {
+      useMessagesStore.getState().addMessage(data);
     });
+  }
 
-    // Intercepter les erreurs WebSocket
-    client.on("error", (error) => {
-      console.error("WebSocket error:", error);
-      errorService.handleWebSocketError(error);
-    });
+  async sendMessage(message: string) {
+    console.log("Sending message on", ChatEvents.CHAT_MESSAGE_SENT, message);
+    await socketService.emit(ChatEvents.CHAT_MESSAGE_SENT, { message });
+  }
+
+  async getMessages(gameId: string): Promise<GameMessage[]> {
+    const data = await httpService.get<GameMessage[]>(
+      `/messages/game/${gameId}`
+    );
+    return data ?? [];
   }
 }
 

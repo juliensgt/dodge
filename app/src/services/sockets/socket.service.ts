@@ -37,11 +37,16 @@ class SocketService {
   }
 
   async joinGame(gameId: string) {
-    const { socket: actualSocket } = useSocketsStore.getState();
+    const { socket: actualSocket, currentGameId } = useSocketsStore.getState();
 
-    //check if socket is already connected
-    if (actualSocket && actualSocket.connected) {
+    // If socket is already connected to the same game, do nothing
+    if (actualSocket && actualSocket.connected && currentGameId === gameId) {
       return;
+    }
+
+    // If socket is connected to a different game, disconnect first
+    if (actualSocket && actualSocket.connected && currentGameId !== gameId) {
+      this.disconnect();
     }
 
     // initialize socket
@@ -93,6 +98,7 @@ class SocketService {
     const { socket, setSocket, setIsConnected, setCurrentGameId } =
       useSocketsStore.getState();
     if (socket) {
+      socket.removeAllListeners();
       socket.disconnect();
       setSocket(null);
       setIsConnected(false);
