@@ -26,8 +26,10 @@ export default function Chat() {
   }, [messages]);
 
   const handleSendMessage = (message: string) => {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) return;
     if (id) {
-      gameService.sendMessage(message);
+      gameService.sendMessage(trimmedMessage);
       setMessage("");
     }
   };
@@ -56,21 +58,28 @@ export default function Chat() {
         </div>
       )}
 
-      <div className="flex gap-2">
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSendMessage(message);
+        }}
+      >
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           type="text"
+          enterKeyHint="send"
           placeholder={t("Envoie ton message...")}
           className="flex-1 px-3 py-2 bg-[var(--text-color)]/15 backdrop-blur-sm rounded-lg text-[var(--text-color)] text-sm placeholder-[var(--action-chat-secondary-text-color)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--action-choice-active-color)] transition-all duration-200"
         />
         <button
-          onClick={() => handleSendMessage(message)}
+          type="submit"
           className="cursor-pointer bg-[var(--text-color)]/15 backdrop-blur-sm rounded-lg p-2 hover:bg-[var(--text-color)]/35 transition-all duration-200 transform hover:scale-105"
         >
           <FontAwesomeIcon icon={faCircleArrowUp} size="lg" color="#ffffff" />
         </button>
-      </div>
+      </form>
     </div>
   );
 }
