@@ -1,7 +1,12 @@
 export interface GameOptions {
-  nbCards: number;
-  timeToPlay: number;
   maxPlayers: number;
+  nbCards: number;
+  nbSeeFirstCards: number;
+  pointsForActionError: number;
+  limitPoints: number;
+  timeToPlay: number;
+  timeToStartGame: number;
+  timeToSeeCards: number;
 }
 
 export interface ActionPlayer {

@@ -105,6 +105,10 @@ export class GameService {
     return { playerData: player, gameData };
   }
 
+  async changeGameState(gameId: string, state: GameState): Promise<Game> {
+    return await this.update(gameId, { state });
+  }
+
   async update(gameId: string, updateData: object): Promise<Game> {
     return (await this.gameModel
       .findByIdAndUpdate(

@@ -6,17 +6,47 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { GameState } from "@/types/game/game.types";
 
 export default function StartingBoard() {
   const { t } = useTranslation();
-  const { players, options } = useGameStore();
+  const { players, options, state } = useGameStore();
   const router = useRouter();
   const { ColorType } = useGradient();
+  const interval = useRef<NodeJS.Timeout | null>(null);
 
-  const time = 10;
+  const time = options.timeToStartGame;
   const codeGame = "TEST";
   const nbPlayersInGame = players.length;
   const maxPlayers = options.maxPlayers;
+
+  useEffect(() => {
+    if (state !== GameState.STARTED || interval.current) return;
+
+    interval.current = setInterval(() => {
+      useGameStore.setState((prev) => {
+        const time = prev.options.timeToStartGame - 1;
+        if (time <= 0) {
+          clearInterval(interval.current!);
+          interval.current = null;
+          console.log("Time to start game is 0");
+        }
+        return {
+          ...prev,
+          options: {
+            ...prev.options,
+            timeToStartGame: Math.max(time, 0),
+          },
+        };
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(interval.current!);
+      interval.current = null;
+    };
+  }, [state]);
 
   const openRules = () => {
     // TODO: Implémenter l'ouverture des règles
@@ -31,7 +61,7 @@ export default function StartingBoard() {
     <div className="relative w-full h-full rounded-5 overflow-hidden">
       <Countdown visible={true} title={t("Salle d'attente")} time={time} />
 
-      <div className="flex flex-col justify-center h-[calc(100%-20vh)] md:h-[calc(100%-25vh)] px-2 md:px-4">
+      <div className="flex flex-col justify-center px-2 md:px-4">
         <div className="flex flex-row justify-between items-center mb-4 md:mb-6">
           <ActionButton
             onClick={leaveGame}

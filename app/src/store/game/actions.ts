@@ -1,9 +1,10 @@
 import { StateCreator } from "zustand";
-import { Game, Player } from "./types";
+import { Game, GameOptions, Player } from "./types";
 
 export interface GameActions {
   // Game state management
   setGame: (game: Game, playerCurrentId?: string) => void;
+  setOptions: (options: GameOptions) => void;
   resetGame: () => void;
 
   // Player management
@@ -28,7 +29,13 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       round: game.round,
       players: game.players,
       currentPlayerId: playerCurrentId,
+      playerWhoPlays: game.playerWhoPlays,
+      options: game.options,
     });
+  },
+
+  setOptions: (options: GameOptions) => {
+    set({ options });
   },
 
   resetGame: () => {
@@ -38,7 +45,7 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       round: 0,
       players: [],
       currentPlayerId: "",
-      playerIdWhoPlays: "",
+      playerWhoPlays: undefined,
       focusMode: false,
       actionQueue: [],
       currentAction: {
@@ -48,7 +55,16 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
         action: null,
       },
       actionsHistory: { players: [], datas: [] },
-      options: { nbCards: 0, timeToPlay: 0, maxPlayers: 6 },
+      options: {
+        nbCards: 0,
+        timeToPlay: 0,
+        maxPlayers: 6,
+        nbSeeFirstCards: 2,
+        pointsForActionError: 5,
+        limitPoints: 150,
+        timeToStartGame: 10,
+        timeToSeeCards: 10,
+      },
     });
   },
 
@@ -89,7 +105,7 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
 
   isCurrentPlayerIsPlaying: () => {
     const state = get();
-    return state.playerIdWhoPlays === state.currentPlayerId;
+    return state.playerWhoPlays.id === state.currentPlayerId;
   },
 
   initGame: (currentPlayerId: string, game: Game) => {
@@ -103,6 +119,11 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
         timeToPlay: 0, //game.options.timeToPlay,
         nbCards: 0, //game.options.nbCards,
         maxPlayers: 6,
+        nbSeeFirstCards: 2,
+        pointsForActionError: 5,
+        limitPoints: 150,
+        timeToStartGame: 10,
+        timeToSeeCards: 10,
       },
       currentAction: {
         time: 0, //game.options.timeToPlay,
