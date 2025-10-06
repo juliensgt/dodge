@@ -48,7 +48,7 @@ export default function Chat() {
             <ChatMessage
               key={index}
               message={message.message}
-              player={message.player.name}
+              player={message.player?.name || "Unknown Player"}
               time={message.date}
             />
           ))}

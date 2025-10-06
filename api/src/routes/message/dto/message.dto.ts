@@ -14,6 +14,15 @@ export class MessageDto {
     dto.gameId = message.gameId;
     if (message.player && message.player.user) {
       dto.player = PlayerDto.fromPlayer(message.player, message.player.user);
+    } else {
+      // Handle case where player has left the game and been deleted
+      dto.player = {
+        id: 'deleted',
+        name: 'Unknown Player',
+        points: 0,
+        currentTime: 0,
+        skinCards: '',
+      } as PlayerDto;
     }
     dto.message = message.message;
     dto.date = message.date;

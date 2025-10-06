@@ -8,7 +8,7 @@ export enum ConnectionType {
 export interface GameMessage {
   id: string;
   gameId: string;
-  player: Player;
+  player?: Player;
   message: string;
   date: Date;
 }
