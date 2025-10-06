@@ -35,6 +35,7 @@ export class MessageService {
         },
       })
       .exec();
+    // Return all messages, MessageDto will handle deleted players gracefully
     return messages.map((message) => MessageDto.fromMessage(message));
   }
 
