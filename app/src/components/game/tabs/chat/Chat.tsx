@@ -60,12 +60,21 @@ export default function Chat() {
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && message.trim()) {
+              handleSendMessage(message);
+            }
+          }}
           type="text"
           placeholder={t("Envoie ton message...")}
           className="flex-1 px-3 py-2 bg-[var(--text-color)]/15 backdrop-blur-sm rounded-lg text-[var(--text-color)] text-sm placeholder-[var(--action-chat-secondary-text-color)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--action-choice-active-color)] transition-all duration-200"
         />
         <button
-          onClick={() => handleSendMessage(message)}
+          onClick={() => {
+            if (message.trim()) {
+              handleSendMessage(message);
+            }
+          }}
           className="cursor-pointer bg-[var(--text-color)]/15 backdrop-blur-sm rounded-lg p-2 hover:bg-[var(--text-color)]/35 transition-all duration-200 transform hover:scale-105"
         >
           <FontAwesomeIcon icon={faCircleArrowUp} size="lg" color="#ffffff" />
