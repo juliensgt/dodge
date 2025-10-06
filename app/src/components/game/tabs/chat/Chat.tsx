@@ -26,9 +26,16 @@ export default function Chat() {
   }, [messages]);
 
   const handleSendMessage = (message: string) => {
-    if (id) {
+    if (id && message.trim()) {
       gameService.sendMessage(message);
       setMessage("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSendMessage(message);
     }
   };
 
@@ -60,6 +67,7 @@ export default function Chat() {
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
           type="text"
           placeholder={t("Envoie ton message...")}
           className="flex-1 px-3 py-2 bg-[var(--text-color)]/15 backdrop-blur-sm rounded-lg text-[var(--text-color)] text-sm placeholder-[var(--action-chat-secondary-text-color)]/60 focus:outline-none focus:ring-1 focus:ring-[var(--action-choice-active-color)] transition-all duration-200"
