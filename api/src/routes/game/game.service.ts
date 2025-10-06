@@ -35,7 +35,17 @@ export class GameService {
   }
 
   async findAll(): Promise<Game[]> {
-    const games = await this.gameModel.find().exec();
+    const games = await this.gameModel
+      .find()
+      .populate({
+        path: 'players',
+        model: Player.name,
+        populate: {
+          path: 'user',
+          model: User.name,
+        },
+      })
+      .exec();
 
     return games;
   }

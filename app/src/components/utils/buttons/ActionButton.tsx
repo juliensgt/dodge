@@ -40,7 +40,7 @@ export default function ActionButton(props: ActionButtonProps) {
   return (
     <button
       onClick={props.onClick}
-      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${
+      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${
         props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
       }`}
       disabled={props.disabled}

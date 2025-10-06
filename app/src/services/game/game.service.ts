@@ -2,7 +2,11 @@ import { GameEvents } from "@/types/events/game.events";
 import { socketService } from "../sockets/socket.service";
 import { Socket } from "socket.io-client";
 import { ChatEvents } from "@/types/events/chat.events";
-import { GameMessage, GameAndPlayerResponse } from "@/types/game/game.types";
+import {
+  GameMessage,
+  GameAndPlayerResponse,
+  GameCardData,
+} from "@/types/game/game.types";
 import { useGameStore } from "@/store/game/game";
 import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
@@ -64,6 +68,11 @@ class GameService {
     const data = await httpService.get<GameMessage[]>(
       `/messages/game/${gameId}`
     );
+    return data ?? [];
+  }
+
+  async getGames(): Promise<GameCardData[]> {
+    const data = await httpService.get<GameCardData[]>(`/games`);
     return data ?? [];
   }
 }
