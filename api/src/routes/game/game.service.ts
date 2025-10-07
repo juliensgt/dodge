@@ -11,8 +11,14 @@ import { PlayerCreateDto } from '../players/dto/player-create.dto';
 import { User } from '../user/user.schema';
 import { Player } from '../players/player.schema';
 import { UserService } from '../user/user.service';
+import { GameEvents } from 'src/websocket/events/game.events';
+import { GameDto } from './dto/game.dto';
+import { socketService } from 'src/websocket/services/socket.service';
 @Injectable()
 export class GameService {
+  // Dictionnaire pour stocker les timers par gameId
+  phaseTimers = new Map<string, NodeJS.Timeout>();
+
   constructor(
     @InjectModel(Game.name) private gameModel: Model<Game>,
     private playerService: PlayerService,
@@ -98,15 +104,90 @@ export class GameService {
       throw new NotFoundException('Player not found in game', ErrorEnum['game/player-not-in-game']);
     }
 
+    // delete timer
+    this.phaseTimers.get(gameId)?.close();
+
     await this.playerService.delete(gameId, player._id.toString());
     gameData = await this.update(gameId, {
+      state: GameState.WAITING,
       players: gameData.players.filter((p) => p._id.toString() !== player._id.toString()),
     });
     return { playerData: player, gameData };
   }
 
+  async startGame(gameId: string): Promise<Game> {
+    const game = await this.changeGameState(gameId, GameState.STARTED);
+
+    this.scheduleNextPhase(
+      gameId,
+      GameState.COUP_OEIL,
+      game.options.timeToStartGame * 1000,
+      async () => {
+        await this.startCoupOeil(gameId);
+      },
+    );
+
+    return game;
+  }
+
+  async startCoupOeil(gameId: string): Promise<Game> {
+    const game = await this.changeGameState(gameId, GameState.COUP_OEIL);
+
+    this.scheduleNextPhase(
+      gameId,
+      GameState.IN_GAME,
+      game.options.timeToSeeCards * 1000,
+      async () => {
+        await this.startRound(gameId);
+      },
+    );
+
+    return game;
+  }
+
+  async startRound(gameId: string): Promise<Game> {
+    const game = await this.findOnePopulated(gameId);
+    if (!game) {
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
+    }
+    game.round++;
+    await this.update(gameId, { round: game.round });
+    return game;
+  }
+
+  scheduleNextPhase(
+    gameId: string,
+    nextState: GameState,
+    delay: number,
+    callback?: () => Promise<void>,
+  ) {
+    if (this.phaseTimers.has(gameId)) clearTimeout(this.phaseTimers.get(gameId));
+
+    const timer = setTimeout(() => {
+      if (this.phaseTimers.has(gameId)) {
+        this.changeGameState(gameId, nextState).catch((err) => {
+          console.error(`[Timer Error][${gameId}]`, err);
+        });
+        this.phaseTimers.delete(gameId);
+        if (callback)
+          callback().catch((err) => {
+            console.error(`[Timer Error][${gameId}]`, err);
+          });
+      }
+    }, delay);
+
+    this.phaseTimers.set(gameId, timer);
+  }
+
   async changeGameState(gameId: string, state: GameState): Promise<Game> {
-    return await this.update(gameId, { state });
+    const game = await this.update(gameId, { state });
+    socketService.broadcastToGame(gameId, GameEvents.GAME_STATE_CHANGED, {
+      gameData: GameDto.fromGame(game),
+    });
+
+    console.log('changeGameState', gameId, state);
+
+    return game;
   }
 
   async update(gameId: string, updateData: object): Promise<Game> {

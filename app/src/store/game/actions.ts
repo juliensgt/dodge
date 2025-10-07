@@ -1,20 +1,25 @@
 import { StateCreator } from "zustand";
 import { Game, GameOptions, Player } from "./types";
+import { GameState } from "@/types/game/game.types";
 
 export interface GameActions {
   // Game state management
   setGame: (game: Game, playerCurrentId?: string) => void;
   setOptions: (options: GameOptions) => void;
+  setGameState: (state: GameState) => void;
+  setPlayers: (players: Player[]) => void;
   resetGame: () => void;
 
   // Player management
   addPlayer: (player: Player) => void;
   removePlayer: (playerId: string) => void;
   getPlayerById: (playerId: string) => Player | undefined;
+  setCurrentPlayerId: (playerId: string) => void;
+  getCurrentPlayerId: () => string | undefined;
 
   // Utility functions
   isCurrentPlayerIsPlaying: () => boolean;
-  getReorderedPlayers: (currentPlayerId: string) => Player[];
+  getPlayers: () => Player[];
 }
 
 export const createGameActions: StateCreator<Game, [], [], GameActions> = (
@@ -68,15 +73,20 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
     });
   },
 
-  setGameState: (state: string) => {
-    switch (state) {
-      case "IN_GAME":
-        set({ focusMode: false });
-        // TODO: setAllCardsCliquable
-        break;
-      default:
-        break;
-    }
+  setGameState: (state: GameState) => {
+    set({ state });
+  },
+
+  setPlayers: (players: Player[]) => {
+    set({ players });
+  },
+
+  setCurrentPlayerId: (playerId: string) => {
+    set({ currentPlayerId: playerId });
+  },
+
+  getCurrentPlayerId: () => {
+    return get().currentPlayerId;
   },
 
   addPlayer: (player: Player) => {
@@ -143,22 +153,26 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
     });
   },
 
-  getReorderedPlayers: (currentPlayerId: string) => {
+  getPlayers: () => {
     const players = get().players;
 
-    console.log("players", players);
-
     const currentPlayerIndex = players.findIndex(
-      (player) => player.id === currentPlayerId
+      (player) => player.id === get().currentPlayerId
     );
 
-    if (currentPlayerIndex !== -1) {
-      return players
-        .slice(currentPlayerIndex)
-        .concat(players.slice(0, currentPlayerIndex));
-    } else {
-      console.error("Joueur courant non trouvé dans la liste des joueurs.");
-      return [];
+    console.log(
+      "currentPlayerIndex",
+      currentPlayerIndex,
+      "for currentPlayerId",
+      get().currentPlayerId
+    );
+
+    if (currentPlayerIndex === -1) {
+      return players;
     }
+
+    return players
+      .slice(currentPlayerIndex)
+      .concat(players.slice(0, currentPlayerIndex));
   },
 });

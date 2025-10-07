@@ -22,7 +22,7 @@ const useGameStore = create<GameStore>((set, get, store) => {
     state: "WAITING",
     round: 0,
     players: [],
-    currentPlayerId: "",
+    currentPlayerId: undefined,
     playerWhoPlays: {
       id: "",
       name: "",
@@ -30,6 +30,7 @@ const useGameStore = create<GameStore>((set, get, store) => {
       points: 0,
       currentTime: 0,
       skinCards: "",
+      ready: false,
     },
     focusMode: false,
     actionQueue: [],

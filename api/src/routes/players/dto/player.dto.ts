@@ -7,6 +7,7 @@ export class PlayerDto {
   points: number;
   currentTime: number;
   skinCards: string;
+  ready: boolean;
 
   static fromPlayer(player: Player, user: User): PlayerDto {
     const dto = new PlayerDto();
@@ -17,7 +18,7 @@ export class PlayerDto {
     }
     dto.points = player.points;
     dto.currentTime = 0;
-
+    dto.ready = player.ready;
     return dto;
   }
 }

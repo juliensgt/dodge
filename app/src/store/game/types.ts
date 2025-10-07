@@ -34,6 +34,7 @@ export interface Player {
   points: number;
   currentTime: number;
   skinCards: string;
+  ready: boolean;
 }
 
 export interface Game {
@@ -42,7 +43,7 @@ export interface Game {
   round: number;
   players: Player[];
   options: GameOptions;
-  currentPlayerId: string;
+  currentPlayerId: string | undefined;
   playerWhoPlays: Player;
   focusMode: boolean;
   actionQueue: ActionQueueItem[];

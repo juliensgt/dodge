@@ -62,12 +62,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (game.state === GameState.WAITING || game.state === GameState.STARTED) {
       await this.gameService
         .removePlayer(gameId, supabaseId)
-        .then(async (response) => {
-          // If the game is full, change the game state to WAITING
-          if (response.gameData!.players.length + 1 === response.gameData!.options.maxPlayers) {
-            response.gameData = await this.gameService.changeGameState(gameId, GameState.WAITING);
-          }
-
+        .then((response) => {
           socketService.broadcastToGame(gameId, GameEvents.PLAYER_LEFT, {
             gameData: GameDto.fromGame(response.gameData!),
             playerData: PlayerDto.fromPlayer(response.playerData!, response.playerData!.user),
@@ -107,16 +102,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         client.data.playerId = response.playerData!._id.toString();
 
-        // If the game is full, change the game state to STARTED
-        if (response.gameData!.players.length === response.gameData!.options.maxPlayers) {
-          response.gameData = await this.gameService.changeGameState(gameId, GameState.STARTED);
-        }
-
         // Send the player data to the client
         socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
           gameData: GameDto.fromGame(response.gameData!),
           playerData: PlayerDto.fromPlayer(response.playerData!, user),
         });
+
+        // If the game is full, change the game state to STARTED
+        if (response.gameData!.players.length === response.gameData!.options.maxPlayers) {
+          await this.gameService.startGame(gameId);
+        }
       })
       .catch((error: WsException) => {
         console.error('error', error);

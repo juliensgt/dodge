@@ -10,7 +10,9 @@ export default function PlayerVisitCard({ player }: PlayerVisitCardProps) {
       <PlayerAvatar player={player} />
       <div className="text-white font-semibold text-sm flex flex-col items-start">
         {player.name || "Joueur"}
-        <div className="text-white/70 text-xs">En ligne</div>
+        <div className="text-white/70 text-xs">
+          {player.ready ? "PRÊT" : "? Victoires"}
+        </div>
       </div>
     </div>
   );

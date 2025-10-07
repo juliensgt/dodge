@@ -8,16 +8,18 @@ import { useGradient } from "@/hooks/useGradient";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { GameState } from "@/types/game/game.types";
+import { gameService } from "@/services/game/game.service";
 
 export default function StartingBoard() {
-  const { t } = useTranslation();
-  const { players, options, state } = useGameStore();
   const router = useRouter();
+  const { t } = useTranslation();
+  const { players, options, state, id } = useGameStore();
+
   const { ColorType } = useGradient();
   const interval = useRef<NodeJS.Timeout | null>(null);
 
   const time = options.timeToStartGame;
-  const codeGame = "TEST";
+  const codeGame = id.slice(0, 6);
   const nbPlayersInGame = players.length;
   const maxPlayers = options.maxPlayers;
 
@@ -30,7 +32,7 @@ export default function StartingBoard() {
         if (time <= 0) {
           clearInterval(interval.current!);
           interval.current = null;
-          console.log("Time to start game is 0");
+          startGame();
         }
         return {
           ...prev,
@@ -55,6 +57,12 @@ export default function StartingBoard() {
 
   const leaveGame = () => {
     router.push("/app");
+  };
+
+  // Send start game event to server
+  // (all players send this event to the server to confirm that they are ready to start the game)
+  const startGame = () => {
+    gameService.sendStartGame();
   };
 
   return (
