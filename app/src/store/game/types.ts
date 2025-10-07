@@ -1,7 +1,12 @@
 export interface GameOptions {
-  nbCards: number;
-  timeToPlay: number;
   maxPlayers: number;
+  nbCards: number;
+  nbSeeFirstCards: number;
+  pointsForActionError: number;
+  limitPoints: number;
+  timeToPlay: number;
+  timeToStartGame: number;
+  timeToSeeCards: number;
 }
 
 export interface ActionPlayer {
@@ -29,6 +34,7 @@ export interface Player {
   points: number;
   currentTime: number;
   skinCards: string;
+  ready: boolean;
 }
 
 export interface Game {
@@ -37,7 +43,7 @@ export interface Game {
   round: number;
   players: Player[];
   options: GameOptions;
-  currentPlayerId: string;
+  currentPlayerId: string | undefined;
   playerWhoPlays: Player;
   focusMode: boolean;
   actionQueue: ActionQueueItem[];

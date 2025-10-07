@@ -59,7 +59,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       throw new WsException('Game not found');
     }
 
-    if (game.state === GameState.WAITING) {
+    if (game.state === GameState.WAITING || game.state === GameState.STARTED) {
       await this.gameService
         .removePlayer(gameId, supabaseId)
         .then((response) => {
@@ -107,6 +107,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
           gameData: GameDto.fromGame(response.gameData!),
           playerData: PlayerDto.fromPlayer(response.playerData!, user),
         });
+
+        // If the game is full, change the game state to STARTED
+        if (response.gameData!.players.length === response.gameData!.options.maxPlayers) {
+          await this.gameService.startGame(gameId);
+        }
       })
       .catch((error: WsException) => {
         console.error('error', error);
@@ -134,93 +139,4 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     this.server.to(`dgd-${gameInfo.gameId}`).emit(ChatEvents.CHAT_MESSAGE_SENT, messageDto);
   }
-
-  /*@SubscribeMessage('leaveGame')
-  @UseGuards(WsAuthGuard)
-  handleLeaveGame(
-    @MessageBody() data: { gameId: string },
-    @ConnectedSocket() client: Socket,
-    @AuthenticatedUser() user: any,
-  ) {
-    try {
-      const connection = this.connectionManager.getConnection(client.id);
-      if (!connection || !connection.gameId) {
-        return { success: false, error: 'Not connected to any game' };
-      }
-
-      // Quitter la partie
-      this.connectionManager.leaveGame(client.id, data.gameId);
-
-      // Notifier les autres joueurs
-      this.connectionManager.broadcastToGame(data.gameId, 'playerLeft', {
-        gameId: data.gameId,
-        userId: (user as any).supabaseId,
-        gameStats: this.gameManager.getGameStats(data.gameId),
-      });
-
-      return { success: true };
-    } catch (error) {
-      console.error('Error in handleLeaveGame:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  @SubscribeMessage('getGameStats')
-  @UseGuards(WsAuthGuard)
-  handleGetGameStats(
-    @MessageBody() data: { gameId: string },
-    @ConnectedSocket() client: Socket,
-    @AuthenticatedUser() user: any,
-  ) {
-    try {
-      const stats = this.gameManager.getGameStats(data.gameId);
-      if (!stats) {
-        return { success: false, error: 'Game not found' };
-      }
-
-      return { success: true, stats };
-    } catch (error) {
-      console.error('Error in handleGetGameStats:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  @SubscribeMessage('getUserGames')
-  @UseGuards(WsAuthGuard)
-  handleGetUserGames(@ConnectedSocket() client: Socket, @AuthenticatedUser() user: any) {
-    try {
-      const userGames = this.gameManager.getUserGames((user as any).supabaseId);
-
-      const gamesData = userGames.map((game) => ({
-        id: game.id,
-        state: game.state,
-        round: game.round,
-        currentPlayerIndex: game.currentPlayerIndex,
-        activePlayers: this.gameManager.getActivePlayers(game.id).length,
-        spectators: game.spectators.size,
-        createdAt: game.createdAt,
-        lastActivity: game.lastActivity,
-      }));
-
-      return { success: true, games: gamesData };
-    } catch (error) {
-      console.error('Error in handleGetUserGames:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-  }
-
-  // ===== GAME ACTIONS =====
-  // Les actions de jeu seront implémentées dans les handlers spécialisés
-  // et utiliseront les nouveaux services GameManager et ConnectionManager
-
-  */
 }

@@ -20,6 +20,16 @@ export class PlayerService {
     return await player.save();
   }
 
+  async update(id: string, updateData: object): Promise<Player> {
+    const player = await this.playerModel.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!player) {
+      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
+    }
+
+    return player;
+  }
+
   async findOne(id: string): Promise<Player> {
     const player = await this.playerModel.findById(id).populate('user').exec();
 

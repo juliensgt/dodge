@@ -19,6 +19,9 @@ export enum GameEvents {
   // Un joueur quitte la partie
   PLAYER_LEFT = 'game:player-left',
 
+  // Un joueur est prêt à commencer la partie
+  PLAYER_READY = 'game:player-ready',
+
   // Changement d'état de jeu (WAITING → STARTED → IN_GAME → etc.)
   // TODO : look at this
   GAME_STATE_CHANGED = 'game:state-changed',

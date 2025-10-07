@@ -12,7 +12,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import AnimatedBanner from "@/components/utils/animations/AnimatedBanner";
 
 export default function InGameBoard() {
-  const { currentPlayerId, getReorderedPlayers, options } = useGameStore();
+  const { getPlayers, options } = useGameStore();
   const isMobile = useIsMobile();
   const nbPlayers = options.maxPlayers;
 
@@ -23,13 +23,11 @@ export default function InGameBoard() {
     ? getMobilePlayerLayout(nbPlayers)
     : getPlayerLayout(nbPlayers);
 
-  const orderedPlayers = getReorderedPlayers(currentPlayerId);
-
   return (
     <div className="relative h-full w-full rounded-[1vh] overflow-hidden max-w-full max-h-full">
       <div className={playerLayout.container}>
         {Array.from({ length: nbPlayers }, (_, index) => {
-          const player = orderedPlayers[index];
+          const player = getPlayers()[index];
           if (!player) {
             return null;
           }

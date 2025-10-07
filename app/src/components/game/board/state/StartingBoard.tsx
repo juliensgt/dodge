@@ -6,17 +6,49 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { GameState } from "@/types/game/game.types";
+import { gameService } from "@/services/game/game.service";
 
 export default function StartingBoard() {
-  const { t } = useTranslation();
-  const { players, options } = useGameStore();
   const router = useRouter();
-  const { ColorType } = useGradient();
+  const { t } = useTranslation();
+  const { players, options, state, id } = useGameStore();
 
-  const time = 10;
-  const codeGame = "TEST";
+  const { ColorType } = useGradient();
+  const interval = useRef<NodeJS.Timeout | null>(null);
+
+  const time = options.timeToStartGame;
+  const codeGame = id.slice(0, 6);
   const nbPlayersInGame = players.length;
   const maxPlayers = options.maxPlayers;
+
+  useEffect(() => {
+    if (state !== GameState.STARTED || interval.current) return;
+
+    interval.current = setInterval(() => {
+      useGameStore.setState((prev) => {
+        const time = prev.options.timeToStartGame - 1;
+        if (time <= 0) {
+          clearInterval(interval.current!);
+          interval.current = null;
+          startGame();
+        }
+        return {
+          ...prev,
+          options: {
+            ...prev.options,
+            timeToStartGame: Math.max(time, 0),
+          },
+        };
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(interval.current!);
+      interval.current = null;
+    };
+  }, [state]);
 
   const openRules = () => {
     // TODO: Implémenter l'ouverture des règles
@@ -27,11 +59,17 @@ export default function StartingBoard() {
     router.push("/app");
   };
 
+  // Send start game event to server
+  // (all players send this event to the server to confirm that they are ready to start the game)
+  const startGame = () => {
+    gameService.sendStartGame();
+  };
+
   return (
     <div className="relative w-full h-full rounded-5 overflow-hidden">
       <Countdown visible={true} title={t("Salle d'attente")} time={time} />
 
-      <div className="flex flex-col justify-center h-[calc(100%-20vh)] md:h-[calc(100%-25vh)] px-2 md:px-4">
+      <div className="flex flex-col justify-center px-2 md:px-4">
         <div className="flex flex-row justify-between items-center mb-4 md:mb-6">
           <ActionButton
             onClick={leaveGame}

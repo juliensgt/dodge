@@ -18,6 +18,9 @@ export class Player {
 
   @Prop()
   points: number;
+
+  @Prop({ default: false })
+  ready: boolean;
 }
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);

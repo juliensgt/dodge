@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
-import { GameState, GameCardData } from "@/types/game/game.types";
+import { GameState, GameCardData, isInGame } from "@/types/game/game.types";
 import {
   faClock,
   faMedal,
@@ -30,18 +30,19 @@ export default function GameCard({
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
 
   const getStatusInfo = (state: GameState) => {
+    if (isInGame(state)) {
+      return {
+        label: t("En cours"),
+        color: "text-green-400",
+        bgColor: "bg-green-500/20",
+      };
+    }
     switch (state) {
       case GameState.WAITING:
         return {
           label: t("En attente"),
           color: "text-yellow-400",
           bgColor: "bg-yellow-500/20",
-        };
-      case GameState.IN_GAME:
-        return {
-          label: t("En cours"),
-          color: "text-green-400",
-          bgColor: "bg-green-500/20",
         };
       case GameState.END_GAME:
         return {
@@ -107,12 +108,12 @@ export default function GameCard({
                 className={`w-2 h-2 rounded-full mr-2 ${
                   game.state === GameState.WAITING
                     ? "bg-yellow-400 animate-pulse"
-                    : game.state === GameState.IN_GAME
+                    : isInGame(game.state)
                       ? "bg-green-400 animate-pulse"
                       : "bg-gray-400"
                 }`}
               ></div>
-              {statusInfo.label}
+              {statusInfo?.label}
             </div>
             <span className="text-white/60 text-sm">
               {t("Manche")} {game.round}

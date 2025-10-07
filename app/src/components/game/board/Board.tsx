@@ -3,11 +3,12 @@ import StartingBoard from "./state/StartingBoard";
 import CoupOeilBoard from "./state/CoupOeilBoard";
 import InGameBoard from "./state/InGameBoard";
 import EndRoundBoard from "./state/EndRoundBoard";
+import { useCallback } from "react";
 
 export default function Board() {
   const { state } = useGameStore();
 
-  const renderBoardState = () => {
+  const renderBoardState = useCallback(() => {
     switch (state) {
       case "WAITING":
         return <StartingBoard />;
@@ -20,7 +21,7 @@ export default function Board() {
       default:
         return <StartingBoard />;
     }
-  };
+  }, [state]);
 
   return (
     <div className="h-[calc(100vh-20px)] w-full overflow-hidden rounded-lg select-none font-['MT']">

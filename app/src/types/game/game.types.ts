@@ -42,8 +42,18 @@ export interface GameCardData {
   options: GameOptionsBo;
 }
 
+export const isInGame = (state: GameState) => {
+  return (
+    state === GameState.STARTED ||
+    state === GameState.IN_GAME ||
+    state === GameState.COUP_OEIL
+  );
+};
+
 export enum GameState {
   WAITING = "WAITING",
+  STARTED = "STARTED",
+  COUP_OEIL = "COUP_OEIL",
   IN_GAME = "IN_GAME",
   END_GAME = "END_GAME",
 }
