@@ -16,6 +16,9 @@ export class Player {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Card' }] })
   main: Card[];
 
+  @Prop({ default: 0 })
+  actionPoints: number;
+
   @Prop()
   points: number;
 

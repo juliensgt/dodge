@@ -10,4 +10,6 @@ export enum ErrorEnum {
   'game/player-already-in-game' = 'game/player-already-in-game',
   'game/game-full' = 'game/game-full',
   'game/player-not-in-game' = 'game/player-not-in-game',
+  'deck/empty' = 'deck/empty',
+  'player/no-action-points' = 'player/no-action-points',
 }

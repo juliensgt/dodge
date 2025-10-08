@@ -6,9 +6,9 @@ import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 import { GameState } from "@/types/game/game.types";
-import { gameService } from "@/services/game/game.service";
+import { useTimer } from "@/hooks/useTimer";
 
 export default function StartingBoard() {
   const router = useRouter();
@@ -16,39 +16,17 @@ export default function StartingBoard() {
   const { players, options, state, id } = useGameStore();
 
   const { ColorType } = useGradient();
-  const interval = useRef<NodeJS.Timeout | null>(null);
+  const [time, setTime] = useState(options.timeToStartGame);
 
-  const time = options.timeToStartGame;
   const codeGame = id.slice(0, 6);
   const nbPlayersInGame = players.length;
   const maxPlayers = options.maxPlayers;
 
-  useEffect(() => {
-    if (state !== GameState.STARTED || interval.current) return;
-
-    interval.current = setInterval(() => {
-      useGameStore.setState((prev) => {
-        const time = prev.options.timeToStartGame - 1;
-        if (time <= 0) {
-          clearInterval(interval.current!);
-          interval.current = null;
-          startGame();
-        }
-        return {
-          ...prev,
-          options: {
-            ...prev.options,
-            timeToStartGame: Math.max(time, 0),
-          },
-        };
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(interval.current!);
-      interval.current = null;
-    };
-  }, [state]);
+  useTimer({
+    initialTime: options.timeToStartGame,
+    isActive: state === GameState.STARTED,
+    onTimeUpdate: setTime,
+  });
 
   const openRules = () => {
     // TODO: Implémenter l'ouverture des règles
@@ -57,12 +35,6 @@ export default function StartingBoard() {
 
   const leaveGame = () => {
     router.push("/app");
-  };
-
-  // Send start game event to server
-  // (all players send this event to the server to confirm that they are ready to start the game)
-  const startGame = () => {
-    gameService.sendStartGame();
   };
 
   return (

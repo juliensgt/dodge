@@ -1,15 +1,52 @@
-import { useGameStore } from "@/store/game/game";
 import Countdown from "@/components/game/countdown/Countdown";
-import { useCardStore } from "@/store/card";
-import { useCountdownStore } from "@/store/countdown";
+import { useGameStore } from "@/store/game/game";
+import { useCardSkin } from "@/hooks/useCardSkin";
+import { Card, CardState } from "@/store/cards/cards.type";
+import CardComponent from "../../cards/card/Card";
+import { useTimer } from "@/hooks/useTimer";
+import { useEffect, useState } from "react";
+import { GameState } from "@/types/game/game.types";
+import { httpService } from "@/services/http/http.service";
 
 export default function CoupOeilBoard() {
-  const cardStore = useCardStore();
-  const gameStore = useGameStore();
-  const countdownStore = useCountdownStore();
+  const { selectedSkinId } = useCardSkin();
+  const { state, options, currentPlayerId } = useGameStore();
+  const [time, setTime] = useState(options.timeToSeeCards);
+  const [cards, setCards] = useState<Card[]>([]);
 
-  const playerId = gameStore.currentPlayerId;
-  const time = countdownStore.time;
+  // Initialize cards
+  useEffect(() => {
+    setCards(
+      new Array(options.nbCards).fill({
+        cardState: CardState.CARD_BACK,
+        valeur: undefined,
+      })
+    );
+  }, [options.nbCards]);
+
+  const handleCardClick = async (index: number) => {
+    await httpService
+      .get<Card>(`/players/${currentPlayerId}/hand/${index}`)
+      .then((card) => {
+        setCards((prevCards) =>
+          prevCards.map((cardPlayer, indexPlayer) =>
+            indexPlayer === index
+              ? {
+                  ...cardPlayer,
+                  cardState: CardState.CARD_FRONT,
+                  valeur: card.valeur,
+                }
+              : cardPlayer
+          )
+        );
+      });
+  };
+
+  useTimer({
+    initialTime: options.timeToSeeCards,
+    isActive: state === GameState.COUP_OEIL,
+    onTimeUpdate: setTime,
+  });
 
   return (
     <div className="relative w-full h-full rounded-5 overflow-hidden">
@@ -20,22 +57,21 @@ export default function CoupOeilBoard() {
         time={time}
       />
 
-      {/* <div className="flex justify-center items-center mx-auto my-[20vh] scale-120">
-        <div className="fake-cards-container relative inline-flex flex-row">
+      <div className="flex justify-center items-center mx-auto my-[20vh]">
+        <div className="relative inline-flex flex-row gap-4">
           {cards.map((card: Card, index: number) => (
             <CardComponent
               key={index}
               cardState={card.cardState}
-              cardImage={card.cardImage}
-              cardValue={card.cardValue}
+              cardValue={card.valeur ? parseInt(card.valeur) : undefined}
               cliquable={true}
-              size="medium"
+              size="large"
               onClick={() => handleCardClick(index)}
-              className="fake-card mx-[2vw] relative"
+              skinId={selectedSkinId}
             />
           ))}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

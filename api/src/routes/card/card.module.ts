@@ -8,6 +8,6 @@ import { Card, CardSchema } from './card.schema';
   imports: [MongooseModule.forFeature([{ name: Card.name, schema: CardSchema }])],
   controllers: [CardController],
   providers: [CardService],
-  exports: [CardService],
+  exports: [CardService, MongooseModule],
 })
 export class CardModule {}

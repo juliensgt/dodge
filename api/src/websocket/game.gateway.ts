@@ -7,6 +7,7 @@ import {
   SubscribeMessage,
   MessageBody,
 } from '@nestjs/websockets';
+import { UseFilters } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
 import { socketService } from './services/socket.service';
@@ -24,12 +25,14 @@ import { MessageService } from 'src/routes/message/message.service';
 import { MessageDto } from 'src/routes/message/dto/message.dto';
 import { PlayerService } from 'src/routes/players/player.service';
 import { GameState } from 'src/enums/game-state.enum';
+import { WsExceptionFilter, WsAllExceptionsFilter } from 'src/common/filters/ws-exception.filter';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
+@UseFilters(WsAllExceptionsFilter, WsExceptionFilter)
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
@@ -60,17 +63,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     if (game.state === GameState.WAITING || game.state === GameState.STARTED) {
-      await this.gameService
-        .removePlayer(gameId, supabaseId)
-        .then((response) => {
-          socketService.broadcastToGame(gameId, GameEvents.PLAYER_LEFT, {
-            gameData: GameDto.fromGame(response.gameData!),
-            playerData: PlayerDto.fromPlayer(response.playerData!, response.playerData!.user),
-          });
-        })
-        .catch((error) => {
-          console.error('error', error);
-        });
+      const response = await this.gameService.removePlayer(gameId, supabaseId).catch((error) => {
+        console.error('Error removing player:', error);
+        throw new WsException('Error removing player');
+      });
+      socketService.broadcastToGame(gameId, GameEvents.PLAYER_LEFT, {
+        gameData: GameDto.fromGame(response.gameData!),
+        playerData: PlayerDto.fromPlayer(response.playerData!, response.playerData!.user),
+      });
     }
     socketService.unregisterConnection(client.id);
     console.log('handleDisconnect');
@@ -84,43 +84,42 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       throw new WsException('Missing userId or gameId');
     }
 
-    const user = await this.userService.findBySupabaseId(userId);
+    const user = await this.userService.findBySupabaseId(userId).catch(() => {
+      throw new WsException('Error finding user');
+    });
 
-    this.gameService
-      .addPlayer(gameId, user)
-      .then(async (response) => {
-        // Register the connection
-        socketService.registerConnection({
-          socketId: client.id,
-          type: ConnectionType.PLAYER,
-          gameId: gameId,
-          userId: userId,
-        });
-        await client.join('dgd-' + gameId);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        client.data.gameId = gameId;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        client.data.playerId = response.playerData!._id.toString();
+    const response = await this.gameService.addPlayer(gameId, user).catch(() => {
+      throw new WsException('Error adding player');
+    });
 
-        // Send the player data to the client
-        socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
-          gameData: GameDto.fromGame(response.gameData!),
-          playerData: PlayerDto.fromPlayer(response.playerData!, user),
-        });
+    // Register the connection
+    socketService.registerConnection({
+      socketId: client.id,
+      type: ConnectionType.PLAYER,
+      gameId: gameId,
+      userId: userId,
+    });
+    await client.join('dgd-' + gameId);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    client.data.gameId = gameId;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    client.data.playerId = response.playerData!._id.toString();
 
-        // If the game is full, change the game state to STARTED
-        if (
-          response.gameData!.state === GameState.WAITING &&
-          response.gameData!.players.length === response.gameData!.options.maxPlayers
-        ) {
-          await this.gameService.startGame(gameId);
-        }
-      })
-      .catch((error: WsException) => {
-        console.error('error', error);
-        client.emit('error', { message: error.message || 'Connection failed' });
-        client.disconnect();
+    // Send the player data to the client
+    socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
+      gameData: GameDto.fromGame(response.gameData!),
+      playerData: PlayerDto.fromPlayer(response.playerData!, user),
+    });
+
+    // If the game is full, change the game state to STARTED
+    if (
+      response.gameData!.state === GameState.WAITING &&
+      response.gameData!.players.length === response.gameData!.options.maxPlayers
+    ) {
+      await this.gameService.startGame(gameId).catch(() => {
+        throw new WsException('Error starting game');
       });
+    }
     console.log('handleConnection');
   }
 

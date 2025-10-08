@@ -1,82 +1,36 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
 import { Game } from './game.schema';
 import { GameState } from '../../enums/game-state.enum';
-import { defaultGameCreateDto, GameCreateDto } from './dto/game-create.dto';
 import { ErrorEnum } from '../../enums/errors/error.enum';
 import { GameStateWithPlayer } from 'src/websocket/types/game.types';
 import { PlayerService } from '../players/player.service';
 import { PlayerCreateDto } from '../players/dto/player-create.dto';
 import { User } from '../user/user.schema';
-import { Player } from '../players/player.schema';
 import { UserService } from '../user/user.service';
 import { GameEvents } from 'src/websocket/events/game.events';
 import { GameDto } from './dto/game.dto';
 import { socketService } from 'src/websocket/services/socket.service';
+import { GameCardsManager } from './managers/game-cards.manager';
+import { GameEntityManager } from './managers/game-entity.manager';
+import { GameTimerManager } from './managers/game-timer.manager';
+import { GameCreateDto } from './dto/game-create.dto';
+import { PlayerActionsPointsManager } from '../players/managers/player-actions-points.manager';
 @Injectable()
 export class GameService {
-  // Dictionnaire pour stocker les timers par gameId
-  phaseTimers = new Map<string, NodeJS.Timeout>();
-
   constructor(
-    @InjectModel(Game.name) private gameModel: Model<Game>,
-    private playerService: PlayerService,
+    private gameEntityManager: GameEntityManager,
+    private gameCardsManager: GameCardsManager,
+    private gameTimerManager: GameTimerManager,
     private userService: UserService,
+    private playerService: PlayerService,
+    private playerActionsPointsManager: PlayerActionsPointsManager,
   ) {}
-
-  async create(gameCreateDto: GameCreateDto): Promise<Game> {
-    const game = new this.gameModel(gameCreateDto || defaultGameCreateDto);
-    return game.save();
-  }
-
-  async findOne(id: string, populateStrings: string[] = []): Promise<Game> {
-    const game = await this.gameModel.findById(id).populate(populateStrings);
-
-    if (!game) {
-      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
-    }
-
-    return game;
-  }
-
-  async findAll(): Promise<Game[]> {
-    const games = await this.gameModel
-      .find()
-      .populate({
-        path: 'players',
-        model: Player.name,
-        populate: {
-          path: 'user',
-          model: User.name,
-        },
-      })
-      .exec();
-
-    return games;
-  }
-
-  async findOnePopulated(id: string): Promise<Game | null> {
-    const gameData = await this.gameModel
-      .findById(id)
-      .populate({
-        path: 'players',
-        model: Player.name,
-        populate: {
-          path: 'user',
-          model: User.name,
-        },
-      })
-      .exec();
-    return gameData;
-  }
 
   async addPlayer(gameId: string, user: User): Promise<GameStateWithPlayer> {
     let player = await this.playerService.findByGameAndUser(gameId, user._id.toString());
-    let gameData = await this.findOnePopulated(gameId);
-    if (gameData === null) {
-      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
-    } else if (gameData.state !== GameState.WAITING && !player) {
+    let gameData = await this.gameEntityManager.findOne(gameId);
+
+    if (gameData.state !== GameState.WAITING && !player) {
       throw new NotFoundException('Game is not in waiting state', ErrorEnum['game/invalid-state']);
     } else if (gameData.players.length >= gameData.options.maxPlayers && !player) {
       throw new NotFoundException('Game is full', ErrorEnum['game/game-full']);
@@ -85,7 +39,7 @@ export class GameService {
     if (!player) {
       const playerCreateDto: PlayerCreateDto = { game: gameData, user };
       player = await this.playerService.create(playerCreateDto);
-      gameData = await this.addPlayerToGame(gameId, player._id);
+      gameData = await this.gameEntityManager.addPlayerToGame(gameId, player._id);
     }
 
     return { playerData: player, gameData: gameData };
@@ -94,21 +48,19 @@ export class GameService {
   async removePlayer(gameId: string, supabaseId: string): Promise<GameStateWithPlayer> {
     const user = await this.userService.findBySupabaseId(supabaseId);
     const player = await this.playerService.findByGameAndUser(gameId, user?._id.toString());
-    let gameData = await this.findOnePopulated(gameId);
+    let gameData = await this.gameEntityManager.findOne(gameId);
 
-    if (!gameData) {
-      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
-    } else if (!player) {
+    if (!player) {
       throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
     } else if (!gameData.players.some((p) => p._id.toString() === player?._id.toString())) {
       throw new NotFoundException('Player not found in game', ErrorEnum['game/player-not-in-game']);
     }
 
     // delete timer
-    this.phaseTimers.get(gameId)?.close();
+    this.gameTimerManager.phaseTimers.get(gameId)?.close();
 
     await this.playerService.delete(gameId, player._id.toString());
-    gameData = await this.update(gameId, {
+    gameData = await this.gameEntityManager.update(gameId, {
       state: GameState.WAITING,
       players: gameData.players.filter((p) => p._id.toString() !== player._id.toString()),
     });
@@ -118,11 +70,15 @@ export class GameService {
   async startGame(gameId: string): Promise<Game> {
     const game = await this.changeGameState(gameId, GameState.STARTED);
 
-    this.scheduleNextPhase(
+    // distribute cards
+
+    this.gameTimerManager.scheduleNextPhase(
       gameId,
-      GameState.COUP_OEIL,
       game.options.timeToStartGame * 1000,
       async () => {
+        await this.gameCardsManager.initDeck(gameId);
+        await this.gameCardsManager.shuffleDeck(gameId);
+        await this.gameCardsManager.distributeCards(gameId);
         await this.startCoupOeil(gameId);
       },
     );
@@ -133,11 +89,18 @@ export class GameService {
   async startCoupOeil(gameId: string): Promise<Game> {
     const game = await this.changeGameState(gameId, GameState.COUP_OEIL);
 
-    this.scheduleNextPhase(
+    await this.playerActionsPointsManager.addActionPoints(
       gameId,
-      GameState.IN_GAME,
+      undefined,
+      game.options.nbSeeFirstCards,
+    );
+
+    this.gameTimerManager.scheduleNextPhase(
+      gameId,
       game.options.timeToSeeCards * 1000,
       async () => {
+        await this.playerActionsPointsManager.resetActionPoints(gameId);
+        await this.changeGameState(gameId, GameState.IN_GAME);
         await this.startRound(gameId);
       },
     );
@@ -146,41 +109,14 @@ export class GameService {
   }
 
   async startRound(gameId: string): Promise<Game> {
-    const game = await this.findOnePopulated(gameId);
-    if (!game) {
-      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
-    }
+    const game = await this.gameEntityManager.findOne(gameId);
     game.round++;
-    await this.update(gameId, { round: game.round });
+    await this.gameEntityManager.update(gameId, { round: game.round });
     return game;
   }
 
-  scheduleNextPhase(
-    gameId: string,
-    nextState: GameState,
-    delay: number,
-    callback?: () => Promise<void>,
-  ) {
-    if (this.phaseTimers.has(gameId)) clearTimeout(this.phaseTimers.get(gameId));
-
-    const timer = setTimeout(() => {
-      if (this.phaseTimers.has(gameId)) {
-        this.changeGameState(gameId, nextState).catch((err) => {
-          console.error(`[Timer Error][${gameId}]`, err);
-        });
-        this.phaseTimers.delete(gameId);
-        if (callback)
-          callback().catch((err) => {
-            console.error(`[Timer Error][${gameId}]`, err);
-          });
-      }
-    }, delay);
-
-    this.phaseTimers.set(gameId, timer);
-  }
-
   async changeGameState(gameId: string, state: GameState): Promise<Game> {
-    const game = await this.update(gameId, { state });
+    const game = await this.gameEntityManager.update(gameId, { state });
     socketService.broadcastToGame(gameId, GameEvents.GAME_STATE_CHANGED, {
       gameData: GameDto.fromGame(game),
     });
@@ -190,36 +126,16 @@ export class GameService {
     return game;
   }
 
-  async update(gameId: string, updateData: object): Promise<Game> {
-    return (await this.gameModel
-      .findByIdAndUpdate(
-        gameId,
-        {
-          $set: updateData,
-        },
-        { new: true },
-      )
-      .populate({
-        path: 'players',
-        model: Player.name,
-        populate: { path: 'user', model: User.name },
-      })) as Game;
+  async findOne(gameId: string): Promise<Game> {
+    return await this.gameEntityManager.findOne(gameId);
   }
 
-  async addPlayerToGame(gameId: string, playerId: Types.ObjectId): Promise<Game> {
-    return (await this.gameModel
-      .findByIdAndUpdate(
-        gameId,
-        {
-          $addToSet: { players: playerId },
-        },
-        { new: true },
-      )
-      .populate({
-        path: 'players',
-        model: Player.name,
-        populate: { path: 'user', model: User.name },
-      })) as Game;
+  async findAll(): Promise<Game[]> {
+    return await this.gameEntityManager.findAll();
+  }
+
+  async create(gameCreateDto: GameCreateDto): Promise<Game> {
+    return await this.gameEntityManager.create(gameCreateDto);
   }
 
   /*async dodge(gameId: string, playerId: string): Promise<void> {
@@ -247,7 +163,7 @@ export class GameService {
   }*/
 
   async clearGame(gameId: string): Promise<void> {
-    const game = await this.findOne(gameId);
+    const game = await this.gameEntityManager.findOne(gameId);
     game.deck = [];
     game.defausse = [];
     game.players = [];
@@ -256,8 +172,8 @@ export class GameService {
     game.tour = 0;
     game.playerWhoPlays = null;
     game.playerDodge = '';
-    await this.gameModel.findByIdAndUpdate(gameId, game);
 
+    await this.gameEntityManager.update(gameId, game);
     await this.playerService.deleteAllByGame(gameId);
   }
 
