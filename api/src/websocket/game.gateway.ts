@@ -109,7 +109,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         });
 
         // If the game is full, change the game state to STARTED
-        if (response.gameData!.players.length === response.gameData!.options.maxPlayers) {
+        if (
+          response.gameData!.state === GameState.WAITING &&
+          response.gameData!.players.length === response.gameData!.options.maxPlayers
+        ) {
           await this.gameService.startGame(gameId);
         }
       })
