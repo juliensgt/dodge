@@ -1,11 +1,8 @@
 import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
-import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
 import { useState } from "react";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
-import CardSkinSelector from "@/components/utils/selectors/CardSkinSelector";
-import Modal from "@/components/utils/modals/Modal";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +12,6 @@ import { httpService } from "@/services/http/http.service";
 import GameList from "@/components/game-list/GameList";
 
 export default function Dashboard() {
-  const [isSkinSelectorOpen, setIsSkinSelectorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"quick" | "list">("list");
   const { t } = useTranslation();
   const { getGradient, GradientType } = useGradient();
@@ -42,14 +38,6 @@ export default function Dashboard() {
     await httpService.post(`/games/${gameId}/reset`);
   };
 
-  const openSkinSelector = () => {
-    setIsSkinSelectorOpen(true);
-  };
-
-  const closeSkinSelector = () => {
-    setIsSkinSelectorOpen(false);
-  };
-
   const handleLogout = async () => {
     await logout();
   };
@@ -60,12 +48,11 @@ export default function Dashboard() {
         className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
       >
         <div className="absolute top-4 right-4 flex gap-4">
-          <ThemeSelector />
           <LanguageSelector />
           <ActionButton
-            onClick={() => openSkinSelector()}
-            label={t("Skins")}
-            color={{ color: ColorType.SECONDARY }}
+            onClick={() => router.push("/app/shop")}
+            label={t("Boutique")}
+            color={{ color: ColorType.PRIMARY }}
           />
           <ActionButton
             onClick={handleLogout}
@@ -134,15 +121,6 @@ export default function Dashboard() {
             />
           )}
         </div>
-
-        {/* Modal pour le sélecteur de skins */}
-        <Modal
-          isOpen={isSkinSelectorOpen}
-          onClose={closeSkinSelector}
-          title={t("Sélectionner un skin de carte")}
-        >
-          <CardSkinSelector />
-        </Modal>
       </div>
     </AuthGuard>
   );

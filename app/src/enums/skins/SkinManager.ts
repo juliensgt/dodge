@@ -6,11 +6,7 @@ import PixelArtSkin from "./list/PixelArtSkin";
 import GalaxySkin from "./list/GalaxySkin";
 import PaperSkin from "./list/PaperSkin";
 import CyberSkin from "./list/CyberSkin";
-import WoodSkin from "./list/WoodSkin";
-import IceSkin from "./list/IceSkin";
-import MilitarySkin from "./list/MilitarySkin";
 import BarbieSkin from "./list/BarbieSkin";
-import HeartSkin from "./list/HeartSkin";
 
 export interface CardSkin {
   id: string;
@@ -78,43 +74,11 @@ export const cardSkins: Record<string, CardSkin> = {
     unlocked: true,
     rarity: "common",
   },
-  wood: {
-    id: "wood",
-    name: "Wood",
-    description: "Style wood",
-    component: WoodSkin,
-    unlocked: true,
-    rarity: "common",
-  },
-  ice: {
-    id: "ice",
-    name: "Ice",
-    description: "Style ice",
-    component: IceSkin,
-    unlocked: true,
-    rarity: "common",
-  },
-  military: {
-    id: "military",
-    name: "Military",
-    description: "Style military",
-    component: MilitarySkin,
-    unlocked: true,
-    rarity: "common",
-  },
   barbie: {
     id: "barbie",
     name: "Barbie",
     description: "Style barbie",
     component: BarbieSkin,
-    unlocked: true,
-    rarity: "common",
-  },
-  heart: {
-    id: "heart",
-    name: "Heart",
-    description: "Style heart",
-    component: HeartSkin,
     unlocked: true,
     rarity: "common",
   },
