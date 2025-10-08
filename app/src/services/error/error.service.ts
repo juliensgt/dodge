@@ -8,7 +8,12 @@ interface ApiError {
 }
 
 interface WebSocketError {
+  error?: string;
   message: string;
+  timestamp?: string;
+  event?: string;
+  gameId?: string;
+  playerId?: string;
 }
 
 interface ToastContextType {
@@ -93,9 +98,18 @@ class ErrorService {
   handleApiError(error: unknown) {
     console.error("API Error:", error);
 
-    const { status, data } = (
-      error as { response: { status: number; data: ApiError } }
-    ).response;
+    // Vérifier si c'est une erreur HTTP avec response
+    const httpError = error as {
+      response?: { status: number; data: ApiError };
+    };
+
+    if (!httpError.response) {
+      // Si ce n'est pas une erreur HTTP, traiter comme une erreur WebSocket
+      this.handleWebSocketError(error as WebSocketError);
+      return;
+    }
+
+    const { status, data } = httpError.response;
     const apiError: ApiError = data;
 
     // Gestion des erreurs par code de statut
@@ -158,11 +172,23 @@ class ErrorService {
   }
 
   // Méthode pour gérer les erreurs WebSocket
-  handleWebSocketError(error: WebSocketError) {
+  handleWebSocketError(error: WebSocketError | unknown) {
     console.error("WebSocket Error:", error);
 
-    // Si c'est une erreur structurée du serveur, utiliser le message de l'API
-    this.showErrorToast("Erreur", error.message);
+    // Vérifier si c'est une erreur structurée du serveur
+    if (error && typeof error === "object" && "message" in error) {
+      const wsError = error as WebSocketError;
+      const title = wsError.error || "Erreur WebSocket";
+      const message = wsError.message || "Une erreur s'est produite";
+
+      this.showErrorToast(title, message);
+    } else {
+      // Erreur inconnue
+      this.showErrorToast(
+        "Erreur WebSocket",
+        "Une erreur inattendue s'est produite"
+      );
+    }
   }
 
   // Méthodes utilitaires pour afficher différents types de toasts

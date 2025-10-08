@@ -60,6 +60,7 @@ export const defaultGameCreateDto: GameCreateDto = {
     timeToStartGame: 3,
     timeToSeeCards: 5,
     nbCards: 4,
+    modeDeJeu: ['default'],
   },
   indexLastPlayerWhoPlay: -1,
   indexPlayerWhoPlays: -1,

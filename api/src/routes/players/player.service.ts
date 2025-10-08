@@ -16,6 +16,7 @@ export class PlayerService {
       points: 0,
       currentTime: 0,
       skinCards: '',
+      actionPoints: 0,
     });
     return await player.save();
   }

@@ -23,7 +23,7 @@ export class WsAuthGuard implements CanActivate {
     const {
       data: { user },
       error,
-    } = await this.supabase.auth.getUser(token);
+    } = await this.supabase.auth.getUser(token as string);
 
     if (error || !user) throw new WsException('Unauthorized');
 
@@ -32,29 +32,20 @@ export class WsAuthGuard implements CanActivate {
     const playerId = client.data.playerId as string;
 
     //On valide l'utilisateur
-    await this.validationService.validateUserId(userId).catch((error) => {
-      console.log('error', error);
-      throw new WsException('Invalid user');
-    });
+    await this.validationService.validateUserId(userId);
 
     //On valide le jeu
     if (!gameId) {
       throw new WsException('Missing gameId');
     }
-    await this.validationService.validateGameId(gameId).catch((error) => {
-      console.log('error', error);
-      throw new WsException('Invalid game');
-    });
+    await this.validationService.validateGameId(gameId);
 
     //On valide le joueur
     if (!playerId) {
       throw new WsException('Missing playerId');
     }
 
-    await this.validationService.validateGameAndPlayer(gameId, playerId).catch((error) => {
-      console.log('error', error);
-      throw new WsException('Invalid game or player');
-    });
+    await this.validationService.validateGameAndPlayer(gameId, playerId);
 
     // On attache l'utilisateur au client
     client.user = user;

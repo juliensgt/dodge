@@ -11,6 +11,7 @@ import {
 import { useGameStore } from "@/store/game/game";
 import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
+import { useCardStore } from "@/store/cards/cards.store";
 
 class GameService {
   constructor() {}
@@ -30,10 +31,8 @@ class GameService {
 
       // set current player id
       if (!game.getCurrentPlayerId()) {
-        console.log("Setting current player id to", data.playerData!.id);
         game.setGame(data.gameData!, data.playerData!.id);
       } else {
-        console.log("Setting current player id to", game.getCurrentPlayerId());
         game.setGame(data.gameData!, game.getCurrentPlayerId());
       }
 
@@ -56,9 +55,8 @@ class GameService {
       game.setGameState(gameState);
     });
 
-    client.on(GameEvents.GAME_STARTED, (data) => {
-      console.log("Game started:", data);
-      // Mettre à jour l'UI si nécessaire
+    client.on(GameEvents.GAME_STARTED, () => {
+      // nothing to do
     });
 
     client.on(GameEvents.GAME_ENDED, (data) => {
@@ -69,12 +67,6 @@ class GameService {
     client.on(ChatEvents.CHAT_MESSAGE_SENT, (data: GameMessage) => {
       useMessagesStore.getState().addMessage(data);
     });
-  }
-
-  // Send start game event to server (all players send this event to the server to confirm that they are ready to start the game)
-  async sendStartGame() {
-    console.log("Sending start game");
-    await socketService.emit(GameEvents.GAME_STARTED);
   }
 
   async sendMessage(message: string) {

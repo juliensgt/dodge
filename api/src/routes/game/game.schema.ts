@@ -48,6 +48,7 @@ export interface GameOptionsBo {
   timeToStartGame: number;
   timeToSeeCards: number;
   nbCards: number;
+  modeDeJeu: string[];
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

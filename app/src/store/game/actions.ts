@@ -1,6 +1,7 @@
 import { StateCreator } from "zustand";
 import { Game, GameOptions, Player } from "./types";
 import { GameState } from "@/types/game/game.types";
+import { useCardStore } from "../cards/cards.store";
 
 export interface GameActions {
   // Game state management
@@ -37,6 +38,8 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       playerWhoPlays: game.playerWhoPlays,
       options: game.options,
     });
+
+    useCardStore.getState().initCards();
   },
 
   setOptions: (options: GameOptions) => {
