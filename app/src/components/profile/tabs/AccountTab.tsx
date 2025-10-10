@@ -17,7 +17,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { User } from "@supabase/supabase-js";
 
-export default function ProfileTab() {
+export default function AccountTab() {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const { GradientType } = useGradient();

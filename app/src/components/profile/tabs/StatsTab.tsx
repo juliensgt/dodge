@@ -37,7 +37,7 @@ interface GameStats {
   achievements: number;
 }
 
-export default function AccountTab() {
+export default function StatsTab() {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const { getGradient, GradientType } = useGradient();
@@ -345,7 +345,7 @@ export default function AccountTab() {
               onClick={() => console.log("Export data")}
               label={t("Exporter")}
               leftSection={<FontAwesomeIcon icon={faDownload} />}
-              gradient={{ gradientType: GradientType.SECONDARY }}
+              gradient={{ gradientType: GradientType.PRIMARY }}
             />
           </div>
 
