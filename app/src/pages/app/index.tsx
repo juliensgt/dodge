@@ -55,9 +55,9 @@ export default function Dashboard() {
             color={{ color: ColorType.PRIMARY }}
           />
           <ActionButton
-            onClick={handleLogout}
-            label={t("Déconnexion")}
-            color={{ color: ColorType.TRANSPARENT }}
+            onClick={() => router.push("/app/profile")}
+            label={t("Profil")}
+            color={{ color: ColorType.PRIMARY }}
           />
         </div>
 

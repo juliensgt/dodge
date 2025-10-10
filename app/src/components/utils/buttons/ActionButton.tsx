@@ -1,8 +1,7 @@
-import { ColorType, GradientType } from "@/enums/themes/list/PurpleTheme";
 import { useGradient } from "@/hooks/useGradient";
 
 interface Gradient {
-  gradientType: GradientType;
+  gradientType: string;
   gradientDirection?:
     | "to-r"
     | "to-l"
@@ -15,7 +14,7 @@ interface Gradient {
 }
 
 interface Color {
-  color: ColorType;
+  color: string;
 }
 
 interface ActionButtonProps {
