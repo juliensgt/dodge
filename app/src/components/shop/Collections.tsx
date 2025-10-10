@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { CardSkin } from "@/enums/skins/SkinManager";
 import { ThemeType } from "@/enums/themes/Theme";
 import Card from "@/components/game/cards/card/Card";
 import { CardState } from "@/components/game/cards/card/Card";
@@ -12,6 +11,9 @@ import {
   faTheaterMasks,
   faTree,
 } from "@fortawesome/free-solid-svg-icons";
+import ShopTabTitle from "./tabs/shop-tab-title";
+import { getRarityBadge, getRarityColor } from "@/types/items/items.type";
+import { CardSkinRarity } from "@/enums/skins/SkinRarity";
 
 interface Collection {
   id: string;
@@ -29,7 +31,7 @@ interface CollectionItem {
   id: string;
   type: "skin" | "theme";
   name: string;
-  rarity: CardSkin["rarity"];
+  rarity: CardSkinRarity;
   unlocked: boolean;
   price?: number;
   skinId?: string;
@@ -63,7 +65,7 @@ export default function Collections() {
           id: "neon-skin",
           type: "skin",
           name: "Néon",
-          rarity: "rare",
+          rarity: CardSkinRarity.RARE,
           unlocked: true,
           skinId: "neon",
         },
@@ -71,7 +73,7 @@ export default function Collections() {
           id: "cyber-skin",
           type: "skin",
           name: "Cyber",
-          rarity: "legendary",
+          rarity: CardSkinRarity.LEGENDARY,
           unlocked: true,
           skinId: "cyber",
         },
@@ -79,7 +81,7 @@ export default function Collections() {
           id: "galaxy-skin",
           type: "skin",
           name: "Galaxy",
-          rarity: "epic",
+          rarity: CardSkinRarity.EPIC,
           unlocked: true,
           skinId: "galaxy",
         },
@@ -87,7 +89,7 @@ export default function Collections() {
           id: "neon-theme",
           type: "theme",
           name: "Neon Theme",
-          rarity: "rare",
+          rarity: CardSkinRarity.RARE,
           unlocked: false,
           price: 300,
           themeId: ThemeType.NEON,
@@ -109,7 +111,7 @@ export default function Collections() {
           id: "forest-theme",
           type: "theme",
           name: "Forest",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           themeId: ThemeType.FOREST,
           preview: "from-emerald-500 to-teal-600",
@@ -118,7 +120,7 @@ export default function Collections() {
           id: "ocean-theme",
           type: "theme",
           name: "Ocean",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           themeId: ThemeType.OCEAN,
           preview: "from-cyan-500 to-blue-600",
@@ -127,7 +129,7 @@ export default function Collections() {
           id: "sunset-theme",
           type: "theme",
           name: "Sunset",
-          rarity: "rare",
+          rarity: CardSkinRarity.RARE,
           unlocked: true,
           themeId: ThemeType.SUNSET,
           preview: "from-orange-500 to-pink-600",
@@ -148,7 +150,7 @@ export default function Collections() {
           id: "default-skin",
           type: "skin",
           name: "Défaut",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           skinId: "default",
         },
@@ -156,7 +158,7 @@ export default function Collections() {
           id: "classic-skin",
           type: "skin",
           name: "Classique",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           skinId: "classic",
         },
@@ -164,7 +166,7 @@ export default function Collections() {
           id: "purple-theme",
           type: "theme",
           name: "Purple",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           themeId: ThemeType.PURPLE,
           preview: "from-purple-600 to-blue-600",
@@ -173,7 +175,7 @@ export default function Collections() {
           id: "monochrome-theme",
           type: "theme",
           name: "Monochrome",
-          rarity: "common",
+          rarity: CardSkinRarity.COMMON,
           unlocked: true,
           themeId: ThemeType.MONOCHROME,
           preview: "from-gray-600 to-slate-700",
@@ -181,36 +183,6 @@ export default function Collections() {
       ],
     },
   ];
-
-  const getRarityColor = (rarity: CardSkin["rarity"]) => {
-    switch (rarity) {
-      case "common":
-        return "border-gray-400 bg-gray-50";
-      case "rare":
-        return "border-blue-400 bg-blue-50";
-      case "epic":
-        return "border-purple-400 bg-purple-50";
-      case "legendary":
-        return "border-yellow-400 bg-yellow-50";
-      default:
-        return "border-gray-400 bg-gray-50";
-    }
-  };
-
-  const getRarityBadge = (rarity: CardSkin["rarity"]) => {
-    switch (rarity) {
-      case "common":
-        return "Commun";
-      case "rare":
-        return "Rare";
-      case "epic":
-        return "Épique";
-      case "legendary":
-        return "Légendaire";
-      default:
-        return "Commun";
-    }
-  };
 
   const handlePurchase = (item: CollectionItem) => {
     console.log(
@@ -224,27 +196,21 @@ export default function Collections() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-bold text-white mb-4">
-            {t("Collections")}
-          </h2>
-          <p className="text-white/80 text-lg">
-            {t("Explorez nos collections thématiques d'objets")}
-          </p>
-        </div>
-        {selectedCollection && (
-          <div>
-            {/* Back Button */}
-            <ActionButton
-              onClick={() => setSelectedCollection(null)}
-              label={t("← Retour aux collections")}
-              color={{ color: ColorType.TRANSPARENT }}
-            />
-          </div>
-        )}
-      </div>
+      <ShopTabTitle
+        title={t("Collections")}
+        subtitle={t("Explorez nos collections thématiques d'objets")}
+        bottomSide={
+          selectedCollection && (
+            <div>
+              <ActionButton
+                onClick={() => setSelectedCollection(null)}
+                label={t("← Retour aux collections")}
+                color={{ color: ColorType.TRANSPARENT }}
+              />
+            </div>
+          )
+        }
+      />
 
       {!selectedCollection ? (
         /* Collections Grid */

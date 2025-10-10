@@ -1,3 +1,5 @@
+import { CardSkinRarity } from "../skins/SkinRarity";
+
 export enum ThemeType {
   PURPLE = "purple",
   OCEAN = "ocean",
@@ -9,9 +11,15 @@ export enum ThemeType {
 
 export interface Theme {
   id: ThemeType;
+  type: "skin" | "theme";
   name: string;
   description: string;
   preview: string; // Classe CSS pour l'aperçu
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  rarity?: CardSkinRarity;
+  theme: unknown;
 }
 
 export interface ThemeColors {
