@@ -10,6 +10,7 @@ import GameCard from "./GameCard";
 interface GameListProps {
   onJoinGame: (gameId: string) => void;
   onSpectateGame: (gameId: string) => void;
+  onCreateGame: () => void;
 }
 
 type FilterOption = "all" | GameState;
@@ -17,6 +18,7 @@ type FilterOption = "all" | GameState;
 export default function GameList({
   onJoinGame,
   onSpectateGame,
+  onCreateGame,
 }: GameListProps) {
   const { t } = useTranslation();
   const { GradientType } = useGradient();
@@ -40,12 +42,6 @@ export default function GameList({
 
   const handleRefresh = () => {
     fetchGames();
-  };
-
-  const handleCreateGame = () => {
-    // For now, redirect to the default game
-    // In the future, this could open a modal to create a new game
-    onJoinGame("66c3a1e23c0a6642ee088edc");
   };
 
   const filteredAndSortedGames = useMemo(() => {
@@ -92,6 +88,11 @@ export default function GameList({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <ActionButton
+            onClick={onCreateGame}
+            label={t("Créer une partie")}
+            gradient={{ gradientType: GradientType.PRIMARY }}
+          />
           <ActionButton
             onClick={handleRefresh}
             label={t("Actualiser")}

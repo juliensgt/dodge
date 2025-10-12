@@ -9,11 +9,9 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
 import { httpService } from "@/services/http/http.service";
 import GameList from "@/components/game-list/GameList";
-import CreateGameModal from "@/components/game-list/CreateGameModal";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"quick" | "list">("list");
-  const [isCreateGameModalOpen, setIsCreateGameModalOpen] = useState(false);
   const { t } = useTranslation();
   const { getGradient, GradientType } = useGradient();
   const router = useRouter();
@@ -30,6 +28,10 @@ export default function Dashboard() {
 
   const handleSpectateGame = (gameId: string) => {
     router.push(`/app/game/${gameId}?spectate=true`);
+  };
+
+  const handleCreateGame = () => {
+    router.push("/app/create-game");
   };
 
   const resetGame = async () => {
@@ -95,7 +97,7 @@ export default function Dashboard() {
           {/* Create Game Button */}
           <div className="flex justify-center mb-6">
             <ActionButton
-              onClick={() => setIsCreateGameModalOpen(true)}
+              onClick={handleCreateGame}
               label={t("Créer une partie")}
               gradient={{ gradientType: GradientType.PRIMARY }}
             />
@@ -123,15 +125,10 @@ export default function Dashboard() {
             <GameList
               onJoinGame={handleJoinGameFromList}
               onSpectateGame={handleSpectateGame}
+              onCreateGame={handleCreateGame}
             />
           )}
         </div>
-
-        {/* Create Game Modal */}
-        <CreateGameModal
-          isOpen={isCreateGameModalOpen}
-          onClose={() => setIsCreateGameModalOpen(false)}
-        />
       </div>
     </AuthGuard>
   );

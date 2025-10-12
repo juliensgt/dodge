@@ -27,11 +27,11 @@ export interface GameOptionsBo {
   pointsForActionError: number;
   limitPoints: number;
   maxPlayers: number;
+  nbCardsPerPlayer: number;
   nbSeeFirstCards: number;
   timeToPlay: number;
   timeToStartGame: number;
   timeToSeeCards: number;
-  nbCards: number;
 }
 
 export interface GameCardData {

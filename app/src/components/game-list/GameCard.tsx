@@ -209,7 +209,7 @@ export default function GameCard({
                 <div>
                   <div className="text-white/60 text-xs">{t("Cartes")}</div>
                   <div className="text-white font-semibold">
-                    {game.options.nbCards}
+                    {game.options.nbCardsPerPlayer}
                   </div>
                 </div>
               </div>

@@ -29,4 +29,10 @@ export class Player {
 export const PlayerSchema = SchemaFactory.createForClass(Player);
 
 // Add unique compound index to prevent duplicate players in the same game
-PlayerSchema.index({ game: 1, user: 1 }, { unique: true });
+PlayerSchema.index(
+  { game: 1, user: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { game: { $type: 'objectId' }, user: { $type: 'objectId' } },
+  },
+);
