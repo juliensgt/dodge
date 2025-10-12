@@ -1,0 +1,126 @@
+import { GameModePreset, DeckPreset, GameMode, DeckType } from "./types";
+
+export const gameModePresets: GameModePreset[] = [
+  {
+    id: GameMode.QUICK,
+    name: "Rapide",
+    description: "Partie rapide pour jouer rapidement",
+    icon: "/images/gamemode/game_mode_quick.png",
+    color: "yellow",
+    options: {
+      maxPlayers: 4,
+      nbCardsPerPlayer: 4,
+      nbSeeFirstCards: 1,
+      pointsForActionError: 2,
+      limitPoints: 50,
+      timeToPlay: 8,
+      timeToStartGame: 10,
+      timeToSeeCards: 10,
+    },
+  },
+  {
+    id: GameMode.CLASSIC,
+    name: "Classique",
+    description: "Le mode traditionnel du jeu",
+    icon: "/images/gamemode/game_mode_classic.png",
+    color: "blue",
+    options: {
+      maxPlayers: 6,
+      nbCardsPerPlayer: 4,
+      nbSeeFirstCards: 2,
+      pointsForActionError: 5,
+      limitPoints: 150,
+      timeToPlay: 30,
+      timeToStartGame: 25,
+      timeToSeeCards: 30,
+    },
+  },
+  {
+    id: GameMode.TOURNAMENT,
+    name: "Tournoi",
+    description: "Configuration pour les tournois (bientôt disponible)",
+    icon: "/images/gamemode/game_mode_tournament.png",
+    color: "purple",
+    options: {
+      maxPlayers: 6,
+      nbCardsPerPlayer: 4,
+      nbSeeFirstCards: 2,
+      pointsForActionError: 7,
+      limitPoints: 200,
+      timeToPlay: 25,
+      timeToStartGame: 8,
+      timeToSeeCards: 8,
+    },
+    hasSpecificSteps: true,
+    disabled: true,
+  },
+  {
+    id: GameMode.CUSTOM,
+    name: "Personnalisé",
+    description: "Créez votre propre configuration (bientôt disponible)",
+    icon: "/images/gamemode/game_mode_custom.png",
+    color: "gray",
+    options: {},
+    disabled: true,
+  },
+];
+
+export const deckPresets: DeckPreset[] = [
+  {
+    id: DeckType.STANDARD,
+    name: "Deck Standard",
+    description: "52 cartes classiques pour débuter",
+    cardCount: 52,
+    color: "blue",
+    icon: "/images/decktype/deck_standard.png",
+  },
+  {
+    id: DeckType.ADVANCED,
+    name: "Deck Avancé",
+    description:
+      "58 cartes avec cartes spéciales pour plus de stratégie et de variété dans vos parties (bientôt disponible)",
+    cardCount: 58,
+    color: "purple",
+    icon: "/images/decktype/deck_advanced.png",
+    disabled: true,
+  },
+  {
+    id: DeckType.ULTIMATE,
+    name: "Deck Ultime",
+    description:
+      "64 cartes avec toutes les cartes spéciales disponibles (bientôt disponible)",
+    cardCount: 64,
+    color: "yellow",
+    icon: "/images/decktype/deck_ultimate.png",
+    disabled: true,
+  },
+  {
+    id: DeckType.CUSTOM,
+    name: "Deck Personnalisé",
+    description:
+      "Créez votre propre deck avec les cartes de votre choix (bientôt disponible)",
+    cardCount: 0,
+    color: "gray",
+    icon: "/images/decktype/deck_custom.png",
+    disabled: true,
+  },
+];
+
+export const defaultFormData = {
+  gameMode: GameMode.CLASSIC,
+  deckType: DeckType.STANDARD,
+  maxPlayers: 6,
+  nbCardsPerPlayer: 4,
+  nbSeeFirstCards: 2,
+  pointsForActionError: 5,
+  limitPoints: 150,
+  timeToPlay: 30,
+  timeToStartGame: 10,
+  timeToSeeCards: 10,
+  privateGame: false,
+  numberOfTables: 1,
+  maxPlayersPerTable: 6,
+  tournamentType: "single" as const,
+  prizePool: 0,
+  tags: [],
+};

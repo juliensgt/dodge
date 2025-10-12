@@ -37,6 +37,15 @@ export class Game {
 
   @Prop()
   tour: number;
+
+  @Prop()
+  gameMode: string;
+
+  @Prop()
+  privateGame: boolean;
+
+  @Prop()
+  password?: string;
 }
 
 export interface GameOptionsBo {
@@ -47,7 +56,7 @@ export interface GameOptionsBo {
   timeToPlay: number;
   timeToStartGame: number;
   timeToSeeCards: number;
-  nbCards: number;
+  nbCardsPerPlayer: number;
   modeDeJeu: string[];
 }
 

@@ -30,7 +30,8 @@ export class GameEntityManager {
   }
 
   async create(gameCreateDto: GameCreateDto): Promise<Game> {
-    const game = new this.gameModel(gameCreateDto || defaultGameCreateDto);
+    console.log('gameCreateDto', gameCreateDto);
+    const game = await this.gameModel.create(gameCreateDto || defaultGameCreateDto);
     if (!game) {
       throw new NotFoundException('Failed to create game', ErrorEnum['game/not-found']);
     }

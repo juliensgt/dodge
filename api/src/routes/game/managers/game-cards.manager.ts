@@ -42,7 +42,7 @@ export class GameCardsManager {
 
     // Distribuer les cartes aux joueurs
     for (const player of players) {
-      for (let i = 0; i < game.options.nbCards; i++) {
+      for (let i = 0; i < game.options.nbCardsPerPlayer; i++) {
         const card = deck.shift();
         if (!card) {
           throw new NotFoundException('Deck is empty', ErrorEnum['deck/empty']);

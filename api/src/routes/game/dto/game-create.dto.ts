@@ -1,13 +1,21 @@
 import { GameState } from '../../../enums/game-state.enum';
-import { Player } from '../../players/player.schema';
 import { Card } from '../../card/card.schema';
 import type { GameOptionsBo } from '../game.schema';
-import { IsOptional, IsArray, IsEnum, IsObject, IsNumber, IsString } from 'class-validator';
+import { Types } from 'mongoose';
+import {
+  IsOptional,
+  IsArray,
+  IsEnum,
+  IsObject,
+  IsNumber,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
 
 export class GameCreateDto {
   @IsOptional()
   @IsArray()
-  players: Player[];
+  players: Types.ObjectId[];
 
   @IsOptional()
   @IsArray()
@@ -20,6 +28,10 @@ export class GameCreateDto {
   @IsOptional()
   @IsEnum(GameState)
   gameState: GameState;
+
+  @IsOptional()
+  @IsString()
+  gameMode: string;
 
   @IsOptional()
   @IsObject()
@@ -44,6 +56,14 @@ export class GameCreateDto {
   @IsOptional()
   @IsNumber()
   tour: number;
+
+  @IsOptional()
+  @IsBoolean()
+  privateGame: boolean;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
 }
 
 export const defaultGameCreateDto: GameCreateDto = {
@@ -59,7 +79,7 @@ export const defaultGameCreateDto: GameCreateDto = {
     timeToPlay: 5,
     timeToStartGame: 3,
     timeToSeeCards: 5,
-    nbCards: 4,
+    nbCardsPerPlayer: 4,
     modeDeJeu: ['default'],
   },
   indexLastPlayerWhoPlay: -1,
@@ -67,4 +87,7 @@ export const defaultGameCreateDto: GameCreateDto = {
   playerDodge: '',
   round: 0,
   tour: 0,
+  gameMode: 'classic',
+  privateGame: false,
+  password: undefined,
 };

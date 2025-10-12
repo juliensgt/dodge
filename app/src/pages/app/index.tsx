@@ -5,7 +5,6 @@ import { useState } from "react";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/router";
-import { useAuth } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
 import { httpService } from "@/services/http/http.service";
@@ -15,7 +14,6 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"quick" | "list">("list");
   const { t } = useTranslation();
   const { getGradient, GradientType } = useGradient();
-  const { logout } = useAuth();
   const router = useRouter();
 
   const handleJoinGame = () => {
@@ -32,14 +30,14 @@ export default function Dashboard() {
     router.push(`/app/game/${gameId}?spectate=true`);
   };
 
+  const handleCreateGame = () => {
+    router.push("/app/create-game");
+  };
+
   const resetGame = async () => {
     const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
 
     await httpService.post(`/games/${gameId}/reset`);
-  };
-
-  const handleLogout = async () => {
-    await logout();
   };
 
   return (
@@ -96,6 +94,15 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Create Game Button */}
+          <div className="flex justify-center mb-6">
+            <ActionButton
+              onClick={handleCreateGame}
+              label={t("Créer une partie")}
+              gradient={{ gradientType: GradientType.PRIMARY }}
+            />
+          </div>
+
           {/* Content */}
           {activeTab === "quick" ? (
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md mx-auto shadow-2xl flex flex-col">
@@ -118,6 +125,7 @@ export default function Dashboard() {
             <GameList
               onJoinGame={handleJoinGameFromList}
               onSpectateGame={handleSpectateGame}
+              onCreateGame={handleCreateGame}
             />
           )}
         </div>

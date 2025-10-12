@@ -10,6 +10,7 @@ import GameCard from "./GameCard";
 interface GameListProps {
   onJoinGame: (gameId: string) => void;
   onSpectateGame: (gameId: string) => void;
+  onCreateGame: () => void;
 }
 
 type FilterOption = "all" | GameState;
@@ -17,6 +18,7 @@ type FilterOption = "all" | GameState;
 export default function GameList({
   onJoinGame,
   onSpectateGame,
+  onCreateGame,
 }: GameListProps) {
   const { t } = useTranslation();
   const { GradientType } = useGradient();
@@ -24,7 +26,6 @@ export default function GameList({
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
-  const [showFilters, setShowFilters] = useState(false);
 
   const fetchGames = async () => {
     setIsLoading(true);
@@ -41,12 +42,6 @@ export default function GameList({
 
   const handleRefresh = () => {
     fetchGames();
-  };
-
-  const handleCreateGame = () => {
-    // For now, redirect to the default game
-    // In the future, this could open a modal to create a new game
-    onJoinGame("66c3a1e23c0a6642ee088edc");
   };
 
   const filteredAndSortedGames = useMemo(() => {
@@ -94,61 +89,55 @@ export default function GameList({
         </div>
         <div className="flex flex-wrap gap-3">
           <ActionButton
+            onClick={onCreateGame}
+            label={t("Créer une partie")}
+            gradient={{ gradientType: GradientType.PRIMARY }}
+          />
+          <ActionButton
             onClick={handleRefresh}
             label={t("Actualiser")}
             color={{ color: ColorType.TRANSPARENT }}
             disabled={isLoading}
           />
-          <ActionButton
-            onClick={() => setShowFilters(!showFilters)}
-            label={showFilters ? t("Masquer filtres") : t("Filtres")}
-            color={{ color: ColorType.SECONDARY }}
-          />
-          <ActionButton
-            onClick={handleCreateGame}
-            label={t("Créer une partie")}
-            gradient={{ gradientType: GradientType.PRIMARY }}
-          />
         </div>
       </div>
 
       {/* Search and Filters */}
-      {showFilters && (
-        <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div>
-              <label className="block text-white/80 text-sm font-medium mb-2">
-                {t("Rechercher")}
-              </label>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t("ID de partie ou nom de joueur...")}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
-              />
-            </div>
 
-            {/* Filter by Status */}
-            <div>
-              <label className="block text-white/80 text-sm font-medium mb-2">
-                {t("Statut")}
-              </label>
-              <select
-                value={filterBy}
-                onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
-              >
-                <option value="all">{t("Tous")}</option>
-                <option value={GameState.WAITING}>{t("En attente")}</option>
-                <option value={GameState.IN_GAME}>{t("En cours")}</option>
-                <option value={GameState.END_GAME}>{t("Terminé")}</option>
-              </select>
-            </div>
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search */}
+          <div>
+            <label className="block text-white/80 text-sm font-medium mb-2">
+              {t("Rechercher")}
+            </label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("ID de partie ou nom de joueur...")}
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+            />
+          </div>
+
+          {/* Filter by Status */}
+          <div>
+            <label className="block text-white/80 text-sm font-medium mb-2">
+              {t("Statut")}
+            </label>
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value as FilterOption)}
+              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+            >
+              <option value="all">{t("Tous")}</option>
+              <option value={GameState.WAITING}>{t("En attente")}</option>
+              <option value={GameState.IN_GAME}>{t("En cours")}</option>
+              <option value={GameState.END_GAME}>{t("Terminé")}</option>
+            </select>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Games Grid */}
       {isLoading ? (
@@ -181,11 +170,6 @@ export default function GameList({
                     label={t("Effacer les filtres")}
                     color={{ color: ColorType.TRANSPARENT }}
                   />
-                  <ActionButton
-                    onClick={handleCreateGame}
-                    label={t("Créer une partie")}
-                    gradient={{ gradientType: GradientType.PRIMARY }}
-                  />
                 </div>
               </>
             ) : (
@@ -193,14 +177,6 @@ export default function GameList({
                 <h3 className="text-xl font-semibold text-white mb-2">
                   {t("Aucune partie disponible")}
                 </h3>
-                <p className="text-white/70 mb-6">
-                  {t("Créez une nouvelle partie pour commencer à jouer !")}
-                </p>
-                <ActionButton
-                  onClick={handleCreateGame}
-                  label={t("Créer une partie")}
-                  gradient={{ gradientType: GradientType.PRIMARY }}
-                />
               </>
             )}
           </div>
