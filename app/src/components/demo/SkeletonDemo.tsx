@@ -1,11 +1,17 @@
 import { useState } from "react";
 import CardContainer from "@/components/game/cards/CardContainer";
 import CardContainerSkeleton from "@/components/game/cards/CardContainerSkeleton";
-import { getPlayerLayout } from "@/scripts/references/playerLayouts";
+import {
+  getDeckContainerClasses,
+  getPlayerLayout,
+} from "@/scripts/references/playerLayouts";
+import { getGradient, GradientType } from "@/enums/themes/list/PurpleTheme";
+import DeckContainer from "../game/cards/DeckContainer";
+import { useIsMobile } from "@/hooks/useIsMobile";
 export default function SkeletonDemo() {
   const [maxPlayers, setMaxPlayers] = useState(6);
   const [actualPlayers, setActualPlayers] = useState(3);
-
+  const isMobile = useIsMobile();
   // Simuler des joueurs avec des valeurs fixes pour éviter l'erreur d'hydratation
   const mockPlayers = Array.from({ length: actualPlayers }, (_, index) => ({
     id: `player-${index}`,
@@ -20,9 +26,7 @@ export default function SkeletonDemo() {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4">
-          Démonstration des skeletons de joueurs
-        </h2>
+        <h2 className="text-2xl font-bold mb-4">Plateau de jeu</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
@@ -32,7 +36,7 @@ export default function SkeletonDemo() {
             <input
               type="range"
               min="2"
-              max="8"
+              max="6"
               value={maxPlayers}
               onChange={(e) => setMaxPlayers(Number(e.target.value))}
               className="w-full"
@@ -63,7 +67,9 @@ export default function SkeletonDemo() {
         </div>
       </div>
 
-      <div className="relative w-full h-192 bg-white rounded-lg border-2 border-gray-300 overflow-hidden">
+      <div
+        className={`relative w-full h-192 rounded-lg border-2 border-gray-300 overflow-hidden ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")}`}
+      >
         {/* Container principal avec CSS Grid */}
         <div className={playerLayout.container}>
           {/* Boucle sur le nombre maximum de joueurs */}
@@ -93,10 +99,11 @@ export default function SkeletonDemo() {
         </div>
 
         {/* Deck central */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="w-16 h-20 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold">
-            DECK
-          </div>
+        <div className="flex gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <DeckContainer
+            className={getDeckContainerClasses(maxPlayers, isMobile)}
+            maxPlayers={maxPlayers}
+          />
         </div>
       </div>
 
