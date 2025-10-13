@@ -7,7 +7,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/router";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
-import { httpService } from "@/services/http/http.service";
 import GameList from "@/components/game-list/GameList";
 
 export default function Dashboard() {
@@ -32,12 +31,6 @@ export default function Dashboard() {
 
   const handleCreateGame = () => {
     router.push("/app/create-game");
-  };
-
-  const resetGame = async () => {
-    const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
-
-    await httpService.post(`/games/${gameId}/reset`);
   };
 
   return (
@@ -94,29 +87,20 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Create Game Button */}
-          <div className="flex justify-center mb-6">
-            <ActionButton
-              onClick={handleCreateGame}
-              label={t("Créer une partie")}
-              gradient={{ gradientType: GradientType.PRIMARY }}
-            />
-          </div>
-
           {/* Content */}
           {activeTab === "quick" ? (
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md mx-auto shadow-2xl flex flex-col">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <ActionButton
-                    onClick={() => handleJoinGame()}
-                    label={t("Rejoindre la partie")}
+                    onClick={handleCreateGame}
+                    label={t("Créer une partie")}
                     gradient={{ gradientType: GradientType.PRIMARY }}
                   />
                   <ActionButton
-                    onClick={resetGame}
-                    label={t("Reset la partie")}
-                    color={{ color: ColorType.TRANSPARENT }}
+                    onClick={() => handleJoinGame()}
+                    label={t("Rejoindre la partie")}
+                    gradient={{ gradientType: GradientType.PRIMARY }}
                   />
                 </div>
               </div>

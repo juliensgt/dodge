@@ -1,4 +1,5 @@
 import { useGradient } from "@/hooks/useGradient";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 interface Gradient {
   gradientType: string;
@@ -19,7 +20,7 @@ interface Color {
 
 interface ActionButtonProps {
   onClick: () => void;
-  label: string;
+  label?: string;
   leftSection?: React.ReactNode;
   rightSection?: React.ReactNode;
   disabled?: boolean;
@@ -39,13 +40,13 @@ export default function ActionButton(props: ActionButtonProps) {
   return (
     <button
       onClick={props.onClick}
-      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${
+      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} h-10 text-white font-semibold px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 ${
         props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
       }`}
       disabled={props.disabled}
     >
       {props.leftSection && props.leftSection}
-      <span className="sm:inline">{props.label}</span>
+      {props.label && <span className="sm:inline">{props.label}</span>}
       {props.rightSection && props.rightSection}
     </button>
   );

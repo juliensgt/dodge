@@ -10,9 +10,13 @@ import {
   faCog,
   faEye,
   faDice,
+  faTrash,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GameOptionsModal from "./options/GameOptionsModal";
+import { useRole } from "@/contexts/AuthContext";
+import { gameService } from "@/services/game/game.service";
 
 interface GameCardProps {
   game: GameCardData;
@@ -26,6 +30,7 @@ export default function GameCard({
   onSpectateGame,
 }: GameCardProps) {
   const { t } = useTranslation();
+  const { isAdmin } = useRole();
   const [isHovered, setIsHovered] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
 
@@ -53,35 +58,72 @@ export default function GameCard({
     }
   };
 
+  const handleDeleteGame = async () => {
+    //TODO : create a custom modal for this
+    if (
+      !window.confirm(t("Êtes-vous sûr de vouloir supprimer cette partie ?"))
+    ) {
+      return;
+    }
+
+    await gameService.deleteGame(game._id);
+  };
+
+  const handleResetGame = async () => {
+    //TODO : create a custom modal for this
+    if (
+      !window.confirm(
+        t("Êtes-vous sûr de vouloir réinitialiser cette partie ?")
+      )
+    ) {
+      return;
+    }
+
+    await gameService.resetGame(game._id);
+  };
+
   const getAvailableActions = (state: GameState) => {
+    const actions = [];
+
     switch (state) {
       case GameState.WAITING:
-        return [
-          {
-            label: t("Rejoindre"),
-            action: () => onJoinGame(game._id),
-            color: { color: ColorType.PRIMARY },
-          },
-        ];
+        actions.push({
+          label: t("Rejoindre"),
+          action: () => onJoinGame(game._id),
+          color: { color: ColorType.PRIMARY },
+        });
+        break;
       case GameState.IN_GAME:
-        return [
-          {
-            label: t("Observer"),
-            action: () => onSpectateGame(game._id),
-            color: { color: ColorType.SECONDARY },
-          },
-        ];
+        actions.push({
+          label: t("Observer"),
+          action: () => onSpectateGame(game._id),
+          color: { color: ColorType.SECONDARY },
+        });
+        break;
       case GameState.END_GAME:
-        return [
-          {
-            label: t("Voir les résultats"),
-            action: () => onSpectateGame(game._id),
-            color: { color: ColorType.TRANSPARENT },
-          },
-        ];
-      default:
-        return [];
+        actions.push({
+          label: t("Voir les résultats"),
+          action: () => onSpectateGame(game._id),
+          color: { color: ColorType.TRANSPARENT },
+        });
+        break;
     }
+
+    // Add admin actions
+    if (isAdmin) {
+      actions.push({
+        action: handleResetGame,
+        color: { color: ColorType.WARNING },
+        icon: faRotateLeft,
+      });
+      actions.push({
+        action: handleDeleteGame,
+        color: { color: ColorType.DANGER },
+        icon: faTrash,
+      });
+    }
+
+    return actions;
   };
 
   const statusInfo = getStatusInfo(game.state);
@@ -234,13 +276,18 @@ export default function GameCard({
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col gap-3 justify-end">
+      <div className="flex gap-3 justify-end flex-wrap">
         {actions.map((action, index) => (
-          <div key={index} className="w-full">
+          <div key={index}>
             <ActionButton
               onClick={action.action}
               label={action.label}
               color={action.color}
+              leftSection={
+                action.icon && (
+                  <FontAwesomeIcon icon={action.icon} className="w-4 h-4" />
+                )
+              }
             />
           </div>
         ))}

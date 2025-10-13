@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CommonModule } from '../common/common.module';
 import { GameModule } from '../routes/game/game.module';
 import { UserModule } from '../routes/user/user.module';
 import { MessageModule } from '../routes/message/message.module';
@@ -8,7 +9,7 @@ import { ValidationService } from './services/validation.service';
 import { WsAuthGuard } from './guards/ws-auth.guard';
 
 @Module({
-  imports: [GameModule, UserModule, MessageModule, PlayerModule],
+  imports: [CommonModule, GameModule, UserModule, MessageModule, PlayerModule],
   providers: [GameGateway, ValidationService, WsAuthGuard],
   exports: [ValidationService, WsAuthGuard],
 })

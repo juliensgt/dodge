@@ -35,6 +35,7 @@ export interface Player {
   currentTime: number;
   skinCards: string;
   ready: boolean;
+  actionPoints: number;
 }
 
 export interface Game {

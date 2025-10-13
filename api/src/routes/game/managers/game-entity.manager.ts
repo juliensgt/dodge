@@ -50,9 +50,6 @@ export class GameEntityManager {
         },
       })
       .exec();
-    if (!games || games.length === 0) {
-      throw new NotFoundException('No games found', ErrorEnum['game/not-found']);
-    }
     return games;
   }
 
@@ -86,5 +83,9 @@ export class GameEntityManager {
         model: Player.name,
         populate: { path: 'user', model: User.name },
       })) as Game;
+  }
+
+  async delete(gameId: string): Promise<void> {
+    await this.gameModel.findByIdAndDelete(gameId);
   }
 }

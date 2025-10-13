@@ -1,4 +1,6 @@
 import { errorService } from "@/services/error/error.service";
+import { authService } from "@/services/auth.service";
+import { useGameStore } from "@/store/game/game";
 
 class HttpService {
   private static instance: HttpService;
@@ -16,10 +18,13 @@ class HttpService {
   }
 
   private async getAuthHeaders(): Promise<HeadersInit> {
-    const token = localStorage.getItem("access_token");
+    const token = await authService.getAccessToken();
+    const playerId = useGameStore.getState().getCurrentPlayerId();
+
     return {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...(playerId && { "X-Player-ID": playerId }),
     };
   }
 

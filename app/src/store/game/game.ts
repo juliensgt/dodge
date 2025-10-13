@@ -31,6 +31,7 @@ const useGameStore = create<GameStore>((set, get, store) => {
       currentTime: 0,
       skinCards: "",
       ready: false,
+      actionPoints: 0,
     },
     focusMode: false,
     actionQueue: [],

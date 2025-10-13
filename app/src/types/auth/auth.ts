@@ -1,3 +1,5 @@
+import { User } from "./user.types";
+
 export enum AuthLevel {
   PUBLIC = "public",
   USER = "user",
@@ -11,6 +13,8 @@ export interface AuthConfig {
 export interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
+  user: User | null;
+  isAdmin: boolean;
   logout: () => Promise<void>;
 }
 

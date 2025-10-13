@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsEmail, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsObject, IsEnum } from 'class-validator';
+import { UserRole } from '../../../enums/auth/user-role.enum';
 
 export class UserCreateDto {
   @IsString()
@@ -26,4 +27,8 @@ export class UserCreateDto {
   @IsOptional()
   @IsObject()
   appMetadata?: Record<string, any>;
+
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
 }

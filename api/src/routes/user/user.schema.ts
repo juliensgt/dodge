@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { UserRole } from '../../enums/auth/user-role.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -21,6 +22,9 @@ export class User {
 
   @Prop({ default: 'en' })
   language: string;
+
+  @Prop({ default: UserRole.USER, enum: UserRole })
+  role: UserRole;
 
   @Prop({ type: Object })
   userMetadata?: Record<string, any>;

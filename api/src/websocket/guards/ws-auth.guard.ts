@@ -1,31 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ValidationService } from '../services/validation.service';
+import { UserService } from '../../routes/user/user.service';
+import { BaseAuthGuard } from '../../common/guards/base-auth.guard';
 
 @Injectable()
-export class WsAuthGuard implements CanActivate {
-  private supabase: SupabaseClient;
-  constructor(private readonly validationService: ValidationService) {
-    this.supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+export class WsAuthGuard extends BaseAuthGuard {
+  constructor(
+    userService: UserService,
+    private readonly validationService: ValidationService,
+  ) {
+    super(userService);
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient();
-    const authHeader = client.handshake?.headers?.authorization;
+    const authHeader = client.handshake?.headers?.authorization as string;
 
     if (!authHeader) throw new WsException('Missing auth token');
 
     const token = authHeader.split(' ')[1];
-    const {
-      data: { user },
-      error,
-    } = await this.supabase.auth.getUser(token as string);
+    const user = await this.validateToken(token);
 
-    if (error || !user) throw new WsException('Unauthorized');
+    if (!user) throw new WsException('Unauthorized');
 
     const userId = user.id;
     const gameId = client.data.gameId as string;
@@ -47,8 +46,11 @@ export class WsAuthGuard implements CanActivate {
 
     await this.validationService.validateGameAndPlayer(gameId, playerId);
 
+    // Get user from database with role information
+    const dbUser = await this.getUserFromDatabase(user);
+
     // On attache l'utilisateur au client
-    client.user = user;
+    client.user = dbUser;
     return true;
   }
 }

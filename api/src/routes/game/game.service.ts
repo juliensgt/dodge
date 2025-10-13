@@ -177,6 +177,11 @@ export class GameService {
     await this.playerService.deleteAllByGame(gameId);
   }
 
+  async deleteGame(gameId: string): Promise<void> {
+    await this.gameEntityManager.delete(gameId);
+    await this.playerService.deleteAllByGame(gameId);
+  }
+
   // ===== TURN MANAGEMENT =====
   /*async switchWithDeck(
     gameId: string,

@@ -11,7 +11,6 @@ import {
 import { useGameStore } from "@/store/game/game";
 import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
-import { useCardStore } from "@/store/cards/cards.store";
 
 class GameService {
   constructor() {}
@@ -84,6 +83,14 @@ class GameService {
   async getGames(): Promise<GameCardData[]> {
     const data = await httpService.get<GameCardData[]>(`/games`);
     return data ?? [];
+  }
+
+  async resetGame(gameId: string): Promise<void> {
+    await httpService.post(`/games/${gameId}/reset`);
+  }
+
+  async deleteGame(gameId: string): Promise<void> {
+    await httpService.delete(`/games/${gameId}`);
   }
 }
 
