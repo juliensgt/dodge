@@ -32,6 +32,7 @@ export interface GameOptionsBo {
   timeToPlay: number;
   timeToStartGame: number;
   timeToSeeCards: number;
+  modeDeJeu: string[];
 }
 
 export interface GameCardData {

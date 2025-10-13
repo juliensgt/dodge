@@ -5,8 +5,9 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { faGamepad, faCog, faTrophy } from "@fortawesome/free-solid-svg-icons";
-import { SummaryStepProps, GameMode } from "../types";
+import { SummaryStepProps, GameMode, DeckType } from "../types";
 import { gameModePresets, deckPresets } from "../constants";
+import { getDeckTypeFromModeDeJeu } from "../utils/deckMapping";
 
 export default function Step3Summary({ formData, onEdit }: SummaryStepProps) {
   const { t } = useTranslation();
@@ -20,6 +21,11 @@ export default function Step3Summary({ formData, onEdit }: SummaryStepProps) {
   const getModeColor = (mode: GameMode) => {
     const preset = gameModePresets.find((p) => p.id === mode);
     return preset?.color || "blue";
+  };
+
+  // Helper function to get the current deck type from modeDeJeu
+  const getCurrentDeckType = (): DeckType => {
+    return getDeckTypeFromModeDeJeu(formData.modeDeJeu);
   };
 
   return (
@@ -104,8 +110,8 @@ export default function Step3Summary({ formData, onEdit }: SummaryStepProps) {
             <div className="flex justify-between">
               <span className="text-white/70">{t("Deck")}:</span>
               <span className="text-white">
-                {deckPresets.find((d) => d.id === formData.deckType)?.name ||
-                  formData.deckType}
+                {deckPresets.find((d) => d.id === getCurrentDeckType())?.name ||
+                  getCurrentDeckType()}
               </span>
             </div>
             <div className="flex justify-between">

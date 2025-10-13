@@ -41,7 +41,6 @@ export interface GameModePreset {
 
 export interface FormData extends GameOptionsBo {
   gameMode: GameMode;
-  deckType: DeckType;
   privateGame: boolean;
   password?: string;
   nbCardsPerPlayer: number;

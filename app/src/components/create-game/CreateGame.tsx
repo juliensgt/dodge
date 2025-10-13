@@ -114,6 +114,7 @@ export default function CreateGame() {
         timeToPlay: formData.timeToPlay,
         timeToStartGame: formData.timeToStartGame,
         timeToSeeCards: formData.timeToSeeCards,
+        modeDeJeu: formData.modeDeJeu,
       };
 
       await httpService

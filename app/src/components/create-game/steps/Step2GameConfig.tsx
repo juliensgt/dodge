@@ -10,6 +10,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { StepProps, DeckType } from "../types";
 import { deckPresets } from "../constants";
+import {
+  getModeDeJeuFromDeckType,
+  getDeckTypeFromModeDeJeu,
+  isDeckSelected as checkDeckSelected,
+} from "../utils/deckMapping";
 import Image from "next/image";
 
 // Reusable components
@@ -356,6 +361,16 @@ export default function Step2GameConfig({ formData, setFormData }: StepProps) {
     }));
   };
 
+  // Helper function to check if a deck is selected based on modeDeJeu
+  const isDeckSelected = (deck: { id: DeckType }): boolean => {
+    return checkDeckSelected(deck, formData.modeDeJeu);
+  };
+
+  // Helper function to get the current deck type from modeDeJeu
+  const getCurrentDeckType = (): DeckType => {
+    return getDeckTypeFromModeDeJeu(formData.modeDeJeu);
+  };
+
   const handleDeckSelect = (deck: {
     id: DeckType;
     name: string;
@@ -372,7 +387,7 @@ export default function Step2GameConfig({ formData, setFormData }: StepProps) {
 
     setFormData((prevFormData) => ({
       ...prevFormData,
-      deckType: deck.id,
+      modeDeJeu: getModeDeJeuFromDeckType(deck.id),
       nbCardsPerPlayer:
         deck.id !== DeckType.CUSTOM
           ? deck.cardCount
@@ -458,14 +473,14 @@ export default function Step2GameConfig({ formData, setFormData }: StepProps) {
                     <DeckCard
                       key={deck.id}
                       deck={deck}
-                      isSelected={formData.deckType === deck.id}
+                      isSelected={isDeckSelected(deck)}
                       onSelect={() => handleDeckSelect(deck)}
                       index={index}
                     />
                   ))}
                 </div>
               </div>
-              <DeckDetails deckType={formData.deckType} />
+              <DeckDetails deckType={getCurrentDeckType()} />
             </div>
           </FormSection>
         </div>

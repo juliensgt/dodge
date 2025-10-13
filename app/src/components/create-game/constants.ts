@@ -108,7 +108,7 @@ export const deckPresets: DeckPreset[] = [
 
 export const defaultFormData = {
   gameMode: GameMode.CLASSIC,
-  deckType: DeckType.STANDARD,
+  modeDeJeu: ["default"],
   maxPlayers: 6,
   nbCardsPerPlayer: 4,
   nbSeeFirstCards: 2,
