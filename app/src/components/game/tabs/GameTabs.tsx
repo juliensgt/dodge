@@ -4,13 +4,22 @@ import Chat from "./chat/Chat";
 import Settings from "./settings/Settings";
 import Ranking from "./ranking/Ranking";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { faGear, faMessage, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import {
+  faGear,
+  faMessage,
+  faTrophy,
+  faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AdminTab from "./admin/AdminTab";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/types/auth/user.types";
 
-type TabType = "chat" | "settings" | "ranking";
+type TabType = "chat" | "settings" | "ranking" | "admin";
 
 export default function GameTabs() {
-  const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.ADMIN;
   const [activeTab, setActiveTab] = useState<TabType>("chat");
   const isMobile = useIsMobile();
 
@@ -30,6 +39,17 @@ export default function GameTabs() {
       label: "",
       icon: <FontAwesomeIcon icon={faTrophy} size="xl" color="#ffffff" />,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "admin" as TabType,
+            label: "",
+            icon: (
+              <FontAwesomeIcon icon={faUserShield} size="xl" color="#ffffff" />
+            ),
+          },
+        ]
+      : []),
   ];
 
   const renderTabContent = () => {
@@ -40,6 +60,9 @@ export default function GameTabs() {
         return <Settings />;
       case "ranking":
         return <Ranking />;
+      case "admin":
+        if (!isAdmin) return null;
+        return <AdminTab />;
       default:
         return null;
     }

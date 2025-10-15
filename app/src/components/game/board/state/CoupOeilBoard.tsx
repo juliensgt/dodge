@@ -17,12 +17,12 @@ export default function CoupOeilBoard() {
   // Initialize cards
   useEffect(() => {
     setCards(
-      new Array(options.nbCards).fill({
+      new Array(options.nbCardsPerPlayer).fill({
         cardState: CardState.CARD_BACK,
         valeur: undefined,
       })
     );
-  }, [options.nbCards]);
+  }, [options.nbCardsPerPlayer]);
 
   const handleCardClick = async (index: number) => {
     await httpService

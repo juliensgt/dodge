@@ -61,4 +61,28 @@ export class GameCardsManager {
     // Mettre à jour le deck du jeu
     await this.gameModel.updateOne({ _id: gameId }, { $set: { deck } });
   }
+
+  async getCardFromDeck(gameId: string): Promise<Card> {
+    const game = await this.gameModel.findById(gameId);
+    if (!game) {
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
+    }
+    const card = game.deck.shift();
+    if (!card) {
+      throw new NotFoundException('No cards in deck');
+    }
+    return card;
+  }
+
+  async getCardFromDefausse(gameId: string): Promise<Card> {
+    const game = await this.gameModel.findById(gameId);
+    if (!game) {
+      throw new NotFoundException('Game not found', ErrorEnum['game/not-found']);
+    }
+    const card = game.defausse.pop();
+    if (!card) {
+      throw new NotFoundException('No cards in defausse');
+    }
+    return card;
+  }
 }

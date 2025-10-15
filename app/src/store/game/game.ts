@@ -21,6 +21,8 @@ const useGameStore = create<GameStore>((set, get, store) => {
     id: "",
     state: "WAITING",
     round: 0,
+    deck: undefined,
+    defausse: undefined,
     players: [],
     currentPlayerId: undefined,
     playerWhoPlays: {
@@ -42,11 +44,13 @@ const useGameStore = create<GameStore>((set, get, store) => {
       action: null,
     },
     actionsHistory: { players: [], datas: [] },
+    playerTimer: 0,
+    playerTimerId: null,
     options: {
       maxPlayers: 0,
       limitPoints: 150,
       pointsForActionError: 5,
-      nbCards: 0,
+      nbCardsPerPlayer: 0,
       nbSeeFirstCards: 2,
       timeToPlay: 0,
       timeToStartGame: 10,

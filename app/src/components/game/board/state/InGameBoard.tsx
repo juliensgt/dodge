@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { useGameStore } from "@/store/game/game";
 import DeckContainer from "@/components/game/cards/DeckContainer";
 import CardContainer from "@/components/game/cards/CardContainer";
@@ -10,18 +9,18 @@ import { getMobilePlayerLayout } from "@/scripts/references/mobilePlayerLayouts"
 import GameVersion from "@/components/utils/GameVersion";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import AnimatedBanner from "@/components/utils/animations/AnimatedBanner";
+import { useEffect } from "react";
 
 export default function InGameBoard() {
-  const { getPlayers, options } = useGameStore();
+  const { getPlayers, options, playerTimer, playerWhoPlays } = useGameStore();
   const isMobile = useIsMobile();
   const nbPlayers = options.maxPlayers;
-
-  const deckRef = useRef<HTMLDivElement>(null);
-  const playerRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
 
   const playerLayout = isMobile
     ? getMobilePlayerLayout(nbPlayers)
     : getPlayerLayout(nbPlayers);
+
+  useEffect(() => {}, [playerWhoPlays]);
 
   return (
     <div className="relative h-full w-full rounded-[1vh] overflow-hidden max-w-full max-h-full">
@@ -32,28 +31,23 @@ export default function InGameBoard() {
             return null;
           }
 
-          // Créer une ref pour ce joueur si elle n'existe pas
-          if (!playerRefs.current[index]) {
-            playerRefs.current[index] = {
-              current: null as unknown as HTMLDivElement,
-            };
-          }
+          const isPlayerWhoPlays = playerWhoPlays?.id === player.id;
 
           return (
             <CardContainer
               key={player.id}
-              ref={playerRefs.current[index]}
               player={player}
               position={index}
               maxPlayers={nbPlayers}
+              isPlayerWhoPlays={isPlayerWhoPlays}
+              playerTimer={isPlayerWhoPlays ? playerTimer : 0}
+              maxTime={options.timeToPlay}
             />
           );
         })}
 
         <DeckContainer
-          ref={deckRef}
           className={getDeckContainerClasses(nbPlayers, isMobile)}
-          maxPlayers={nbPlayers}
         />
       </div>
 

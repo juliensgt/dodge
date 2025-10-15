@@ -19,6 +19,6 @@ import { GameTimerManager } from './managers/game-timer.manager';
   ],
   controllers: [GameController],
   providers: [GameService, GameEntityManager, GameCardsManager, GameTimerManager],
-  exports: [GameService, MongooseModule],
+  exports: [GameService, GameEntityManager, GameCardsManager, GameTimerManager, MongooseModule],
 })
 export class GameModule {}

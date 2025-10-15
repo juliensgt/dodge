@@ -32,7 +32,7 @@ export class PlayerService {
   }
 
   async findOne(id: string): Promise<Player> {
-    const player = await this.playerModel.findById(id).populate('user').exec();
+    const player = await this.playerModel.findById(new Types.ObjectId(id)).populate('user').exec();
 
     if (!player) {
       throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);

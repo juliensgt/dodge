@@ -2,6 +2,7 @@ import { StateCreator } from "zustand";
 import { Game, GameOptions, Player } from "./types";
 import { GameState } from "@/types/game/game.types";
 import { useCardStore } from "../cards/cards.store";
+import { Card } from "../cards/cards.type";
 
 export interface GameActions {
   // Game state management
@@ -18,15 +19,26 @@ export interface GameActions {
   setCurrentPlayerId: (playerId: string) => void;
   getCurrentPlayerId: () => string | undefined;
 
+  // Card management
+  setDeck: (deck: Card) => void;
+  addDefausse: (defausse: Card) => void;
+
   // Utility functions
   isCurrentPlayerIsPlaying: () => boolean;
   getPlayers: () => Player[];
+
+  setPlayerWhoPlays: (player: Player) => void;
+  startPlayerTimer: () => void;
+  stopPlayerTimer: () => void;
+  getPlayerTimer: () => number;
 }
 
-export const createGameActions: StateCreator<Game, [], [], GameActions> = (
-  set,
-  get
-) => ({
+export const createGameActions: StateCreator<
+  Game & GameActions,
+  [],
+  [],
+  GameActions
+> = (set, get) => ({
   setGame: (game: Game, playerCurrentId?: string) => {
     console.log("Setting game", game);
     set({
@@ -63,8 +75,10 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
         action: null,
       },
       actionsHistory: { players: [], datas: [] },
+      playerTimer: 0,
+      playerTimerId: null,
       options: {
-        nbCards: 0,
+        nbCardsPerPlayer: 0,
         timeToPlay: 0,
         maxPlayers: 6,
         nbSeeFirstCards: 2,
@@ -90,6 +104,16 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
 
   getCurrentPlayerId: () => {
     return get().currentPlayerId;
+  },
+
+  setDeck: (deck: Card) => {
+    set({ deck });
+  },
+
+  addDefausse: (defausse: Card) => {
+    set((state) => ({
+      defausse: [defausse, ...(state.defausse || [])],
+    }));
   },
 
   addPlayer: (player: Player) => {
@@ -130,7 +154,7 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       round: game.round,
       options: {
         timeToPlay: 0, //game.options.timeToPlay,
-        nbCards: 0, //game.options.nbCards,
+        nbCardsPerPlayer: 0, //game.options.nbCardsPerPlayer,
         maxPlayers: 6,
         nbSeeFirstCards: 2,
         pointsForActionError: 5,
@@ -163,13 +187,6 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
       (player) => player.id === get().currentPlayerId
     );
 
-    console.log(
-      "currentPlayerIndex",
-      currentPlayerIndex,
-      "for currentPlayerId",
-      get().currentPlayerId
-    );
-
     if (currentPlayerIndex === -1) {
       return players;
     }
@@ -177,5 +194,46 @@ export const createGameActions: StateCreator<Game, [], [], GameActions> = (
     return players
       .slice(currentPlayerIndex)
       .concat(players.slice(0, currentPlayerIndex));
+  },
+
+  setPlayerWhoPlays: (player: Player) => {
+    set({ playerWhoPlays: player });
+  },
+
+  startPlayerTimer: () => {
+    const state = get();
+    const timeToPlay = state.options.timeToPlay;
+
+    // Clear existing timer
+    if (state.playerTimerId) {
+      clearInterval(state.playerTimerId);
+    }
+
+    // Set initial timer value
+    set({ playerTimer: timeToPlay });
+
+    // Start countdown
+    const timerId = setInterval(() => {
+      const currentTimer = get().playerTimer;
+      if (currentTimer <= 0) {
+        get().stopPlayerTimer();
+      } else {
+        set({ playerTimer: currentTimer - 1 });
+      }
+    }, 1000);
+
+    set({ playerTimerId: timerId });
+  },
+
+  stopPlayerTimer: () => {
+    const state = get();
+    if (state.playerTimerId) {
+      clearInterval(state.playerTimerId);
+      set({ playerTimerId: null, playerTimer: 0 });
+    }
+  },
+
+  getPlayerTimer: () => {
+    return get().playerTimer;
   },
 });

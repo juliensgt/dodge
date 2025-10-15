@@ -1,6 +1,8 @@
+import { Card } from "../cards/cards.type";
+
 export interface GameOptions {
   maxPlayers: number;
-  nbCards: number;
+  nbCardsPerPlayer: number;
   nbSeeFirstCards: number;
   pointsForActionError: number;
   limitPoints: number;
@@ -50,4 +52,8 @@ export interface Game {
   actionQueue: ActionQueueItem[];
   currentAction: ActionPlayer;
   actionsHistory: ActionsHistory;
+  playerTimer: number;
+  playerTimerId: ReturnType<typeof setInterval> | null;
+  deck: Card | undefined;
+  defausse: Card[] | undefined;
 }

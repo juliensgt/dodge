@@ -12,8 +12,12 @@ import { Server, Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
 import { socketService } from './services/socket.service';
 import { GameService } from 'src/routes/game/game.service';
+import { GameTimerManager } from 'src/routes/game/managers/game-timer.manager';
 import { ConnectionType } from './types/connection.types';
 import { GameEvents } from './events/game.events';
+import { TurnEvents } from './events/turn.events';
+import { ActionType } from 'src/enums/action-type.enum';
+import { Card } from 'src/routes/card/card.schema';
 import { UserService } from 'src/routes/user/user.service';
 import { PlayerDto } from 'src/routes/players/dto/player.dto';
 import { GameDto } from 'src/routes/game/dto/game.dto';
@@ -26,6 +30,7 @@ import { MessageDto } from 'src/routes/message/dto/message.dto';
 import { PlayerService } from 'src/routes/players/player.service';
 import { GameState } from 'src/enums/game-state.enum';
 import { WsExceptionFilter, WsAllExceptionsFilter } from 'src/common/filters/ws-exception.filter';
+import { GameCardsManager } from 'src/routes/game/managers/game-cards.manager';
 
 @WebSocketGateway({
   cors: {
@@ -39,6 +44,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   constructor(
     private readonly gameService: GameService,
+    private readonly gameTimerManager: GameTimerManager,
+    private readonly gameCardsManager: GameCardsManager,
     private readonly userService: UserService,
     private readonly messageService: MessageService,
     private readonly playerService: PlayerService,
@@ -116,7 +123,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       response.gameData!.state === GameState.WAITING &&
       response.gameData!.players.length === response.gameData!.options.maxPlayers
     ) {
-      await this.gameService.startGame(gameId).catch(() => {
+      await this.gameService.startWaitingGame(gameId).catch(() => {
         throw new WsException('Error starting game');
       });
     }
@@ -140,5 +147,44 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const messageDto = MessageDto.fromMessage(message);
 
     this.server.to(`dgd-${gameInfo.gameId}`).emit(ChatEvents.CHAT_MESSAGE_SENT, messageDto);
+  }
+
+  @SubscribeMessage(TurnEvents.CARD_SOURCE_CHOSEN)
+  @UseGuards(WsAuthGuard)
+  async handleCardSourceChosen(
+    @MessageBody() data: { choice: ActionType.SWITCH_WITH_DECK | ActionType.SWITCH_WITH_DEFAUSSE },
+    @GameInfo() gameInfo: { gameId: string; playerId: string },
+  ) {
+    console.log('gameInfo', gameInfo);
+    // Vérify if the player is the current player in the game
+    const player = await this.playerService.findOne(gameInfo.playerId);
+    const game = await this.gameService.findOne(gameInfo.gameId);
+    if (!player || !game) {
+      throw new WsException('Player or game not found');
+    }
+    if (!game.players.some((p) => p._id.toString() === player._id.toString())) {
+      throw new WsException(
+        'Player not in game' +
+          player._id.toString() +
+          ' not in game' +
+          game.players.map((p) => p._id.toString()).join(', '),
+      );
+    }
+    if (game.playerWhoPlays?._id.toString() !== player._id.toString()) {
+      throw new WsException('Player is not the current player');
+    }
+    this.gameTimerManager.cancelPlayerTimer(player._id.toString());
+
+    let card: Card;
+    if (data.choice === ActionType.SWITCH_WITH_DECK) {
+      card = await this.gameCardsManager.getCardFromDeck(gameInfo.gameId);
+    } else {
+      card = await this.gameCardsManager.getCardFromDefausse(gameInfo.gameId);
+    }
+
+    this.server.to(`dgd-${gameInfo.gameId}`).emit(TurnEvents.CARD_SOURCE_CHOSEN, {
+      choice: data.choice,
+      card: card,
+    });
   }
 }

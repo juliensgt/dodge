@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
-import { Player } from "@/store/game/player";
+import React from "react";
+import { Player } from "@/store/game/types";
 import Card, { CardState } from "./card/Card";
 import {
   getPlayerClasses,
@@ -19,80 +19,99 @@ interface CardContainerProps {
   maxPlayers: number;
   style?: React.CSSProperties;
   className?: string;
+  isPlayerWhoPlays?: boolean;
+  playerTimer?: number;
+  maxTime?: number;
 }
 
-const CardContainer = forwardRef<HTMLDivElement, CardContainerProps>(
-  ({ player, position, maxPlayers, style, className = "" }, ref) => {
-    const isMobile = useIsMobile();
-    const playerClasses = getPlayerClasses(maxPlayers, position, isMobile);
-    const { selectedSkinId } = useCardSkin();
+export default function CardContainer({
+  player,
+  position,
+  maxPlayers,
+  style,
+  className = "",
+  isPlayerWhoPlays = false,
+  playerTimer = 0,
+  maxTime = 30,
+}: CardContainerProps) {
+  const isMobile = useIsMobile();
+  const playerClasses = getPlayerClasses(maxPlayers, position, isMobile);
+  const { selectedSkinId } = useCardSkin();
 
-    // Récupération des tailles selon la position du joueur
-    const isMainPlayer = position === 0;
-    const sizes = isMainPlayer
-      ? getMainPlayerSizes(maxPlayers, isMobile)
-      : getOtherPlayersSizes(maxPlayers, isMobile);
+  // Récupération des tailles selon la position du joueur
+  const isMainPlayer = position === 0;
+  const sizes = isMainPlayer
+    ? getMainPlayerSizes(maxPlayers, isMobile)
+    : getOtherPlayersSizes(maxPlayers, isMobile);
 
-    // Récupération du layout des cartes
-    const cardLayouts = getCardLayouts(maxPlayers, isMobile);
-    const cardLayout = isMainPlayer
-      ? cardLayouts.mainPlayer
-      : cardLayouts.otherPlayers;
+  // Récupération du layout des cartes
+  const cardLayouts = getCardLayouts(maxPlayers, isMobile);
+  const cardLayout = isMainPlayer
+    ? cardLayouts.mainPlayer
+    : cardLayouts.otherPlayers;
 
-    // Simuler des cartes pour le joueur (à remplacer par les vraies données)
-    const playerCards = Array.from({ length: 4 }, (_, index) => ({
-      id: `${player.id}-${index}`,
-      cardState: CardState.CARD_BACK,
-      cardValue: index + 1,
-      cliquable: position === 0, // Seul le joueur principal peut cliquer
-    }));
+  // Simuler des cartes pour le joueur (à remplacer par les vraies données)
+  const playerCards = Array.from({ length: 4 }, (_, index) => ({
+    id: `${player.id}-${index}`,
+    cardState: CardState.CARD_BACK,
+    cardValue: index + 1,
+    cliquable: position === 0, // Seul le joueur principal peut cliquer
+  }));
 
-    return (
-      <div
-        ref={ref}
-        className={`${playerClasses.container} select-none ${className}`}
-        style={style}
-      >
-        <div className={`flex flex-col ${isMobile ? "gap-1" : "gap-4"}`}>
-          {/* Profil du joueur MOBILE*/}
-          {isMobile && (
-            <div className={`${playerClasses.profileAlignment} flex flex-col`}>
+  return (
+    <div
+      className={`${playerClasses.container} select-none ${className} relative`}
+      style={style}
+    >
+      <div className={`flex flex-col ${isMobile ? "gap-1" : "gap-4"}`}>
+        {/* Profil du joueur MOBILE*/}
+        {isMobile && (
+          <div className={`${playerClasses.profileAlignment} flex flex-col`}>
+            <PlayerName player={player} size={sizes.name} />
+            <PlayerPoints player={player} size={sizes.points} />
+            {isPlayerWhoPlays && playerTimer > 0 && (
+              <div className="text-xs text-gray-600 text-center">
+                {playerTimer}s
+              </div>
+            )}
+          </div>
+        )}
+        {/* Cartes du joueur*/}
+        <div className={cardLayout} data-card-container>
+          {playerCards.map((card) => (
+            <div key={card.id} data-card>
+              <Card
+                cardState={card.cardState}
+                cardValue={card.cardValue}
+                cliquable={card.cliquable}
+                size={sizes.card}
+                skinId={selectedSkinId}
+              />
+            </div>
+          ))}
+        </div>
+        {/* Profil du joueur DESKTOP*/}
+        {!isMobile && (
+          <div
+            className={`${playerClasses.profileAlignment} text-center flex flex-row gap-4`}
+          >
+            <PlayerAvatar
+              player={player}
+              size={sizes.avatar}
+              isPlayerWhoPlays={isPlayerWhoPlays}
+              playerTimer={isPlayerWhoPlays ? playerTimer : 0}
+              maxTime={maxTime}
+            />
+            <div className="flex flex-col items-start">
               <PlayerName player={player} size={sizes.name} />
               <PlayerPoints player={player} size={sizes.points} />
+              {isPlayerWhoPlays && playerTimer > 0 && (
+                <div className="text-xs text-white/80">{playerTimer}s</div>
+              )}
             </div>
-          )}
-          {/* Cartes du joueur*/}
-          <div className={cardLayout} data-card-container>
-            {playerCards.map((card) => (
-              <div key={card.id} data-card>
-                <Card
-                  cardState={card.cardState}
-                  cardValue={card.cardValue}
-                  cliquable={card.cliquable}
-                  size={sizes.card}
-                  skinId={selectedSkinId}
-                />
-              </div>
-            ))}
           </div>
-          {/* Profil du joueur DESKTOP*/}
-          {!isMobile && (
-            <div
-              className={`${playerClasses.profileAlignment} text-center flex flex-row gap-2`}
-            >
-              <PlayerAvatar player={player} size={sizes.avatar} />
-              <div className="flex flex-col items-start">
-                <PlayerName player={player} size={sizes.name} />
-                <PlayerPoints player={player} size={sizes.points} />
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    );
-  }
-);
-
-CardContainer.displayName = "CardContainer";
-
-export default CardContainer;
+    </div>
+  );
+}

@@ -7,9 +7,10 @@ import { PlayerModule } from '../routes/players/player.module';
 import { GameGateway } from './game.gateway';
 import { ValidationService } from './services/validation.service';
 import { WsAuthGuard } from './guards/ws-auth.guard';
+import { CardModule } from '../routes/card/card.module';
 
 @Module({
-  imports: [CommonModule, GameModule, UserModule, MessageModule, PlayerModule],
+  imports: [CommonModule, GameModule, UserModule, MessageModule, PlayerModule, CardModule],
   providers: [GameGateway, ValidationService, WsAuthGuard],
   exports: [ValidationService, WsAuthGuard],
 })

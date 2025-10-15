@@ -8,6 +8,9 @@ import { PlayerCreateDto } from '../players/dto/player-create.dto';
 import { User } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { GameEvents } from 'src/websocket/events/game.events';
+import { TurnEvents } from 'src/websocket/events/turn.events';
+import { ActionType } from '../../enums/action-type.enum';
+import { PlayerDto } from '../players/dto/player.dto';
 import { GameDto } from './dto/game.dto';
 import { socketService } from 'src/websocket/services/socket.service';
 import { GameCardsManager } from './managers/game-cards.manager';
@@ -67,7 +70,7 @@ export class GameService {
     return { playerData: player, gameData };
   }
 
-  async startGame(gameId: string): Promise<Game> {
+  async startWaitingGame(gameId: string): Promise<Game> {
     const game = await this.changeGameState(gameId, GameState.STARTED);
 
     // distribute cards
@@ -99,11 +102,28 @@ export class GameService {
       gameId,
       game.options.timeToSeeCards * 1000,
       async () => {
-        await this.playerActionsPointsManager.resetActionPoints(gameId);
-        await this.changeGameState(gameId, GameState.IN_GAME);
-        await this.startRound(gameId);
+        await this.startGame(gameId);
       },
     );
+
+    return game;
+  }
+
+  async startGame(gameId: string): Promise<Game> {
+    await this.playerActionsPointsManager.resetActionPoints(gameId);
+    const game = await this.changeGameState(gameId, GameState.IN_GAME);
+
+    //Choose first player randomly
+    const firstPlayer = game.players[Math.floor(Math.random() * game.players.length)];
+    game.playerWhoPlays = firstPlayer;
+    await this.gameEntityManager.update(gameId, { playerWhoPlays: firstPlayer });
+
+    socketService.broadcastToGame(gameId, GameEvents.GAME_STARTED, {
+      gameData: GameDto.fromGame(game),
+    });
+
+    //Start round
+    await this.startRound(gameId);
 
     return game;
   }
@@ -112,6 +132,42 @@ export class GameService {
     const game = await this.gameEntityManager.findOne(gameId);
     game.round++;
     await this.gameEntityManager.update(gameId, { round: game.round });
+
+    //Start turn
+    await this.startTurn(gameId);
+    return game;
+  }
+
+  async startTurn(gameId: string): Promise<Game> {
+    const game = await this.gameEntityManager.findOne(gameId);
+
+    if (!game.playerWhoPlays) {
+      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
+    }
+
+    const playerWhoPlays = await this.playerService.findOne(game.playerWhoPlays._id.toString());
+
+    socketService.broadcastToGame(gameId, TurnEvents.TURN_STARTED, {
+      player: PlayerDto.fromPlayer(playerWhoPlays, playerWhoPlays.user),
+    });
+
+    this.gameTimerManager.schedulePlayerTurn(
+      playerWhoPlays._id.toString(),
+      game.options.timeToPlay * 1000,
+      async () => {
+        // Default action: get card from deck
+        try {
+          const card = await this.gameCardsManager.getCardFromDeck(gameId);
+          socketService.broadcastToGame(gameId, TurnEvents.CARD_SOURCE_CHOSEN, {
+            choice: ActionType.SWITCH_WITH_DECK,
+            card: card,
+          });
+        } catch (error) {
+          console.error(`[Timer Error][${gameId}] Failed to get card from deck:`, error);
+        }
+      },
+    );
+
     return game;
   }
 
@@ -120,9 +176,6 @@ export class GameService {
     socketService.broadcastToGame(gameId, GameEvents.GAME_STATE_CHANGED, {
       gameData: GameDto.fromGame(game),
     });
-
-    console.log('changeGameState', gameId, state);
-
     return game;
   }
 
