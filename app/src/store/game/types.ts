@@ -1,3 +1,4 @@
+import { ActionType } from "@/enums/action-type.enum";
 import { Card } from "../cards/cards.type";
 
 export interface GameOptions {
@@ -56,4 +57,5 @@ export interface Game {
   playerTimerId: ReturnType<typeof setInterval> | null;
   deck: Card | undefined;
   defausse: Card[] | undefined;
+  choices: ActionType[];
 }

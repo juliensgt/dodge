@@ -12,23 +12,31 @@ interface DeckContainerProps {
 
 export default function DeckContainer({ className }: DeckContainerProps) {
   const isMobile = useIsMobile();
-  const { options, deck, defausse } = useGameStore();
+  const { options, deck, defausse, choices } = useGameStore();
   const sizes = getDeckSizes(options.maxPlayers, isMobile);
   const { playerWhoPlays, currentPlayerId } = useGameStore();
   const isCurrentPlayer = currentPlayerId === playerWhoPlays?.id;
 
   const handleDeckClick = () => {
-    console.log("Deck clicked and isCurrentPlayer");
-    gameService.sendCardSourceChoice(ActionType.SWITCH_WITH_DECK);
+    if (choices.includes(ActionType.GET_CARD_IN_DECK)) {
+      gameService.sendCardSourceChoice(ActionType.GET_CARD_IN_DECK);
+    }
   };
 
   const handleDefausseClick = () => {
-    console.log("Defausse clicked and isCurrentPlayer");
-    gameService.sendCardSourceChoice(ActionType.SWITCH_WITH_DEFAUSSE);
+    if (choices.includes(ActionType.GET_CARD_IN_DEFAUSSE)) {
+      gameService.sendCardSourceChoice(ActionType.GET_CARD_IN_DEFAUSSE);
+    } else if (choices.includes(ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER)) {
+      gameService.sendCardSwitchChoice(
+        ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER
+      );
+    } else if (choices.includes(ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE)) {
+      gameService.sendCardSwitchChoice(ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE);
+    }
   };
 
   // Update the deck and defausse when they change
-  useEffect(() => {}, [deck, defausse]);
+  useEffect(() => {}, [deck, defausse, choices]);
 
   return (
     <div className={`${className}`}>

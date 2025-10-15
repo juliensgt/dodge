@@ -2,7 +2,8 @@ import { StateCreator } from "zustand";
 import { Game, GameOptions, Player } from "./types";
 import { GameState } from "@/types/game/game.types";
 import { useCardStore } from "../cards/cards.store";
-import { Card } from "../cards/cards.type";
+import { Card, CardState } from "../cards/cards.type";
+import { ActionType } from "@/enums/action-type.enum";
 
 export interface GameActions {
   // Game state management
@@ -20,8 +21,12 @@ export interface GameActions {
   getCurrentPlayerId: () => string | undefined;
 
   // Card management
+  resetDeck: () => void;
   setDeck: (deck: Card) => void;
   addDefausse: (defausse: Card) => void;
+
+  // Choices management
+  setChoices: (choices: ActionType[]) => void;
 
   // Utility functions
   isCurrentPlayerIsPlaying: () => boolean;
@@ -66,6 +71,8 @@ export const createGameActions: StateCreator<
       players: [],
       currentPlayerId: "",
       playerWhoPlays: undefined,
+      deck: undefined,
+      defausse: undefined,
       focusMode: false,
       actionQueue: [],
       currentAction: {
@@ -106,8 +113,16 @@ export const createGameActions: StateCreator<
     return get().currentPlayerId;
   },
 
+  setChoices: (choices: ActionType[]) => {
+    set({ choices });
+  },
+
+  resetDeck: () => {
+    set({ deck: { cardState: CardState.CARD_BACK, valeur: undefined } });
+  },
+
   setDeck: (deck: Card) => {
-    set({ deck });
+    set({ deck: { ...deck, cardState: CardState.CARD_FRONT } });
   },
 
   addDefausse: (defausse: Card) => {
@@ -204,7 +219,7 @@ export const createGameActions: StateCreator<
     const state = get();
     const timeToPlay = state.options.timeToPlay;
 
-    // Clear existing timer
+    // Clear existing timer if it exists
     if (state.playerTimerId) {
       clearInterval(state.playerTimerId);
     }
@@ -229,8 +244,8 @@ export const createGameActions: StateCreator<
     const state = get();
     if (state.playerTimerId) {
       clearInterval(state.playerTimerId);
-      set({ playerTimerId: null, playerTimer: 0 });
     }
+    set({ playerTimerId: null, playerTimer: 0 });
   },
 
   getPlayerTimer: () => {

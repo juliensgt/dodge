@@ -73,44 +73,77 @@ class GameService {
     });
 
     // Turn events
-    client.on(TurnEvents.TURN_STARTED, (data: { player: Player }) => {
-      const game = useGameStore.getState();
-      console.log("Turn started for player:", data.player);
+    client.on(
+      TurnEvents.TURN_STARTED,
+      (data: { player: Player; nextChoices: ActionType[] }) => {
+        const game = useGameStore.getState();
+        console.log("Turn started for player:", data.player);
 
-      // Update current player in store
-      game.setPlayerWhoPlays(data.player);
+        game.setChoices(data.nextChoices);
 
-      // Start player timer
-      game.startPlayerTimer();
-    });
+        // Update current player in store
+        game.setPlayerWhoPlays(data.player);
+
+        // Start player timer
+        game.startPlayerTimer();
+      }
+    );
 
     client.on(
       TurnEvents.CARD_SOURCE_CHOSEN,
-      (data: { choice: ActionType; card: Card }) => {
+      (data: { choice: ActionType; card: Card; nextChoices: ActionType[] }) => {
         if (data && data.card && data.choice) {
           console.log("Card source chosen:", data);
 
           const game = useGameStore.getState();
-          if (data.choice === ActionType.SWITCH_WITH_DECK) {
+          game.setChoices(data.nextChoices);
+          if (data.choice === ActionType.GET_CARD_IN_DECK) {
             data.card = { ...data.card, cardState: CardState.CARD_FRONT };
             game.setDeck(data.card);
-          } else if (data.choice === ActionType.SWITCH_WITH_DEFAUSSE) {
+          } else if (data.choice === ActionType.GET_CARD_IN_DEFAUSSE) {
             game.addDefausse(data.card);
           }
-          game.stopPlayerTimer();
+          game.startPlayerTimer();
+        }
+      }
+    );
+
+    client.on(
+      TurnEvents.CARD_SWITCHED,
+      (data: { choice: ActionType; card: Card; targetCardIndex?: number }) => {
+        console.log("Card switched:", data);
+        if (data && data.card && data.choice) {
+          const game = useGameStore.getState();
+
+          game.resetDeck();
+          game.addDefausse(data.card);
+          if (data.choice === ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE) {
+            // animate card going to defausse
+          } else if (
+            data.choice === ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER
+          ) {
+            // animate card going to player's main
+          } else if (data.choice === ActionType.SWITCH_FROM_DECK_TO_PLAYER) {
+            // animate card going to player's main
+          }
         }
       }
     );
   }
 
   async sendMessage(message: string) {
-    console.log("Sending message on", ChatEvents.CHAT_MESSAGE_SENT, message);
     await socketService.emit(ChatEvents.CHAT_MESSAGE_SENT, { message });
   }
 
   async sendCardSourceChoice(choice: ActionType) {
-    console.log("Sending card source choice:", choice);
     await socketService.emit(TurnEvents.CARD_SOURCE_CHOSEN, { choice });
+  }
+
+  async sendCardSwitchChoice(choice: ActionType, targetCardIndex?: number) {
+    await socketService.emit(TurnEvents.CARD_SWITCHED, {
+      choice,
+      targetCardIndex,
+    });
   }
 
   async getMessages(gameId: string): Promise<GameMessage[]> {

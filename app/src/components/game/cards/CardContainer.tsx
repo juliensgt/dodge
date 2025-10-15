@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Player } from "@/store/game/types";
 import Card, { CardState } from "./card/Card";
 import {
@@ -12,6 +12,9 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import PlayerAvatar from "@/components/utils/players/PlayerAvatar";
 import PlayerName from "@/components/utils/players/PlayerName";
 import PlayerPoints from "@/components/utils/players/PlayerPoints";
+import { gameService } from "@/services/game/game.service";
+import { ActionType } from "@/enums/action-type.enum";
+import { useGameStore } from "@/store/game/game";
 
 interface CardContainerProps {
   player: Player;
@@ -37,7 +40,8 @@ export default function CardContainer({
   const isMobile = useIsMobile();
   const playerClasses = getPlayerClasses(maxPlayers, position, isMobile);
   const { selectedSkinId } = useCardSkin();
-
+  const { choices, currentPlayerId } = useGameStore();
+  const isCurrentPlayer = player.id === currentPlayerId;
   // Récupération des tailles selon la position du joueur
   const isMainPlayer = position === 0;
   const sizes = isMainPlayer
@@ -55,8 +59,25 @@ export default function CardContainer({
     id: `${player.id}-${index}`,
     cardState: CardState.CARD_BACK,
     cardValue: index + 1,
-    cliquable: position === 0, // Seul le joueur principal peut cliquer
+    cliquable: isCurrentPlayer,
   }));
+
+  const handleCardClick = (index: number) => {
+    if (isCurrentPlayer) {
+      let choice: ActionType | undefined;
+      if (choices.includes(ActionType.SWITCH_FROM_DECK_TO_PLAYER)) {
+        choice = ActionType.SWITCH_FROM_DECK_TO_PLAYER;
+      } else if (choices.includes(ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER)) {
+        choice = ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER;
+      }
+      if (choice) {
+        gameService.sendCardSwitchChoice(choice, index);
+      }
+    }
+  };
+
+  // Update the player cards when the choices change
+  useEffect(() => {}, [choices]);
 
   return (
     <div
@@ -78,14 +99,15 @@ export default function CardContainer({
         )}
         {/* Cartes du joueur*/}
         <div className={cardLayout} data-card-container>
-          {playerCards.map((card) => (
+          {playerCards.map((card, index) => (
             <div key={card.id} data-card>
               <Card
                 cardState={card.cardState}
                 cardValue={card.cardValue}
-                cliquable={card.cliquable}
+                cliquable={isCurrentPlayer}
                 size={sizes.card}
                 skinId={selectedSkinId}
+                onClick={() => handleCardClick(index)}
               />
             </div>
           ))}

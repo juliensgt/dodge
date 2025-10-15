@@ -18,6 +18,8 @@ import { GameEntityManager } from './managers/game-entity.manager';
 import { GameTimerManager } from './managers/game-timer.manager';
 import { GameCreateDto } from './dto/game-create.dto';
 import { PlayerActionsPointsManager } from '../players/managers/player-actions-points.manager';
+import { Player } from '../players/player.schema';
+import { Card } from '../card/card.schema';
 @Injectable()
 export class GameService {
   constructor(
@@ -138,7 +140,7 @@ export class GameService {
     return game;
   }
 
-  async startTurn(gameId: string): Promise<Game> {
+  async startTurn(gameId: string) {
     const game = await this.gameEntityManager.findOne(gameId);
 
     if (!game.playerWhoPlays) {
@@ -149,26 +151,99 @@ export class GameService {
 
     socketService.broadcastToGame(gameId, TurnEvents.TURN_STARTED, {
       player: PlayerDto.fromPlayer(playerWhoPlays, playerWhoPlays.user),
+      nextChoices: [ActionType.GET_CARD_IN_DECK, ActionType.GET_CARD_IN_DEFAUSSE],
     });
 
+    await this.startCardSourceChosen(gameId, playerWhoPlays);
+  }
+
+  async startCardSourceChosen(gameId: string, playerWhoPlays: Player) {
+    const game = await this.gameEntityManager.findOne(gameId);
     this.gameTimerManager.schedulePlayerTurn(
       playerWhoPlays._id.toString(),
       game.options.timeToPlay * 1000,
       async () => {
         // Default action: get card from deck
-        try {
-          const card = await this.gameCardsManager.getCardFromDeck(gameId);
-          socketService.broadcastToGame(gameId, TurnEvents.CARD_SOURCE_CHOSEN, {
-            choice: ActionType.SWITCH_WITH_DECK,
-            card: card,
-          });
-        } catch (error) {
-          console.error(`[Timer Error][${gameId}] Failed to get card from deck:`, error);
-        }
+        const choice = ActionType.GET_CARD_IN_DECK;
+        const card = await this.gameCardsManager.getCardFromDeck(gameId);
+
+        const nextChoices = [
+          ActionType.SWITCH_FROM_DECK_TO_PLAYER,
+          ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE,
+        ];
+
+        socketService.broadcastToGame(gameId, TurnEvents.CARD_SOURCE_CHOSEN, {
+          choice,
+          card,
+          nextChoices,
+        });
+
+        this.gameTimerManager.cancelPlayerTimer(playerWhoPlays._id.toString());
+        await this.startCardSwitched(gameId, playerWhoPlays, card, choice);
       },
     );
+  }
 
-    return game;
+  async startCardSwitched(
+    gameId: string,
+    playerWhoPlays: Player,
+    card: Card,
+    previousChoice: ActionType,
+  ) {
+    const game = await this.gameEntityManager.findOne(gameId);
+    this.gameTimerManager.schedulePlayerTurn(
+      playerWhoPlays._id.toString(),
+      game.options.timeToPlay * 1000,
+      async () => {
+        if (previousChoice == ActionType.GET_CARD_IN_DECK) {
+          card = await this.gameCardsManager.switchFromDeckToDefausse(gameId);
+          socketService.broadcastToGame(gameId, TurnEvents.CARD_SWITCHED, {
+            choice: ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE,
+            card: card,
+          });
+        } else if (previousChoice == ActionType.GET_CARD_IN_DEFAUSSE) {
+          // Choose a random card from the player's hand
+          const targetCardIndex = Math.floor(Math.random() * playerWhoPlays.main.length);
+          console.log('targetCardIndex', targetCardIndex);
+          card = await this.gameCardsManager.switchFromDefausseToPlayer(
+            gameId,
+            playerWhoPlays._id.toString(),
+            targetCardIndex,
+          );
+          socketService.broadcastToGame(gameId, TurnEvents.CARD_SWITCHED, {
+            choice: ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER,
+            card: card,
+            targetCardIndex,
+          });
+        }
+        this.gameTimerManager.cancelPlayerTimer(playerWhoPlays._id.toString());
+        await this.startSpecialCardDetected(gameId, playerWhoPlays, card);
+      },
+    );
+  }
+
+  async startSpecialCardDetected(gameId: string, playerWhoPlays: Player, card: Card) {
+    // TODO: Implement special card detected logic
+
+    await this.nextTurn(gameId);
+  }
+
+  async nextTurn(gameId: string) {
+    console.log('nextTurn', gameId);
+    const game = await this.gameEntityManager.findOne(gameId);
+
+    const indexPlayerWhoPlays = game.players.findIndex(
+      (player) => player._id.toString() === game.playerWhoPlays?._id.toString(),
+    );
+    if (indexPlayerWhoPlays === -1) {
+      throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
+    }
+    const nextPlayerIndex =
+      indexPlayerWhoPlays + 1 >= game.players.length ? 0 : indexPlayerWhoPlays + 1;
+    const nextPlayer = game.players[nextPlayerIndex];
+
+    await this.gameEntityManager.update(gameId, { playerWhoPlays: nextPlayer });
+    await this.startTurn(gameId);
   }
 
   async changeGameState(gameId: string, state: GameState): Promise<Game> {

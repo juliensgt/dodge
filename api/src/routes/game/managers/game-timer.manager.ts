@@ -48,6 +48,7 @@ export class GameTimerManager {
 
   cancelPlayerTimer(playerId: string): void {
     if (this.playerTimers.has(playerId)) {
+      console.log('cancelling player timer', playerId);
       clearTimeout(this.playerTimers.get(playerId));
       this.playerTimers.delete(playerId);
     }

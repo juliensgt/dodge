@@ -152,7 +152,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage(TurnEvents.CARD_SOURCE_CHOSEN)
   @UseGuards(WsAuthGuard)
   async handleCardSourceChosen(
-    @MessageBody() data: { choice: ActionType.SWITCH_WITH_DECK | ActionType.SWITCH_WITH_DEFAUSSE },
+    @MessageBody() data: { choice: ActionType.GET_CARD_IN_DECK | ActionType.GET_CARD_IN_DEFAUSSE },
     @GameInfo() gameInfo: { gameId: string; playerId: string },
   ) {
     console.log('gameInfo', gameInfo);
@@ -163,28 +163,90 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       throw new WsException('Player or game not found');
     }
     if (!game.players.some((p) => p._id.toString() === player._id.toString())) {
-      throw new WsException(
-        'Player not in game' +
-          player._id.toString() +
-          ' not in game' +
-          game.players.map((p) => p._id.toString()).join(', '),
-      );
+      throw new WsException('Player not in game');
     }
     if (game.playerWhoPlays?._id.toString() !== player._id.toString()) {
       throw new WsException('Player is not the current player');
     }
     this.gameTimerManager.cancelPlayerTimer(player._id.toString());
 
-    let card: Card;
-    if (data.choice === ActionType.SWITCH_WITH_DECK) {
+    let card: Card | undefined;
+    let nextChoices: ActionType[] = [];
+    if (data.choice === ActionType.GET_CARD_IN_DECK) {
       card = await this.gameCardsManager.getCardFromDeck(gameInfo.gameId);
-    } else {
+      nextChoices = [
+        ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE,
+        ActionType.SWITCH_FROM_DECK_TO_PLAYER,
+      ];
+    } else if (data.choice === ActionType.GET_CARD_IN_DEFAUSSE) {
       card = await this.gameCardsManager.getCardFromDefausse(gameInfo.gameId);
+      nextChoices = [ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER];
+    }
+
+    if (!card) {
+      throw new WsException('Card not found');
     }
 
     this.server.to(`dgd-${gameInfo.gameId}`).emit(TurnEvents.CARD_SOURCE_CHOSEN, {
       choice: data.choice,
       card: card,
+      nextChoices,
     });
+
+    await this.gameService.startCardSwitched(gameInfo.gameId, player, card, data.choice);
+  }
+
+  @SubscribeMessage(TurnEvents.CARD_SWITCHED)
+  @UseGuards(WsAuthGuard)
+  async handleCardSwitched(
+    @MessageBody() data: { choice: ActionType; card: Card; targetCardIndex?: number },
+    @GameInfo() gameInfo: { gameId: string; playerId: string },
+  ) {
+    console.log('gameInfo', gameInfo);
+    console.log('data', data);
+    const player = await this.playerService.findOne(gameInfo.playerId);
+    const game = await this.gameService.findOne(gameInfo.gameId);
+    if (!player || !game) {
+      throw new WsException('Player or game not found');
+    }
+    if (!game.players.some((p) => p._id.toString() === player._id.toString())) {
+      throw new WsException('Player not in game');
+    }
+    if (game.playerWhoPlays?._id.toString() !== player._id.toString()) {
+      throw new WsException('Player is not the current player');
+    }
+    if (
+      data.choice !== ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE &&
+      data.targetCardIndex === undefined
+    ) {
+      throw new WsException('Target card index not found');
+    }
+    let card: Card | undefined;
+    if (data.choice === ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE) {
+      card = await this.gameCardsManager.switchFromDeckToDefausse(gameInfo.gameId);
+    } else if (data.choice === ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER) {
+      card = await this.gameCardsManager.switchFromDefausseToPlayer(
+        gameInfo.gameId,
+        gameInfo.playerId,
+        data.targetCardIndex!,
+      );
+    } else if (data.choice === ActionType.SWITCH_FROM_DECK_TO_PLAYER) {
+      card = await this.gameCardsManager.switchFromDeckToPlayer(
+        gameInfo.gameId,
+        gameInfo.playerId,
+        data.targetCardIndex!,
+      );
+    }
+    if (!card) {
+      throw new WsException('Card not found');
+    }
+    this.server.to(`dgd-${gameInfo.gameId}`).emit(TurnEvents.CARD_SWITCHED, {
+      choice: data.choice,
+      card,
+      targetCardIndex: data.targetCardIndex,
+    });
+
+    this.gameTimerManager.cancelPlayerTimer(player._id.toString());
+    await this.gameService.startSpecialCardDetected(gameInfo.gameId, player, card);
   }
 }
