@@ -7,6 +7,7 @@ import { useTimer } from "@/hooks/useTimer";
 import { useEffect, useState } from "react";
 import { GameState } from "@/types/game/game.types";
 import { httpService } from "@/services/http/http.service";
+import { motion } from "framer-motion";
 
 export default function CoupOeilBoard() {
   const { selectedSkinId } = useCardSkin();
@@ -60,19 +61,39 @@ export default function CoupOeilBoard() {
       <div className="flex justify-center items-center mx-auto my-[20vh]">
         <div className="relative inline-flex flex-row gap-4">
           {cards.map((card: Card, index: number) => (
-            <CardComponent
+            <motion.div
               key={index}
-              cardState={card.cardState}
-              cardValue={card.valeur ? parseInt(card.valeur) : undefined}
-              cliquable={true}
-              size="large"
-              onClick={
-                card.cardState === CardState.CARD_BACK
-                  ? () => handleCardClick(index)
-                  : undefined
-              }
-              skinId={selectedSkinId}
-            />
+              initial={{
+                opacity: 0,
+                scale: 0.3,
+                x: 0,
+                y: -200,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.15,
+                ease: [0.34, 1.56, 0.64, 1],
+              }}
+            >
+              <CardComponent
+                cardState={card.cardState}
+                cardValue={card.valeur ? parseInt(card.valeur) : undefined}
+                cliquable={true}
+                size="large"
+                onClick={
+                  card.cardState === CardState.CARD_BACK
+                    ? () => handleCardClick(index)
+                    : undefined
+                }
+                skinId={selectedSkinId}
+              />
+            </motion.div>
           ))}
         </div>
       </div>
