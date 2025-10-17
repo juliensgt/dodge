@@ -9,6 +9,9 @@ import { PlayerModule } from '../players/player.module';
 import { GameEntityManager } from './managers/game-entity.manager';
 import { GameCardsManager } from './managers/game-cards.manager';
 import { GameTimerManager } from './managers/game-timer.manager';
+import { GamePlayerManager } from './managers/game-player.manager';
+import { GameFlowManager } from './managers/game-flow.manager';
+import { GameTurnManager } from './managers/game-turn.manager';
 
 @Module({
   imports: [
@@ -18,7 +21,24 @@ import { GameTimerManager } from './managers/game-timer.manager';
     PlayerModule,
   ],
   controllers: [GameController],
-  providers: [GameService, GameEntityManager, GameCardsManager, GameTimerManager],
-  exports: [GameService, GameEntityManager, GameCardsManager, GameTimerManager, MongooseModule],
+  providers: [
+    GameService,
+    GameEntityManager,
+    GameCardsManager,
+    GameTimerManager,
+    GamePlayerManager,
+    GameFlowManager,
+    GameTurnManager,
+  ],
+  exports: [
+    GameService,
+    GameEntityManager,
+    GameCardsManager,
+    GameTimerManager,
+    GamePlayerManager,
+    GameFlowManager,
+    GameTurnManager,
+    MongooseModule,
+  ],
 })
 export class GameModule {}
