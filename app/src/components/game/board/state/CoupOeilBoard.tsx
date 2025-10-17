@@ -66,7 +66,11 @@ export default function CoupOeilBoard() {
               cardValue={card.valeur ? parseInt(card.valeur) : undefined}
               cliquable={true}
               size="large"
-              onClick={() => handleCardClick(index)}
+              onClick={
+                card.cardState === CardState.CARD_BACK
+                  ? () => handleCardClick(index)
+                  : undefined
+              }
               skinId={selectedSkinId}
             />
           ))}
