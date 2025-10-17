@@ -27,6 +27,22 @@ interface CardContainerProps {
   maxTime?: number;
 }
 
+// Helper pour obtenir la taille de l'avatar en pixels
+const getAvatarSizeInPx = (size: string): number => {
+  switch (size) {
+    case "xsmall":
+      return 32;
+    case "small":
+      return 40;
+    case "medium":
+      return 56;
+    case "large":
+      return 72;
+    default:
+      return 56;
+  }
+};
+
 export default function CardContainer({
   player,
   position,
@@ -47,6 +63,8 @@ export default function CardContainer({
   const sizes = isMainPlayer
     ? getMainPlayerSizes(maxPlayers, isMobile)
     : getOtherPlayersSizes(maxPlayers, isMobile);
+
+  const avatarSizePx = getAvatarSizeInPx(sizes.avatar);
 
   // Récupération du layout des cartes
   const cardLayouts = getCardLayouts(maxPlayers, isMobile);
@@ -84,7 +102,7 @@ export default function CardContainer({
       className={`${playerClasses.container} select-none ${className} relative`}
       style={style}
     >
-      <div className={`flex flex-col ${isMobile ? "gap-1" : "gap-4"}`}>
+      <div className={`flex flex-col ${isMobile ? "gap-1" : "gap-2"}`}>
         {/* Profil du joueur MOBILE*/}
         {isMobile && (
           <div className={`${playerClasses.profileAlignment} flex flex-col`}>
@@ -115,15 +133,23 @@ export default function CardContainer({
         {/* Profil du joueur DESKTOP*/}
         {!isMobile && (
           <div
-            className={`${playerClasses.profileAlignment} text-center flex flex-row gap-4`}
+            className={`${playerClasses.profileAlignment} text-center flex flex-row gap-2 items-center`}
           >
-            <PlayerAvatar
-              player={player}
-              size={sizes.avatar}
-              isPlayerWhoPlays={isPlayerWhoPlays}
-              playerTimer={isPlayerWhoPlays ? playerTimer : 0}
-              maxTime={maxTime}
-            />
+            <div
+              className="flex-shrink-0 relative flex items-center justify-center"
+              style={{
+                width: `${avatarSizePx + 16}px`, // +16px pour le débordement
+                height: `${avatarSizePx + 16}px`,
+              }}
+            >
+              <PlayerAvatar
+                player={player}
+                size={sizes.avatar}
+                isPlayerWhoPlays={isPlayerWhoPlays}
+                playerTimer={isPlayerWhoPlays ? playerTimer : 0}
+                maxTime={maxTime}
+              />
+            </div>
             <div className="flex flex-col items-start">
               <PlayerName player={player} size={sizes.name} />
               <PlayerPoints player={player} size={sizes.points} />
