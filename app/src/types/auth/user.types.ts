@@ -13,4 +13,6 @@ export interface User {
   language: string;
   createdAt: Date;
   updatedAt: Date;
+  crowns: number;
+  level: number;
 }

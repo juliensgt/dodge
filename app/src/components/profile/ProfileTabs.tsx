@@ -5,6 +5,7 @@ import AccountTab from "./tabs/AccountTab";
 import SettingsTab from "./tabs/SettingsTab";
 import StatsTab from "./tabs/StatsTab";
 import RulesTab from "./tabs/RulesTab";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
   faUser,
@@ -63,32 +64,88 @@ export default function ProfileTabs({
     },
   ];
   return (
-    <div className={`${isMobile ? "max-w-full px-4" : "max-w-6xl"} mx-auto`}>
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 flex flex-wrap justify-center gap-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              if (onTabChange) {
-                onTabChange(tab.id, tab.tab);
-              } else {
-                setActiveTab(tab.id);
-                setActiveTabContent(tab.tab);
-              }
+    <>
+      {/* Desktop - Top Tabs */}
+      {!isMobile && (
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 flex flex-wrap justify-center gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (onTabChange) {
+                    onTabChange(tab.id, tab.tab);
+                  } else {
+                    setActiveTab(tab.id);
+                    setActiveTabContent(tab.tab);
+                  }
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? "bg-white/20 text-white shadow-lg scale-105"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile - Bottom Tabs */}
+      <AnimatePresence>
+        {isMobile && (
+          <motion.nav
+            key="profile-mobile-nav"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-              activeTab === tab.id
-                ? "bg-white/20 text-white shadow-lg scale-105"
-                : "text-white/70 hover:text-white hover:bg-white/10"
-            }`}
+            className="fixed bottom-16 left-0 right-0 z-40 bg-gradient-to-t from-gray-900/95 via-gray-900/90 to-gray-900/85 backdrop-blur-xl border-t border-white/30 shadow-lg"
           >
-            <div className="flex items-center gap-2">
-              <span>{tab.icon}</span>
-              {!isMobile && <span>{tab.label}</span>}
+            <div className="flex justify-around items-center h-14 px-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    if (onTabChange) {
+                      onTabChange(tab.id, tab.tab);
+                    } else {
+                      setActiveTab(tab.id);
+                      setActiveTabContent(tab.tab);
+                    }
+                  }}
+                  className={`flex flex-col items-center justify-center gap-0.5 transition-all duration-200 flex-1 ${
+                    activeTab === tab.id ? "text-yellow-400" : "text-white/80"
+                  }`}
+                >
+                  <motion.span
+                    animate={
+                      activeTab === tab.id
+                        ? { scale: [1, 1.15, 1.1] }
+                        : { scale: 1 }
+                    }
+                    transition={{ duration: 0.3 }}
+                  >
+                    {tab.icon}
+                  </motion.span>
+                  <span className="text-[10px] font-light text-center leading-tight max-w-[70px]">
+                    {tab.label}
+                  </span>
+                </button>
+              ))}
             </div>
-          </button>
-        ))}
-      </div>
-    </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -1,118 +1,95 @@
-import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
-import ActionButton from "@/components/utils/buttons/ActionButton";
-import { useGradient } from "@/hooks/useGradient";
 import { useState } from "react";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useRouter } from "next/router";
+import { useGradient } from "@/hooks/useGradient";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
-import GameList from "@/components/game-list/GameList";
+import AppHeader, { AppTab } from "@/components/layout/AppHeader";
+import { AnimatePresence, motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import PlayTab from "@/components/layout/tabs/play/PlayTab";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<"quick" | "list">("list");
-  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<AppTab>("play");
+  const [direction, setDirection] = useState(0);
   const { getGradient, GradientType } = useGradient();
-  const router = useRouter();
+  const isMobile = useIsMobile();
+  const [activeTabContent, setActiveTabContent] = useState<React.ReactNode>(
+    <PlayTab onShowGameList={() => {}} />
+  );
 
-  const handleJoinGame = () => {
-    // Redirect to game page - the game will handle player creation via WebSocket
-    const gameId = "66c3a1e23c0a6642ee088edc"; // Default game ID
-    router.push(`/app/game/${gameId}`);
-  };
+  const handleTabChange = (tab: AppTab, content: React.ReactNode) => {
+    if (tab === activeTab) return;
 
-  const handleJoinGameFromList = (gameId: string) => {
-    router.push(`/app/game/${gameId}`);
-  };
+    // Determine animation direction based on tab order
+    const tabOrder = ["play", "shop", "profile"];
+    const currentIndex = tabOrder.indexOf(activeTab);
+    const newIndex = tabOrder.indexOf(tab);
+    const newDirection = newIndex > currentIndex ? 1 : -1;
 
-  const handleSpectateGame = (gameId: string) => {
-    router.push(`/app/game/${gameId}?spectate=true`);
-  };
-
-  const handleCreateGame = () => {
-    router.push("/app/create-game");
+    setDirection(newDirection);
+    setActiveTab(tab);
+    setActiveTabContent(content);
   };
 
   return (
     <AuthGuard level={AuthLevel.USER}>
       <div
-        className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center p-8 font-['MT']`}
+        className={`min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} font-['MT']`}
       >
-        <div className="absolute top-4 right-4 flex gap-4">
-          <LanguageSelector />
-          <ActionButton
-            onClick={() => router.push("/app/shop")}
-            label={t("Boutique")}
-            color={{ color: ColorType.PRIMARY }}
-          />
-          <ActionButton
-            onClick={() => router.push("/app/profile")}
-            label={t("Profil")}
-            color={{ color: ColorType.PRIMARY }}
-          />
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="w-full max-w-6xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-6xl font-bold text-white mb-4">DODGE</h1>
-            <p className="text-lg text-white">
-              {t("Rejoignez une partie et défiez vos amis !")}
-            </p>
-          </div>
+        <AppHeader
+          setActiveTab={setActiveTab}
+          setActiveTabContent={setActiveTabContent}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
 
-          {/* Tab Navigation */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-1 flex">
-              <button
-                onClick={() => setActiveTab("quick")}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === "quick"
-                    ? "bg-white/20 text-white shadow-lg"
-                    : "text-white/70 hover:text-white"
-                }`}
-              >
-                {t("Rejoindre rapidement")}
-              </button>
-              <button
-                onClick={() => setActiveTab("list")}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === "list"
-                    ? "bg-white/20 text-white shadow-lg"
-                    : "text-white/70 hover:text-white"
-                }`}
-              >
-                {t("Liste des parties")}
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          {activeTab === "quick" ? (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md mx-auto shadow-2xl flex flex-col">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <ActionButton
-                    onClick={handleCreateGame}
-                    label={t("Créer une partie")}
-                    gradient={{ gradientType: GradientType.PRIMARY }}
-                  />
-                  <ActionButton
-                    onClick={() => handleJoinGame()}
-                    label={t("Rejoindre la partie")}
-                    gradient={{ gradientType: GradientType.PRIMARY }}
-                  />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <GameList
-              onJoinGame={handleJoinGameFromList}
-              onSpectateGame={handleSpectateGame}
-              onCreateGame={handleCreateGame}
-            />
-          )}
+        {/* Tab Content with Animation */}
+        <div
+          className={`overflow-hidden mx-auto ${isMobile ? "pt-14 px-2" : "max-w-7xl"}`}
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={activeTab}
+              custom={direction}
+              initial={{
+                x: -300,
+                opacity: 0,
+              }}
+              animate={{
+                x: 0,
+                opacity: 1,
+              }}
+              exit={{
+                x: 300,
+                opacity: 0,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                duration: 0.4,
+              }}
+            >
+              <main className="relative z-10 mx-auto h-full">
+                {activeTabContent}
+              </main>
+            </motion.div>
+          </AnimatePresence>
         </div>
+
+        {/* Footer */}
+        {!isMobile && (
+          <footer
+            className={`relative z-10 text-center py-6 mt-8 ${isMobile ? "mb-16" : ""}`}
+          >
+            <p className="text-white/40 text-sm">© 2025 DODGE</p>
+          </footer>
+        )}
       </div>
     </AuthGuard>
   );

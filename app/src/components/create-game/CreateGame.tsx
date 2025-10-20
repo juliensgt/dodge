@@ -18,7 +18,7 @@ import ActionButton from "@/components/utils/buttons/ActionButton";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { httpService } from "@/services/http/http.service";
 import { GameOptionsBo } from "@/types/game/game.types";
-import CreateGameHeader from "./CreateGameHeader";
+import AppHeader from "@/components/layout/AppHeader";
 import CreateGameStepNavigation from "./CreateGameStepNavigation";
 import Step1GameMode from "./steps/Step1GameMode";
 import Step2TournamentConfig from "./steps/Step2TournamentConfig";
@@ -200,20 +200,22 @@ export default function CreateGame() {
       </div>
 
       <div className="relative z-10">
-        {/* Header */}
-        <CreateGameHeader handleBack={() => router.back()} />
+        {/* Navigation Header */}
+        <AppHeader currentPage="play" />
 
         {/* Step Navigation */}
-        <CreateGameStepNavigation
-          currentStep={currentStep}
-          totalSteps={getTotalSteps()}
-          steps={getSteps()}
-          onStepClick={handleStepClick}
-        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+          <CreateGameStepNavigation
+            currentStep={currentStep}
+            totalSteps={getTotalSteps()}
+            steps={getSteps()}
+            onStepClick={handleStepClick}
+          />
+        </div>
 
         {/* Content */}
         <div
-          className={`${isMobile ? "max-w-full" : "max-w-6xl"} mx-auto ${isMobile ? "px-4 pb-4" : "px-6 pb-8"}`}
+          className={`max-w-7xl mx-auto ${isMobile ? "px-4 pb-4" : "px-6 pb-8"}`}
         >
           <div className="overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
