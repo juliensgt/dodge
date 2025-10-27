@@ -1,6 +1,5 @@
 import SkeletonDemo from "@/components/demo/SkeletonDemo";
 import CardSystemDemo from "@/components/demo/CardSystemDemo";
-import SkeletonMobileDemo from "@/components/demo/SkeletonMobileDemo";
 import { useGradient } from "@/hooks/useGradient";
 import { GradientType } from "@/enums/themes/list/PurpleTheme";
 

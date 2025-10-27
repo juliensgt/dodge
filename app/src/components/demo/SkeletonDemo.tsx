@@ -8,6 +8,7 @@ import {
 import { getGradient, GradientType } from "@/enums/themes/list/PurpleTheme";
 import DeckContainer from "../game/cards/DeckContainer";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { Player } from "@/store/game/types";
 export default function SkeletonDemo() {
   const [maxPlayers, setMaxPlayers] = useState(6);
   const [actualPlayers, setActualPlayers] = useState(3);
@@ -90,7 +91,7 @@ export default function SkeletonDemo() {
             return (
               <CardContainer
                 key={player.id}
-                player={player}
+                player={player as Player}
                 position={index}
                 maxPlayers={maxPlayers}
               />
@@ -102,7 +103,6 @@ export default function SkeletonDemo() {
         <div className="flex gap-2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <DeckContainer
             className={getDeckContainerClasses(maxPlayers, isMobile)}
-            maxPlayers={maxPlayers}
           />
         </div>
       </div>

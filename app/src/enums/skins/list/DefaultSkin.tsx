@@ -1,4 +1,5 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { GradientType } from "@/enums/themes/list/PurpleTheme";
+import { useGradient } from "@/hooks/useGradient";
 import { Size } from "@/scripts/references/playerLayouts";
 
 interface DefaultSkinProps {
@@ -6,14 +7,11 @@ interface DefaultSkinProps {
 }
 
 export default function DefaultSkin({ size = "small" }: DefaultSkinProps) {
-  const theme = useTheme();
-  const { getGradient, GradientType } = theme.getCurrentTheme();
-
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
-      className={`card-back w-full h-full relative rounded-lg overflow-hidden shadow-lg ${getGradient(GradientType.PRIMARY, "to-r")}`}
+      className={`card-back w-full h-full relative rounded-lg overflow-hidden shadow-lg ${useGradient().getGradient(GradientType.PRIMARY, "to-r")}`}
     >
       {/* Lettre D principale */}
       <div className="absolute inset-0 flex items-center justify-center">

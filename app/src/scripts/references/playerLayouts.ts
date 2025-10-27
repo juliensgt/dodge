@@ -3,7 +3,7 @@
 
 import { getMobilePlayerLayout } from "./mobilePlayerLayouts";
 
-export type Size = "xsmall" | "small" | "medium" | "large";
+export type Size = "xxsmall" | "xsmall" | "small" | "medium" | "large";
 
 export type PlayerLayout = {
   container: string; // Classes CSS pour le conteneur principal

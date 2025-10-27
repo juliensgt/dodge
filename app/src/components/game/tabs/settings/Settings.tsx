@@ -2,7 +2,6 @@ import CardSkinSelector from "@/components/utils/selectors/CardSkinSelector";
 import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
 import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAnimationStore } from "@/store/animations";
 import AnimationSettings from "./AnimationSettings";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
@@ -11,7 +10,6 @@ import { useState } from "react";
 
 export default function Settings() {
   const { t } = useTranslation();
-  const { showBanner } = useAnimationStore();
   const [isSkinSelectorOpen, setIsSkinSelectorOpen] = useState(false);
   return (
     <div className="space-y-2">

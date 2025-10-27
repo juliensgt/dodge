@@ -5,7 +5,7 @@ interface PaperSkinProps {
 }
 
 export default function PaperSkin({ size = "small" }: PaperSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
@@ -83,4 +83,3 @@ export default function PaperSkin({ size = "small" }: PaperSkinProps) {
     </div>
   );
 }
-

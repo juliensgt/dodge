@@ -15,7 +15,7 @@ export interface MessagesState {
 // Combined store type
 type MessagesStore = MessagesState & MessagesActions;
 
-const useMessagesStore = create<MessagesStore>((set, get) => {
+const useMessagesStore = create<MessagesStore>((set) => {
   return {
     messages: [],
     initializeMessages: (gameId: string) => {

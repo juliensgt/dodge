@@ -20,7 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function SettingsTab() {
   const { t } = useTranslation();
   const { logout } = useAuth();
-  const { getGradient, GradientType } = useGradient();
+  const { GradientType } = useGradient();
   const [settings, setSettings] = useState({
     notifications: {
       gameInvites: true,
@@ -44,11 +44,15 @@ export default function SettingsTab() {
   });
   const [saved, setSaved] = useState(false);
 
-  const handleSettingChange = (category: string, key: string, value: any) => {
+  const handleSettingChange = (
+    category: string,
+    key: string,
+    value: string | number | boolean
+  ) => {
     setSettings((prev) => ({
       ...prev,
       [category]: {
-        ...prev[category as keyof typeof prev],
+        ...(prev[category as keyof typeof prev] as Record<string, unknown>),
         [key]: value,
       },
     }));

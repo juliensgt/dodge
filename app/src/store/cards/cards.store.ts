@@ -18,7 +18,7 @@ const useCardStore = create<CardStore>((set, get) => ({
 
   initCards: () => {
     const game = useGameStore.getState();
-    const nbCards = game.options.nbCards;
+    const nbCards = game.options.nbCardsPerPlayer;
     for (const playerId of game.players.map((player) => player.id)) {
       const playerCards: Card[] = [];
       for (let i = 0; i < nbCards; i++) {

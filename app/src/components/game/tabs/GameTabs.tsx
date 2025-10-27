@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "@/hooks/useTranslation";
 import Chat from "./chat/Chat";
 import Settings from "./settings/Settings";
 import Ranking from "./ranking/Ranking";

@@ -5,6 +5,7 @@ import React, {
   useCallback,
   ReactNode,
   useEffect,
+  useMemo,
 } from "react";
 import { ToastProps } from "@/components/utils/toast/Toast";
 import { errorService } from "@/services/error/error.service";
@@ -51,12 +52,15 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     setToasts([]);
   }, []);
 
-  const value: ToastContextType = {
-    toasts,
-    addToast,
-    removeToast,
-    clearToasts,
-  };
+  const value: ToastContextType = useMemo(
+    () => ({
+      toasts,
+      addToast,
+      removeToast,
+      clearToasts,
+    }),
+    [toasts, addToast, removeToast, clearToasts]
+  );
 
   // Initialiser le service d'erreur avec le contexte toast
   useEffect(() => {

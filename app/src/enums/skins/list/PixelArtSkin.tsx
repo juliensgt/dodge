@@ -5,7 +5,7 @@ interface PixelArtSkinProps {
 }
 
 export default function PixelArtSkin({ size = "small" }: PixelArtSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
@@ -77,4 +77,3 @@ export default function PixelArtSkin({ size = "small" }: PixelArtSkinProps) {
     </div>
   );
 }
-

@@ -37,6 +37,7 @@ export default function Card({
     medium: "w-20 h-28", // 80px x 112px
     large: "w-24 h-32", // 96px x 128px
     xsmall: "w-10 h-14", // 40px x 56px
+    xxsmall: "w-8 h-11", // 32px x 44px
   };
 
   const handleClick = () => {

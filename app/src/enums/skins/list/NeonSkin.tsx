@@ -5,7 +5,7 @@ interface NeonSkinProps {
 }
 
 export default function NeonSkin({ size = "small" }: NeonSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div

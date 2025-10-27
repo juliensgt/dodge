@@ -1,4 +1,4 @@
-import { Player } from "@/store/game";
+import { Player } from "@/store/game/types";
 
 interface PlayerRankEndRoundProps {
   player: Player;

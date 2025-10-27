@@ -5,7 +5,7 @@ interface GalaxySkinProps {
 }
 
 export default function GalaxySkin({ size = "small" }: GalaxySkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
@@ -75,4 +75,3 @@ export default function GalaxySkin({ size = "small" }: GalaxySkinProps) {
     </div>
   );
 }
-

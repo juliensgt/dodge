@@ -1,27 +1,25 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ShopTabs, { ShopTab as ShopTabType } from "@/components/shop/ShopTabs";
-import ShopOfTheWeek from "@/components/shop/ShopOfTheWeek";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import ProfileTabs, { ProfileTabType } from "@/components/profile/ProfileTabs";
+import AccountTab from "@/components/profile/tabs/AccountTab";
+import { AnimatePresence, motion } from "framer-motion";
 
-export default function ShopTab() {
+interface ProfileTabProps {
+  isActive?: boolean;
+}
+
+export default function ProfileTab({ isActive = true }: ProfileTabProps) {
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState<ShopTabType>("shop-week");
+  const [activeTab, setActiveTab] = useState<ProfileTabType>("profile");
   const [activeTabContent, setActiveTabContent] = useState<React.ReactNode>(
-    <ShopOfTheWeek />
+    <AccountTab />
   );
   const [direction, setDirection] = useState(0);
 
-  const handleTabChange = (tab: ShopTabType, content: React.ReactNode) => {
+  const handleTabChange = (tab: ProfileTabType, content: React.ReactNode) => {
     if (tab === activeTab) return;
 
-    const tabOrder = [
-      "shop-week",
-      "collections",
-      "my-skins",
-      "my-themes",
-      "buy-coins",
-    ];
+    const tabOrder = ["profile", "settings", "rules", "stats"];
     const currentIndex = tabOrder.indexOf(activeTab);
     const newIndex = tabOrder.indexOf(tab);
     const newDirection = newIndex > currentIndex ? 1 : -1;
@@ -32,12 +30,12 @@ export default function ShopTab() {
   };
 
   return (
-    <>
-      {/* Shop Tabs - Hidden on mobile (it's fixed at bottom now) */}
+    <div className={isMobile ? "h-full w-full" : ""}>
+      {/* Profile Tabs - Hidden on mobile (it's fixed at bottom now) */}
       {!isMobile && (
         <div className="mb-8 mt-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ShopTabs
+            <ProfileTabs
               setActiveTab={setActiveTab}
               setActiveTabContent={setActiveTabContent}
               activeTab={activeTab}
@@ -47,9 +45,9 @@ export default function ShopTab() {
         </div>
       )}
 
-      {/* Mobile - Add the tabs component (it will render as fixed bottom) */}
-      {isMobile && (
-        <ShopTabs
+      {/* Mobile - Add the tabs component (only visible when this tab is active) */}
+      {isMobile && isActive && (
+        <ProfileTabs
           setActiveTab={setActiveTab}
           setActiveTabContent={setActiveTabContent}
           activeTab={activeTab}
@@ -88,6 +86,6 @@ export default function ShopTab() {
           </AnimatePresence>
         </div>
       </div>
-    </>
+    </div>
   );
 }

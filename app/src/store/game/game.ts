@@ -25,10 +25,10 @@ const useGameStore = create<GameStore>((set, get, store) => {
     defausse: undefined,
     players: [],
     currentPlayerId: undefined,
+    choices: [],
     playerWhoPlays: {
       id: "",
       name: "",
-      avatar: "",
       points: 0,
       currentTime: 0,
       skinCards: "",

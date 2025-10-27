@@ -18,7 +18,6 @@ import ActionButton from "@/components/utils/buttons/ActionButton";
 import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { httpService } from "@/services/http/http.service";
 import { GameOptionsBo } from "@/types/game/game.types";
-import AppHeader from "@/components/layout/AppHeader";
 import CreateGameStepNavigation from "./CreateGameStepNavigation";
 import Step1GameMode from "./steps/Step1GameMode";
 import Step2TournamentConfig from "./steps/Step2TournamentConfig";
@@ -200,9 +199,6 @@ export default function CreateGame() {
       </div>
 
       <div className="relative z-10">
-        {/* Navigation Header */}
-        <AppHeader currentPage="play" />
-
         {/* Step Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
           <CreateGameStepNavigation

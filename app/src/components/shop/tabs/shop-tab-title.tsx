@@ -21,7 +21,7 @@ export default function ShopTabTitle({
       <div className="flex justify-between">
         <div className="flex flex-col gap-2">
           <h2
-            className={`${isMobile ? "text-2xl" : "text-4xl"} font-bold text-white`}
+            className={`${isMobile ? "text-2xl" : "text-4xl"} font-bold text-white font-lucky`}
           >
             {t(title)}
           </h2>

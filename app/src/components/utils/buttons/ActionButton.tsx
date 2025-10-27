@@ -1,5 +1,4 @@
 import { useGradient } from "@/hooks/useGradient";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 interface Gradient {
   gradientType: string;
@@ -26,6 +25,7 @@ interface ActionButtonProps {
   disabled?: boolean;
   gradient?: Gradient;
   color?: Color;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function ActionButton(props: ActionButtonProps) {
@@ -37,10 +37,17 @@ export default function ActionButton(props: ActionButtonProps) {
   const gradientClasses = getGradient(gradientType, gradientDirection);
   const hoverClasses = getGradientHover(gradientType, gradientDirection);
 
+  const sizeClasses =
+    props.size === "sm"
+      ? "h-7 px-2 text-xs"
+      : props.size === "lg"
+        ? "h-12 px-6 text-lg"
+        : "h-10 px-4 text-base";
+
   return (
     <button
       onClick={props.onClick}
-      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} h-10 text-white font-semibold px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 ${
+      className={`${props.gradient ? gradientClasses : ""} ${hoverClasses} ${props.color ? colorClasses : ""} ${sizeClasses} text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 ${
         props.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
       }`}
       disabled={props.disabled}

@@ -1,4 +1,4 @@
-import { Player } from "@/store/game/player";
+import { Player } from "@/store/game/types";
 import { Size } from "@/scripts/references/playerLayouts";
 
 interface PlayerNameProps {

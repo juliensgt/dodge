@@ -5,7 +5,7 @@ interface CyberSkinProps {
 }
 
 export default function CyberSkin({ size = "small" }: CyberSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
@@ -111,4 +111,3 @@ export default function CyberSkin({ size = "small" }: CyberSkinProps) {
     </div>
   );
 }
-

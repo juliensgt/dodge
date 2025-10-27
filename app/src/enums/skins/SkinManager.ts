@@ -7,7 +7,6 @@ import PaperSkin from "./list/PaperSkin";
 import CyberSkin from "./list/CyberSkin";
 import BarbieSkin from "./list/BarbieSkin";
 import { CardSkinRarity } from "./SkinRarity";
-import { ThemeType } from "../themes/Theme";
 import { Size } from "@/scripts/references/playerLayouts";
 
 export interface CardSkin {

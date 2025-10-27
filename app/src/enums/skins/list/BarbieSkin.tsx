@@ -5,7 +5,7 @@ interface BarbieSkinProps {
 }
 
 export default function BarbieSkin({ size = "small" }: BarbieSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div
@@ -94,4 +94,3 @@ export default function BarbieSkin({ size = "small" }: BarbieSkinProps) {
     </div>
   );
 }
-

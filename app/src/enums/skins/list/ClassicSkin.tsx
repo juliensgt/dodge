@@ -5,7 +5,7 @@ interface ClassicSkinProps {
 }
 
 export default function ClassicSkin({ size = "small" }: ClassicSkinProps) {
-  const isSmall = size === "small" || size === "xsmall";
+  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
 
   return (
     <div

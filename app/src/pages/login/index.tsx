@@ -73,7 +73,7 @@ export default function Login() {
   };
 
   const handleBackToWelcome = () => {
-    router.push("/welcome");
+    router.push("/");
   };
 
   return (

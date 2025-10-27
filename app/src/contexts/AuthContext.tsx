@@ -49,7 +49,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         router.push("/login");
         return;
       }
-      setUser(await userService.getUser((await authService.getUserId()) ?? ""));
+
+      // Only fetch user data if authenticated
+      if (authenticated) {
+        const userId = await authService.getUserId();
+        if (userId) {
+          try {
+            setUser(await userService.getUser(userId));
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+            // If user fetch fails, consider user as not authenticated
+            setIsAuthenticated(false);
+            setUser(null);
+          }
+        }
+      } else {
+        setUser(null);
+      }
+
       setLoading(false);
     };
 

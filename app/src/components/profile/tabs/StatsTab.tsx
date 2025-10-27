@@ -3,8 +3,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
-import { useGradient } from "@/hooks/useGradient";
+import { ColorType, GradientType } from "@/enums/themes/list/PurpleTheme";
 import {
   faChartBar,
   faTrophy,
@@ -40,7 +39,6 @@ interface GameStats {
 export default function StatsTab() {
   const { t } = useTranslation();
   const { logout } = useAuth();
-  const { getGradient, GradientType } = useGradient();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<GameStats>({
     gamesPlayed: 0,

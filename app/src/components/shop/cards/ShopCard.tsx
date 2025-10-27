@@ -1,10 +1,8 @@
-import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
-import { getRarityBadge, getRarityColor } from "@/types/items/items.type";
 import Card from "@/components/game/cards/card/Card";
 import { CardState } from "@/components/game/cards/card/Card";
 import { CardSkin } from "@/enums/skins/SkinManager";
 import { Theme } from "@/enums/themes/Theme";
+import Image from "next/image";
 
 interface ShopCardProps {
   buttonLabel: string;
@@ -15,143 +13,152 @@ interface ShopCardProps {
   showButton: boolean;
   setHoveredItem: (hoveredItem: string | null) => void;
   onClick: (item: CardSkin | Theme) => void;
+  isMobile?: boolean;
 }
 
 export default function ShopCard({
-  buttonLabel,
   onClick,
   selectedItem,
   item,
   hoveredItem,
   buyable,
-  showButton,
   setHoveredItem,
+  isMobile = false,
 }: ShopCardProps) {
+  const getRarityGradient = (rarity?: string) => {
+    switch (rarity) {
+      case "common":
+        return "from-gray-600/50 to-gray-800/40";
+      case "rare":
+        return "from-blue-600/50 to-blue-800/40";
+      case "epic":
+        return "from-purple-600/50 to-purple-800/40";
+      case "legendary":
+        return "from-yellow-600/50 to-yellow-800/40";
+      default:
+        return "from-gray-600/20 to-gray-800/40";
+    }
+  };
+
+  const getRarityGlow = (rarity?: string) => {
+    switch (rarity) {
+      case "common":
+        return "shadow-gray-500/20";
+      case "rare":
+        return "shadow-blue-500/30";
+      case "epic":
+        return "shadow-purple-500/40";
+      case "legendary":
+        return "shadow-yellow-500/50";
+      default:
+        return "shadow-gray-500/20";
+    }
+  };
+
   return (
     <div
       key={item.id}
-      className={`relative backdrop-blur-lg rounded-2xl p-6 border-2 transition-all duration-300 ${
-        hoveredItem === item.id ? "scale-105 shadow-2xl" : ""
-      } ${item.rarity ? getRarityColor(item.rarity) : ""}`}
-      onMouseEnter={() => setHoveredItem(item.id)}
-      onMouseLeave={() => setHoveredItem(null)}
+      onClick={() => onClick(item)}
+      className={`relative bg-gradient-to-b ${getRarityGradient(item.rarity)} backdrop-blur-xl rounded-xl overflow-hidden transition-all duration-300 cursor-pointer group ${isMobile ? "p-2" : "p-4"} ${
+        hoveredItem === item.id && !isMobile
+          ? `scale-105 shadow-2xl ${getRarityGlow(item.rarity)}`
+          : `shadow-lg ${getRarityGlow(item.rarity)}`
+      } ${selectedItem === item.id ? "ring-2 ring-yellow-400/60 ring-offset-2 ring-offset-black/50" : ""}`}
+      onMouseEnter={() => !isMobile && setHoveredItem(item.id)}
+      onMouseLeave={() => !isMobile && setHoveredItem(null)}
     >
-      {/* Discount Badge */}
-      {item.discount && buyable && (
-        <div className="absolute -top-2 -right-2 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-full z-10">
-          -{item.discount}%
-        </div>
+      {/* Royal border effect */}
+      <div className="absolute inset-0 rounded-xl border border-white/25 pointer-events-none" />
+
+      {/* Shimmer effect on hover */}
+      {!isMobile && hoveredItem === item.id && (
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer pointer-events-none" />
       )}
 
-      {/* Rarity Badge */}
-      <div className="flex gap-1 absolute top-1 left-2 z-10">
-        {/* Type Badge */}
-        {item.type && (
-          <div className="">
-            <span
-              className={`px-2 py-1 font-bold text-xs rounded-full ${
-                item.type === "skin"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-blue-200 text-blue-700"
-              }`}
-            >
-              {item.type === "skin" ? "Carte" : "Thème"}
-            </span>
-          </div>
-        )}
-        {item.rarity && (
-          <div className="">
-            <span
-              className={`px-2 py-1 font-bold text-xs rounded-full ${
-                item.rarity === "common"
-                  ? "bg-gray-200 text-gray-700"
-                  : item.rarity === "rare"
-                    ? "bg-blue-200 text-blue-700"
-                    : item.rarity === "epic"
-                      ? "bg-purple-200 text-purple-700"
-                      : "bg-yellow-200 text-yellow-700"
-              }`}
-            >
-              {getRarityBadge(item.rarity)}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Rarity indicator - top corner accent */}
+      {item.rarity && (
+        <div
+          className={`absolute top-0 right-0 w-16 h-16 ${
+            item.rarity === "common"
+              ? "bg-gradient-to-br from-gray-400/20"
+              : item.rarity === "rare"
+                ? "bg-gradient-to-br from-blue-400/30"
+                : item.rarity === "epic"
+                  ? "bg-gradient-to-br from-purple-400/40"
+                  : "bg-gradient-to-br from-yellow-400/50"
+          } rounded-bl-full opacity-60`}
+        />
+      )}
 
       {/* Item Preview */}
-      <div className="flex justify-center mb-4 mt-4">
+      <div
+        className={`flex justify-center ${isMobile ? "mb-2 mt-1" : "mb-3 mt-2"}`}
+      >
         {item.type === "skin" && item.id ? (
-          <div className="flex gap-2 items-end">
+          <div className={`flex ${isMobile ? "gap-1" : "gap-2"} items-end`}>
             <Card
               cardState={CardState.CARD_BACK}
-              size="medium"
+              size={isMobile ? "small" : "medium"}
               skinId={item.id}
             />
-            <Card
-              cardState={CardState.CARD_BACK}
-              size="small"
-              skinId={item.id}
-            />
+            {!isMobile && (
+              <Card
+                cardState={CardState.CARD_BACK}
+                size="small"
+                skinId={item.id}
+              />
+            )}
           </div>
         ) : item.type === "theme" && item.preview ? (
           <div
-            className={`w-48 h-24 rounded-lg bg-gradient-to-r ${item.preview} border-2 border-white/30`}
+            className={`rounded-lg bg-gradient-to-r ${item.preview} shadow-lg ${isMobile ? "w-24 h-12" : "w-48 h-24"}`}
           ></div>
         ) : (
-          <div className="w-20 h-24 bg-gray-300 rounded-lg flex items-center justify-center">
-            <span className="text-4xl">🎨</span>
+          <div
+            className={`bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center shadow-lg ${isMobile ? "w-12 h-16 text-2xl" : "w-20 h-24 text-4xl"}`}
+          >
+            <span>🎨</span>
           </div>
         )}
       </div>
 
-      {/* Selection Indicator */}
-      {selectedItem === item.id && (
-        <div className="absolute top-3 right-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      )}
-
       {/* Item Info */}
-      <div className="text-center mb-4">
-        <h3 className="text-white font-bold text-lg mb-2">{item.name}</h3>
-        <p className="text-white/70 text-sm mb-3">{item.description}</p>
+      <div className="text-center">
+        <h3
+          className={`text-white font-lucky drop-shadow-lg ${isMobile ? "text-sm leading-tight mb-1 line-clamp-1" : "text-base mb-2 leading-tight"}`}
+        >
+          {item.name}
+        </h3>
+        {!isMobile && (
+          <p className="text-white/60 text-xs mb-2 line-clamp-2">
+            {item.description}
+          </p>
+        )}
 
         {/* Price */}
         {buyable && (
-          <div className="flex items-center justify-center gap-2">
-            {item.originalPrice && (
-              <span className="text-white/50 line-through text-sm">
-                {item.originalPrice} coins
-              </span>
-            )}
-            <span className="text-yellow-400 font-bold text-xl">
-              {item.price} coins
+          <div
+            className={`flex items-center justify-center gap-1.5 ${isMobile ? "mt-1" : "mt-2"}`}
+          >
+            <span
+              className={`text-yellow-400 font-bold drop-shadow-[0_0_8px_rgba(250,204,21,0.5)] ${isMobile ? "text-base" : "text-lg"}`}
+            >
+              {item.price}
             </span>
+            <Image
+              src="/images/icons/coins.png"
+              alt="Coins"
+              width={isMobile ? 20 : 20}
+              height={isMobile ? 20 : 20}
+              className="drop-shadow-lg"
+            />
           </div>
         )}
       </div>
 
-      {/* Purchase Button */}
-      {showButton && (
-        <div className="flex justify-center items-end">
-          <ActionButton
-            onClick={() => onClick(item)}
-            label={buttonLabel}
-            color={{ color: ColorType.PRIMARY }}
-          />
-        </div>
+      {/* Selection indicator - subtle glow */}
+      {selectedItem === item.id && (
+        <div className="absolute inset-0 rounded-xl ring-2 ring-yellow-400/60 pointer-events-none animate-pulse" />
       )}
     </div>
   );

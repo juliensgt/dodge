@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Countdown from "@/components/game/countdown/Countdown";
 import PlayerRankEndRound from "@/components/utils/rank/PlayerRankEndRound";
 import ProgressRank from "@/components/utils/rank/ProgressRank";
 import PlayerEvolutionEndRound from "@/components/utils/rank/PlayerEvolutionEndRound";
 import { useGameStore } from "@/store/game/game";
-import { Player } from "@/store/game/player";
+import { Player } from "@/store/game/types";
 
 export default function EndRoundBoard() {
   const game = useGameStore();
@@ -16,19 +16,13 @@ export default function EndRoundBoard() {
 
   const totalPages = slides.length;
 
-  const nextPage = () => {
+  const nextPage = useCallback(() => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
-  };
+  }, [totalPages]);
 
   const setPage = (index: number) => {
     setCurrentPage(index);
     resetAutoSlide(); // Réinitialise le timer lors d'un clic manuel
-  };
-
-  // Auto-slide avec setInterval
-  const startAutoSlide = () => {
-    const intervalId = setInterval(nextPage, intervalTime);
-    return intervalId;
   };
 
   // Réinitialise l'intervalle quand l'utilisateur clique sur un bouton
@@ -37,9 +31,15 @@ export default function EndRoundBoard() {
   };
 
   useEffect(() => {
+    // Auto-slide avec setInterval
+    const startAutoSlide = () => {
+      const intervalId = setInterval(nextPage, intervalTime);
+      return intervalId;
+    };
+
     const intervalId = startAutoSlide();
     return () => clearInterval(intervalId);
-  }, [startAutoSlide]);
+  }, [nextPage, intervalTime]);
 
   return (
     <div className="end-round-board relative w-full h-full rounded-5 bg-[var(--primary-color)] overflow-hidden select-none">
