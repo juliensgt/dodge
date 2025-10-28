@@ -9,7 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/contexts/ToastContext";
 import ToastContainer from "@/components/utils/toast/ToastContainer";
 import { AuthLevel } from "@/types/auth/auth";
-config.autoAddCss = false;
+config.autoAddCss = true;
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

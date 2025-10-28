@@ -24,16 +24,23 @@ export default function Game() {
       resetGame();
       socketService.disconnect();
 
-      gameService.initializeGame(gameId as string).then(() => {
-        setIsLoading(false);
-      });
+      gameService
+        .initializeGame(gameId as string)
+        .then(() => {
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error initializing game:", error);
+          // Redirect to /app if game initialization fails
+          router.push("/app");
+        });
     }
 
     // Cleanup function to disconnect socket when component unmounts
     return () => {
       socketService.disconnect();
     };
-  }, [gameId, resetGame]);
+  }, [gameId, resetGame, router]);
 
   // Handle browser navigation (back/forward buttons)
   useEffect(() => {

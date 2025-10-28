@@ -11,10 +11,9 @@ import AppContainer from "@/components/layout/app/AppContainer";
 import { motion } from "framer-motion";
 import * as PurpleTheme from "@/enums/themes/list/PurpleTheme";
 
-export default function Dashboard() {
+function DashboardContent() {
   const [activeTab, setActiveTab] = useState<AppTab>("play");
   const [isLoading, setIsLoading] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const isMobile = useIsMobile();
 
   // Define all tabs with their content (all tabs stay mounted for smooth transitions)
@@ -52,19 +51,13 @@ export default function Dashboard() {
       setIsLoading(false);
     }, 2000);
 
-    // Then enable transitions after a short delay
-    const enableTransitionTimer = setTimeout(() => {
-      setIsTransitioning(true);
-    }, 3000);
-
     return () => {
       clearTimeout(hideLoaderTimer);
-      clearTimeout(enableTransitionTimer);
     };
   }, [appTabs]);
 
   return (
-    <AuthGuard level={AuthLevel.USER}>
+    <>
       <div
         className={`min-h-screen ${PurpleTheme.getGradient(PurpleTheme.GradientType.BACKGROUND_MAIN, "to-br")} font-['MT'] relative`}
       >
@@ -95,7 +88,7 @@ export default function Dashboard() {
 
         {/* App content - hidden during loading, no transitions until loaded */}
         <div
-          className={`${isLoading ? "opacity-0 pointer-events-none no-transitions" : "opacity-100"} ${isTransitioning ? "transition-opacity duration-500" : ""}`}
+          className={`${isLoading ? "opacity-0 pointer-events-none no-transitions" : "opacity-100"}`}
         >
           {/* Decorative background elements */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -131,6 +124,14 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+    </>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <AuthGuard level={AuthLevel.USER}>
+      <DashboardContent />
     </AuthGuard>
   );
 }

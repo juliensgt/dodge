@@ -36,12 +36,12 @@ class SocketService {
     return socket;
   }
 
-  async joinGame(gameId: string) {
+  async joinGame(gameId: string): Promise<void> {
     const { socket: actualSocket, currentGameId } = useSocketsStore.getState();
 
     // If socket is already connected to the same game, do nothing
     if (actualSocket && actualSocket.connected && currentGameId === gameId) {
-      return;
+      return Promise.resolve();
     }
 
     // If socket is connected to a different game, disconnect first
@@ -52,22 +52,35 @@ class SocketService {
     // initialize socket
     const socket = await this.initializeSocket(gameId);
 
-    // setup listeners
-    socket.on("connect", () => {
-      this.connect(socket, gameId);
-    });
+    return new Promise<void>((resolve, reject) => {
+      // Track if already connected to prevent multiple resolves
+      let hasResolved = false;
 
-    socket.on("disconnect", () => {
-      this.disconnect();
-    });
+      // setup listeners
+      socket.on("connect", () => {
+        if (!hasResolved) {
+          hasResolved = true;
+          this.connect(socket, gameId);
+          resolve();
+        }
+      });
 
-    // Intercepte r les erreurs WebSocket
-    socket.on("error", (error) => {
-      console.error("WebSocket error:", error);
-      errorService.handleWebSocketError(error);
-    });
+      socket.on("disconnect", () => {
+        this.disconnect();
+      });
 
-    gameService.setupGameEventListeners(socket);
+      // Intercepte r les erreurs WebSocket
+      socket.on("error", (error) => {
+        console.error("WebSocket error:", error);
+        errorService.handleWebSocketError(error);
+        if (!hasResolved) {
+          hasResolved = true;
+          reject(error);
+        }
+      });
+
+      gameService.setupGameEventListeners(socket);
+    });
   }
 
   connect(socket: Socket, gameId: string) {

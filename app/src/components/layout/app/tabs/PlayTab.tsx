@@ -3,17 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 import ChestSystem from "./play/components/ChestSystem";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useTheme } from "@/contexts/ThemeContext";
 import PlayButtons from "./play/buttons/PlayButtons";
 import PlayerProfileCard from "./play/components/PlayerProfileCard";
 import MissionsBubble from "./play/components/MissionsBubble";
 import LeaderboardBubble from "./play/components/LeaderboardBubble";
 import BattlePassCard from "./play/components/BattlePassCard";
+import ArsenalDisplay from "./play/components/ArsenalDisplay";
+import { THEMES } from "@/enums/themes/ThemeManager";
 
 export default function PlayTab() {
+  const router = useRouter();
   const isMobile = useIsMobile();
+  const { selectedSkinId, currentTheme } = useTheme();
   const [showMissions, setShowMissions] = useState(false);
+
+  // Récupération du thème sélectionné
+  const theme = THEMES[currentTheme];
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentTime, setCurrentTime] = useState(dayjs());
 
@@ -25,6 +34,11 @@ export default function PlayTab() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Handle play button click - navigate to loading page
+  const handlePlayGame = () => {
+    router.push("/app/game");
+  };
 
   const battlePassProgress = {
     currentLevel: 8,
@@ -79,26 +93,7 @@ export default function PlayTab() {
     state: ChestState;
   }
 
-  const chests: Chest[] = [
-    {
-      id: 1,
-      type: "bronze",
-      unlockDate: new Date("2025-10-20T22:00:00Z"),
-      state: ChestState.UNLOCKED,
-    },
-    {
-      id: 2,
-      type: "silver",
-      unlockDate: new Date("2025-10-22T00:00:00Z"),
-      state: ChestState.UNLOCKED,
-    },
-    {
-      id: 3,
-      type: "gold",
-      unlockDate: new Date("2025-10-26T00:00:00Z"),
-      state: ChestState.UNLOCKED,
-    },
-  ];
+  const chests: Chest[] = [];
 
   // Simplified responsive classes
   const containerHeight = isMobile ? "h-full" : "min-h-[calc(100vh-8rem)]";
@@ -110,11 +105,32 @@ export default function PlayTab() {
   const smallTextSize = isMobile ? "text-xs" : "text-sm";
 
   return (
-    <div className={`flex flex-col ${containerHeight} ${containerOverflow}`}>
-      {/* Player Profile Card */}
-      <PlayerProfileCard padding={padding} maxWidth={maxWidth} />
+    <div
+      className={`flex flex-col ${containerHeight} ${containerOverflow} ${isMobile ? "relative z-10" : ""}`}
+    >
+      {/* Player Profile and Battle Pass Row for Mobile */}
+      {isMobile ? (
+        <div className={`${padding}`}>
+          <div className="flex gap-2 items-stretch">
+            <div className="flex-1 h-full">
+              <PlayerProfileCard padding="" maxWidth="" />
+            </div>
 
-      {/* Battle Pass and Missions Row */}
+            <div className="h-full">
+              <BattlePassCard
+                isMobile={isMobile}
+                experience={battlePassProgress.experience}
+                experienceToNext={battlePassProgress.experienceToNext}
+                isPremium={battlePassProgress.isPremium}
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <PlayerProfileCard padding={padding} maxWidth={maxWidth} />
+      )}
+
+      {/* Missions and Leaderboard Row */}
       <div className={padding}>
         <div
           className={`flex ${isMobile ? "justify-between items-start" : "gap-2"} ${maxWidth}`}
@@ -134,14 +150,7 @@ export default function PlayTab() {
                   userRank={leaderboard.find((p) => p.name === "You")?.rank}
                 />
               </div>
-              {/* Mobile: Right side with Battle Pass */}
-              <BattlePassCard
-                isMobile={isMobile}
-                currentLevel={battlePassProgress.currentLevel}
-                experience={battlePassProgress.experience}
-                experienceToNext={battlePassProgress.experienceToNext}
-                isPremium={battlePassProgress.isPremium}
-              />
+              <ArsenalDisplay theme={theme} selectedSkinId={selectedSkinId} />
             </>
           ) : (
             <>
@@ -158,7 +167,6 @@ export default function PlayTab() {
               />
               <BattlePassCard
                 isMobile={isMobile}
-                currentLevel={battlePassProgress.currentLevel}
                 experience={battlePassProgress.experience}
                 experienceToNext={battlePassProgress.experienceToNext}
                 isPremium={battlePassProgress.isPremium}
@@ -173,7 +181,7 @@ export default function PlayTab() {
         {/* Desktop Chest System */}
         {!isMobile && (
           <>
-            <PlayButtons maxWidth={maxWidth} />
+            <PlayButtons maxWidth={maxWidth} onPlayClick={handlePlayGame} />
             <ChestSystem
               chests={chests}
               currentTime={currentTime}
@@ -188,9 +196,6 @@ export default function PlayTab() {
       {/* Mobile Bottom Menu - Positioned above nav */}
       {isMobile && (
         <div>
-          <div className={padding}>
-            <PlayButtons maxWidth={maxWidth} />
-          </div>
           <ChestSystem
             chests={chests}
             currentTime={currentTime}
@@ -198,6 +203,9 @@ export default function PlayTab() {
             padding={padding}
             maxWidth={maxWidth}
           />
+          <div className={padding + " pb-5"}>
+            <PlayButtons maxWidth={maxWidth} onPlayClick={handlePlayGame} />
+          </div>
         </div>
       )}
 

@@ -6,9 +6,13 @@ import SecondaryButton from "./SecondaryButton";
 
 interface PlayButtonsProps {
   maxWidth: string;
+  onPlayClick?: () => void;
 }
 
-export default function PlayButtons({ maxWidth }: PlayButtonsProps) {
+export default function PlayButtons({
+  maxWidth,
+  onPlayClick,
+}: PlayButtonsProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -21,7 +25,11 @@ export default function PlayButtons({ maxWidth }: PlayButtonsProps) {
   };
 
   const handlePlayGame = () => {
-    router.push("/app/game");
+    if (onPlayClick) {
+      onPlayClick();
+    } else {
+      router.push("/app/game");
+    }
   };
 
   const handleModeClick = (e: React.MouseEvent) => {

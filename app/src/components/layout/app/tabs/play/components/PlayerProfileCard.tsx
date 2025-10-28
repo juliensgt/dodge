@@ -26,17 +26,17 @@ export default function PlayerProfileCard({
   const theme = THEMES[currentTheme];
 
   return (
-    <div className={padding}>
+    <div className={`${padding} h-full`}>
       <div
-        className={`flex ${maxWidth} gap-3 items-center bg-gradient-to-r ${GradientType.BACKGROUND_MAIN} rounded-xl p-3 border border-white/20 hover:border-white/40 transition-all duration-300`}
+        className={`flex ${maxWidth} gap-3 items-center bg-gradient-to-r ${GradientType.BACKGROUND_MAIN} rounded-xl p-3 border border-white/20 hover:border-white/40 transition-all duration-300 h-full`}
       >
         {/* Avatar du joueur */}
         <div className="relative">
           <Image
             src="/images/icons/avatar.png"
             alt="Profile"
-            width={isMobile ? 60 : 80}
-            height={isMobile ? 60 : 80}
+            width={isMobile ? 45 : 80}
+            height={isMobile ? 45 : 80}
             priority
             className="drop-shadow-lg cursor-pointer transition-all"
             onClick={() => router.push("/app")}
@@ -58,24 +58,7 @@ export default function PlayerProfileCard({
         </div>
 
         {/* Version Mobile - Skin et Thème compacts */}
-        {isMobile ? (
-          <div className="flex items-center gap-2">
-            {/* Skin de carte miniature */}
-            <Card
-              cardState={CardState.CARD_BACK}
-              size="xsmall"
-              skinId={selectedSkinId}
-            />
-            <div className="flex flex-col text-white/90">
-              <span className="text-sm font-passionone text-white/60">
-                Deck
-              </span>
-              <span className="text-sm font-lucky">
-                {cardSkin?.name || "Défaut"}
-              </span>
-            </div>
-          </div>
-        ) : (
+        {!isMobile && (
           <>
             {/* Version Desktop - Skin de carte sélectionné */}
             <div className="flex items-center gap-2">
