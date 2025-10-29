@@ -1,5 +1,5 @@
 import { Player } from "@/store/game/types";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
 import { Size } from "@/scripts/references/playerLayouts";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -26,8 +26,8 @@ export default function PlayerAvatar({
   playerTimer = 0,
   maxTime = 30,
 }: PlayerAvatarProps) {
-  const { getCurrentThemeColors } = useTheme();
-  const themeColors = getCurrentThemeColors();
+  const { getCurrentTheme } = useCollection();
+  const themeColors = getCurrentTheme().getHexColors();
   const config = SIZE_CONFIG[size];
   const { avatarSize } = config;
 

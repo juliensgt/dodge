@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import Card, { CardState } from "@/components/game/cards/card/Card";
-import { Theme } from "@/enums/themes/Theme";
+import { ITheme } from "@/enums/themes/ITheme";
 
 interface ArsenalDisplayProps {
-  theme: Theme;
+  theme: ITheme;
   selectedSkinId: string;
 }
 
@@ -20,12 +20,12 @@ export default function ArsenalDisplay({
       <motion.div className="relative">
         {/* Main arena circle with theme gradient */}
         <div
-          className={`w-56 h-56 rounded-full bg-gradient-to-br ${theme.preview}`}
+          className={`w-56 h-56 rounded-full bg-gradient-to-br ${theme.getGradient(theme.GradientType.PRIMARY, "to-r")}`}
           style={{ opacity: 0.4 }}
         />
         {/* Outer glow */}
         <div
-          className={`absolute inset-0 w-56 h-56 rounded-full bg-gradient-to-br ${theme.preview} blur-3xl`}
+          className={`absolute inset-0 w-56 h-56 rounded-full bg-gradient-to-br ${theme.getGradient(theme.GradientType.PRIMARY, "to-r")} blur-3xl`}
           style={{ opacity: 0.15, transform: "scale(1.5)" }}
         />
       </motion.div>

@@ -3,7 +3,7 @@ import Head from "next/head";
 import "@/pages/globals.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { CollectionProvider } from "@/contexts/CollectionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -14,8 +14,8 @@ config.autoAddCss = true;
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <LanguageProvider>
-      <ThemeProvider>
-        <AuthProvider requiredLevel={AuthLevel.PUBLIC}>
+      <AuthProvider requiredLevel={AuthLevel.PUBLIC}>
+        <CollectionProvider>
           <ToastProvider>
             <Head>
               <link rel="icon" href="/favicon.ico" />
@@ -23,8 +23,8 @@ export default function App({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
             <ToastContainer />
           </ToastProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </CollectionProvider>
+      </AuthProvider>
     </LanguageProvider>
   );
 }

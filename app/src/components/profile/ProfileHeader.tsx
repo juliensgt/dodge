@@ -1,6 +1,6 @@
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ActionButton from "../utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProfileHeaderProps {

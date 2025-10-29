@@ -31,7 +31,10 @@ const useGameStore = create<GameStore>((set, get, store) => {
       name: "",
       points: 0,
       currentTime: 0,
-      skinCards: "",
+      collection: {
+        skin: "default",
+        theme: "purple",
+      },
       ready: false,
       actionPoints: 0,
     },

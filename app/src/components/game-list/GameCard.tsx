@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { GameState, GameCardData, isInGame } from "@/types/game/game.types";
 import {
   faClock,

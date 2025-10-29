@@ -3,7 +3,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType, GradientType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import {
   faChartBar,
   faTrophy,
@@ -330,23 +330,6 @@ export default function StatsTab() {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">
-              {t("Exporter mes données")}
-            </h4>
-            <p className="text-white/70 text-sm">
-              {t(
-                "Téléchargez une copie de toutes vos données de jeu et de profil."
-              )}
-            </p>
-            <ActionButton
-              onClick={() => console.log("Export data")}
-              label={t("Exporter")}
-              leftSection={<FontAwesomeIcon icon={faDownload} />}
-              gradient={{ gradientType: GradientType.PRIMARY }}
-            />
-          </div>
-
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">
               {t("Importer des données")}

@@ -6,6 +6,7 @@ import { ErrorEnum } from '../../enums/errors/error.enum';
 import { MessageDto } from './dto/message.dto';
 import { Player } from '../players/player.schema';
 import { User } from '../user/user.schema';
+import { Collection } from '../collections/collection.schema';
 
 @Injectable()
 export class MessageService {
@@ -32,11 +33,15 @@ export class MessageService {
         populate: {
           path: 'user',
           model: User.name,
+          populate: {
+            path: 'collection',
+            model: Collection.name,
+          },
         },
       })
       .exec();
     // Return all messages, MessageDto will handle deleted players gracefully
-    return messages.map((message) => MessageDto.fromMessage(message));
+    return Promise.all(messages.map((message) => MessageDto.fromMessage(message)));
   }
 
   async create(messageData: Partial<Message>): Promise<Message> {

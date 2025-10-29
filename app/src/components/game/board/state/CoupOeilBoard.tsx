@@ -1,6 +1,5 @@
 import Countdown from "@/components/game/countdown/Countdown";
 import { useGameStore } from "@/store/game/game";
-import { useCardSkin } from "@/hooks/useCardSkin";
 import { Card, CardState } from "@/store/cards/cards.type";
 import CardComponent from "../../cards/card/Card";
 import { useTimer } from "@/hooks/useTimer";
@@ -8,9 +7,10 @@ import { useEffect, useState } from "react";
 import { GameState } from "@/types/game/game.types";
 import { httpService } from "@/services/http/http.service";
 import { motion } from "framer-motion";
+import { useCollection } from "@/contexts/CollectionContext";
 
 export default function CoupOeilBoard() {
-  const { selectedSkinId } = useCardSkin();
+  const { getCurrentSkin } = useCollection();
   const { state, options, currentPlayerId } = useGameStore();
   const [time, setTime] = useState(options.timeToSeeCards);
   const [cards, setCards] = useState<Card[]>([]);
@@ -91,7 +91,7 @@ export default function CoupOeilBoard() {
                     ? () => handleCardClick(index)
                     : undefined
                 }
-                skinId={selectedSkinId}
+                skinId={getCurrentSkin().id}
               />
             </motion.div>
           ))}

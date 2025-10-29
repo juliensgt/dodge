@@ -4,7 +4,6 @@ import { ThemeType } from "@/enums/themes/Theme";
 import Card from "@/components/game/cards/card/Card";
 import { CardState } from "@/components/game/cards/card/Card";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faRobot,
@@ -14,6 +13,7 @@ import {
 import ShopTabTitle from "./tabs/shop-tab-title";
 import { getRarityBadge, getRarityColor } from "@/types/items/items.type";
 import { CardSkinRarity } from "@/enums/skins/SkinRarity";
+import { ColorType } from "@/enums/themes/ITheme";
 
 interface Collection {
   id: string;
@@ -205,7 +205,9 @@ export default function Collections() {
               <ActionButton
                 onClick={() => setSelectedCollection(null)}
                 label={t("← Retour aux collections")}
-                color={{ color: ColorType.TRANSPARENT }}
+                color={{
+                  color: ColorType.TRANSPARENT,
+                }}
               />
             </div>
           )

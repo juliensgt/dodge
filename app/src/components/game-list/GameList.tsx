@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { gameService } from "@/services/game/game.service";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { useGradient } from "@/hooks/useGradient";
 import { GameCardData, GameState } from "@/types/game/game.types";
 import GameCard from "./GameCard";

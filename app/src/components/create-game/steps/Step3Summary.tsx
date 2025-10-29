@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { faGamepad, faCog, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { SummaryStepProps, GameMode, DeckType } from "../types";
 import { gameModePresets, deckPresets } from "../constants";

@@ -12,6 +12,7 @@ import { GameTimerManager } from './managers/game-timer.manager';
 import { GamePlayerManager } from './managers/game-player.manager';
 import { GameFlowManager } from './managers/game-flow.manager';
 import { GameTurnManager } from './managers/game-turn.manager';
+import { CollectionModule } from '../collections/collection.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GameTurnManager } from './managers/game-turn.manager';
     CardModule,
     UserModule,
     PlayerModule,
+    CollectionModule,
   ],
   controllers: [GameController],
   providers: [

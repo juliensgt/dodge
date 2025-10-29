@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/contexts/AuthContext";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { useGradient } from "@/hooks/useGradient";
 import {
   faBell,

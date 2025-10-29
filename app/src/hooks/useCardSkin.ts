@@ -1,12 +1,11 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
+import { getCardSkin } from "@/enums/skins/SkinManager";
 
 export function useCardSkin() {
-  const theme = useTheme();
+  const { setSkin } = useCollection();
 
   return {
-    selectedSkinId: theme.selectedSkinId,
-    selectSkin: theme.selectSkin,
-    getUnlockedSkins: theme.getUnlockedSkins,
-    getCardSkin: theme.getCardSkin,
+    setSkin: (skinId: string) => setSkin(skinId),
+    getSkin: (skinId: string) => getCardSkin(skinId),
   };
 }

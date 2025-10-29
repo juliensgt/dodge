@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getUnlockedSkins } from "@/enums/skins/SkinManager";
-import { useCardSkin } from "@/hooks/useCardSkin";
 import ShopCard from "./cards/ShopCard";
 import { CardSkinRarity } from "@/enums/skins/SkinRarity";
 import { getRarityBadge } from "@/types/items/items.type";
 import ShopTabTitle from "./tabs/shop-tab-title";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useCollection } from "@/contexts/CollectionContext";
 
 type FilterType = "all" | "common" | "rare" | "epic" | "legendary";
 
 export default function MySkins() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const { selectedSkinId, selectSkin } = useCardSkin();
+  const { getCurrentSkin, setSkin } = useCollection();
   const [filter, setFilter] = useState<FilterType>("all");
   const [hoveredSkin, setHoveredSkin] = useState<string | null>(null);
 
@@ -147,7 +147,7 @@ export default function MySkins() {
         {filteredSkins.map((skin) => (
           <ShopCard
             key={skin.id}
-            selectedItem={selectedSkinId}
+            selectedItem={getCurrentSkin().id}
             item={skin}
             hoveredItem={hoveredSkin}
             setHoveredItem={setHoveredSkin}
@@ -155,7 +155,7 @@ export default function MySkins() {
             buyable={false}
             showButton={true}
             onClick={(item) => {
-              selectSkin(item.id);
+              setSkin(item.id);
             }}
             isMobile={isMobile}
           />

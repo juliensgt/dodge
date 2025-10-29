@@ -1,5 +1,5 @@
-import { useTheme } from "../../../../contexts/ThemeContext";
-import { ThemeType } from "../../../../enums/themes/Theme";
+import { useCollection } from "@/contexts/CollectionContext";
+import { ThemeType } from "@/enums/themes/Theme";
 import Image from "next/image";
 
 interface CardFrontProps {
@@ -27,9 +27,8 @@ export default function CardFront({
   cardValue,
   className = "",
 }: CardFrontProps) {
-  const { currentTheme } = useTheme();
-  const cardGradient = getCardGradient(currentTheme);
-
+  const { getCurrentTheme } = useCollection();
+  const cardGradient = getCardGradient(getCurrentTheme().getThemeType());
   return (
     <div
       className={`card-front w-full h-full relative rounded-lg shadow-md ${cardGradient} ${className}`}

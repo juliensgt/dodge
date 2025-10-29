@@ -4,7 +4,7 @@ import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 import AnimationSettings from "./AnimationSettings";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import Modal from "@/components/utils/modals/Modal";
 import { useState } from "react";
 

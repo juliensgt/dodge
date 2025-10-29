@@ -6,9 +6,9 @@ import { AuthLevel } from "@/types/auth/auth";
 import { useGradient } from "@/hooks/useGradient";
 import { useTranslation } from "@/hooks/useTranslation";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
 import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
+import { ColorType } from "@/enums/themes/ITheme";
 
 export default function Login() {
   const router = useRouter();

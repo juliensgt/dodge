@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { CreateGameHeaderProps } from "./types";
 
 const BackButton = ({ onClick }: { onClick: () => void }) => (

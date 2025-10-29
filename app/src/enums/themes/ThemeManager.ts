@@ -1,19 +1,12 @@
 import { Theme, ThemeType, ThemeColors } from "./Theme";
-import * as PurpleTheme from "./list/PurpleTheme";
-import * as OceanTheme from "./list/OceanTheme";
-import * as ForestTheme from "./list/ForestTheme";
-import * as SunsetTheme from "./list/SunsetTheme";
-import * as NeonTheme from "./list/NeonTheme";
-import * as MonochromeTheme from "./list/MonochromeTheme";
+import { ITheme } from "./ITheme";
+import PurpleTheme from "./list/PurpleTheme";
+import OceanTheme from "./list/OceanTheme";
+import ForestTheme from "./list/ForestTheme";
+import SunsetTheme from "./list/SunsetTheme";
+import NeonTheme from "./list/NeonTheme";
+import MonochromeTheme from "./list/MonochromeTheme";
 import { CardSkinRarity } from "../skins/SkinRarity";
-
-export type GradientTheme =
-  | typeof PurpleTheme
-  | typeof OceanTheme
-  | typeof ForestTheme
-  | typeof SunsetTheme
-  | typeof NeonTheme
-  | typeof MonochromeTheme;
 
 // Configuration des thèmes disponibles
 export const THEMES: Record<ThemeType, Theme> = {
@@ -80,10 +73,8 @@ export const THEMES: Record<ThemeType, Theme> = {
 } as const;
 
 // Fonction pour obtenir un thème par son ID
-export function getTheme(themeId: ThemeType): GradientTheme {
-  return (
-    THEMES as unknown as Record<ThemeType, Theme & { theme: GradientTheme }>
-  )[themeId]?.theme as GradientTheme;
+export function getTheme(themeId: ThemeType): ITheme {
+  return THEMES[themeId]?.theme as ITheme;
 }
 
 // Fonction pour obtenir tous les thèmes disponibles

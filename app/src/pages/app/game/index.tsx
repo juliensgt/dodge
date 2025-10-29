@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
 import Card, { CardState } from "@/components/game/cards/card/Card";
-import { useTheme } from "@/contexts/ThemeContext";
-import { THEMES } from "@/enums/themes/ThemeManager";
+import { useCollection } from "@/contexts/CollectionContext";
+import { GradientType } from "@/enums/themes/list/PurpleTheme";
 
 const loadingTips = [
   "Préparez votre stratégie...",
@@ -15,11 +15,9 @@ const loadingTips = [
 
 export default function LoadingGame() {
   const router = useRouter();
-  const { selectedSkinId, currentTheme } = useTheme();
+  const { getCurrentSkin, getCurrentTheme } = useCollection();
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [currentTip, setCurrentTip] = useState(0);
-
-  const theme = THEMES[currentTheme];
 
   useEffect(() => {
     // Simulate loading progress
@@ -55,7 +53,7 @@ export default function LoadingGame() {
     <div className="fixed inset-0 overflow-hidden font-display">
       {/* Animated background gradient */}
       <motion.div
-        className={`fixed inset-0 bg-gradient-to-br ${theme.preview}`}
+        className={`fixed inset-0 bg-gradient-to-br ${getCurrentTheme().getGradient(GradientType.PRIMARY, "to-r")}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -100,7 +98,7 @@ export default function LoadingGame() {
             <Card
               cardState={CardState.CARD_BACK}
               size="small"
-              skinId={selectedSkinId}
+              skinId={getCurrentSkin().id}
             />
           </motion.div>
 
@@ -120,7 +118,7 @@ export default function LoadingGame() {
             <Card
               cardState={CardState.CARD_BACK}
               size="small"
-              skinId={selectedSkinId}
+              skinId={getCurrentSkin().id}
             />
           </motion.div>
 
@@ -140,7 +138,7 @@ export default function LoadingGame() {
             <Card
               cardState={CardState.CARD_BACK}
               size="small"
-              skinId={selectedSkinId}
+              skinId={getCurrentSkin().id}
             />
           </motion.div>
         </motion.div>

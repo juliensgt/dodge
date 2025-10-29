@@ -1,4 +1,4 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CountdownProps {
@@ -14,8 +14,8 @@ export default function Countdown({
   title,
   subtitle,
 }: CountdownProps) {
-  const { getCurrentThemeColors } = useTheme();
-  const themeColors = getCurrentThemeColors();
+  const { getCurrentTheme } = useCollection();
+  const themeColors = getCurrentTheme().getHexColors();
 
   const isUrgent = time <= 3 && time > 0;
 

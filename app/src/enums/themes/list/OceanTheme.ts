@@ -1,31 +1,10 @@
-export interface Gradient {
-  gradientType: GradientType;
-  gradientDirection?:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl";
-}
+import { ITheme, ColorType, GradientDirection } from "../ITheme";
+import { ThemeColors, ThemeType } from "../Theme";
 
 export enum GradientType {
   PRIMARY = "from-cyan-500 to-blue-600",
   BACKGROUND_MAIN = "from-cyan-900 via-blue-900 to-indigo-900",
   AVATAR_DEFAULT = "from-cyan-400 to-blue-500",
-}
-
-// Couleurs pour les boutons et autres éléments
-export enum ColorType {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  SUCCESS = "success",
-  WARNING = "warning",
-  DANGER = "danger",
-  INFO = "info",
-  TRANSPARENT = "transparent",
 }
 
 export const colors = {
@@ -38,51 +17,45 @@ export const colors = {
   [ColorType.TRANSPARENT]: "bg-white/10 backdrop-blur-sm border border-white/5",
 };
 
-// Couleurs hexadécimales du thème
-export const hexColors = {
+export const hexColors: ThemeColors = {
   primary: "#0891b2", // cyan-600
   secondary: "#2563eb", // blue-600
   background: "#0c4a6e", // sky-900
   text: "#ffffff", // white
 };
 
-export function getColor(color: ColorType): string {
-  return colors[color];
-}
+// Implémentation de l'interface ITheme
+export const OceanTheme: ITheme = {
+  GradientType: {
+    PRIMARY: GradientType.PRIMARY,
+    BACKGROUND_MAIN: GradientType.BACKGROUND_MAIN,
+    AVATAR_DEFAULT: GradientType.AVATAR_DEFAULT,
+  },
+  ColorType,
+  colors,
+  hexColors,
+  getColor(color: ColorType): string {
+    return colors[color];
+  },
+  getHexColors(): ThemeColors {
+    return hexColors;
+  },
+  getGradient(
+    gradientType: string,
+    direction: GradientDirection = "to-r"
+  ): string {
+    return `bg-gradient-${direction} ${gradientType}`;
+  },
+  getGradientHover(
+    gradientType: string,
+    direction: GradientDirection = "to-r"
+  ): string {
+    return `hover:bg-gradient-${direction} ${gradientType}`;
+  },
+  getThemeType(): ThemeType {
+    return ThemeType.OCEAN;
+  },
+};
 
-// Fonction pour récupérer les couleurs hexadécimales
-export function getHexColors() {
-  return hexColors;
-}
-
-// Fonction utilitaire pour obtenir les classes CSS complètes
-export function getGradient(
-  gradientType: GradientType,
-  direction:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl" = "to-r"
-): string {
-  return `bg-gradient-${direction} ${gradientType}`;
-}
-
-// Fonction utilitaire pour obtenir les classes de hover
-export function getGradientHover(
-  gradientType: GradientType,
-  direction:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl" = "to-r"
-): string {
-  return `hover:bg-gradient-${direction} ${gradientType}`;
-}
+// Export par défaut pour compatibilité
+export default OceanTheme;

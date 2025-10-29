@@ -2,7 +2,7 @@ import LanguageSelector from "@/components/utils/selectors/LanguageSelector";
 import ThemeSelector from "@/components/utils/selectors/ThemeSelector";
 import ActionButton from "@/components/utils/buttons/ActionButton";
 import { useGradient } from "@/hooks/useGradient";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
+import { ColorType } from "@/enums/themes/ITheme";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";

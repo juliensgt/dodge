@@ -1,31 +1,10 @@
-export interface Gradient {
-  gradientType: GradientType;
-  gradientDirection?:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl";
-}
+import { ITheme, ColorType, GradientDirection } from "../ITheme";
+import { ThemeColors, ThemeType } from "../Theme";
 
 export enum GradientType {
   PRIMARY = "from-orange-500 to-pink-600",
   BACKGROUND_MAIN = "from-orange-900 via-pink-900 to-red-900",
   AVATAR_DEFAULT = "from-orange-400 to-pink-500",
-}
-
-// Couleurs pour les boutons et autres éléments
-export enum ColorType {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  SUCCESS = "success",
-  WARNING = "warning",
-  DANGER = "danger",
-  INFO = "info",
-  TRANSPARENT = "transparent",
 }
 
 export const colors = {
@@ -38,51 +17,45 @@ export const colors = {
   [ColorType.TRANSPARENT]: "bg-white/10 backdrop-blur-sm border border-white/5",
 };
 
-// Couleurs hexadécimales du thème
-export const hexColors = {
+export const hexColors: ThemeColors = {
   primary: "#ea580c", // orange-600
   secondary: "#db2777", // pink-600
   background: "#9a3412", // orange-900
   text: "#ffffff", // white
 };
 
-export function getColor(color: ColorType): string {
-  return colors[color];
-}
+// Implémentation de l'interface ITheme
+export const SunsetTheme: ITheme = {
+  GradientType: {
+    PRIMARY: GradientType.PRIMARY,
+    BACKGROUND_MAIN: GradientType.BACKGROUND_MAIN,
+    AVATAR_DEFAULT: GradientType.AVATAR_DEFAULT,
+  },
+  ColorType,
+  colors,
+  hexColors,
+  getColor(color: ColorType): string {
+    return colors[color];
+  },
+  getHexColors(): ThemeColors {
+    return hexColors;
+  },
+  getGradient(
+    gradientType: string,
+    direction: GradientDirection = "to-r"
+  ): string {
+    return `bg-gradient-${direction} ${gradientType}`;
+  },
+  getGradientHover(
+    gradientType: string,
+    direction: GradientDirection = "to-r"
+  ): string {
+    return `hover:bg-gradient-${direction} ${gradientType}`;
+  },
+  getThemeType(): ThemeType {
+    return ThemeType.SUNSET;
+  },
+};
 
-// Fonction pour récupérer les couleurs hexadécimales
-export function getHexColors() {
-  return hexColors;
-}
-
-// Fonction utilitaire pour obtenir les classes CSS complètes
-export function getGradient(
-  gradientType: GradientType,
-  direction:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl" = "to-r"
-): string {
-  return `bg-gradient-${direction} ${gradientType}`;
-}
-
-// Fonction utilitaire pour obtenir les classes de hover
-export function getGradientHover(
-  gradientType: GradientType,
-  direction:
-    | "to-r"
-    | "to-l"
-    | "to-b"
-    | "to-br"
-    | "to-bl"
-    | "to-t"
-    | "to-tr"
-    | "to-tl" = "to-r"
-): string {
-  return `hover:bg-gradient-${direction} ${gradientType}`;
-}
+// Export par défaut pour compatibilité
+export default SunsetTheme;

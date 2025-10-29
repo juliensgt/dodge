@@ -136,8 +136,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     } catch (error) {
       console.error('Error in handleConnection:', error);
       client.emit('error', {
-        message: error.message || 'Error connecting to game',
-        code: error.code || 'CONNECTION_ERROR',
+        message: (error as Error).message || 'Error connecting to game',
+        code: (error as unknown as { code?: string }).code || 'CONNECTION_ERROR',
       });
       client.disconnect();
       return;

@@ -4,9 +4,14 @@ import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { Message, MessageSchema } from './message.schema';
 import { UserModule } from '../user/user.module';
+import { CollectionModule } from '../collections/collection.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]), UserModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
+    UserModule,
+    CollectionModule,
+  ],
   controllers: [MessageController],
   providers: [MessageService],
   exports: [MessageService],

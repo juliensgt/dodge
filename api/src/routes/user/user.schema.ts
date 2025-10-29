@@ -17,9 +17,6 @@ export class User {
   @Prop()
   email?: string;
 
-  @Prop()
-  skinCards: string;
-
   @Prop({ default: 'en' })
   language: string;
 
@@ -40,3 +37,15 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Virtual populate pour la collection
+UserSchema.virtual('collection', {
+  ref: 'Collection',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: true,
+});
+
+// Activer les virtuals dans les JSON et les populate
+UserSchema.set('toJSON', { virtuals: true });
+UserSchema.set('toObject', { virtuals: true });

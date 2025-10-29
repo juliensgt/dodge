@@ -7,15 +7,18 @@ import PlayTab from "@/components/layout/app/tabs/PlayTab";
 import ShopTab from "@/components/layout/app/tabs/ShopTab";
 import CollectionTab from "@/components/layout/app/tabs/CollectionTab";
 import ProfileTab from "@/components/layout/app/tabs/ProfileTab";
+import AdminTab from "@/components/layout/app/tabs/AdminTab";
 import AppContainer from "@/components/layout/app/AppContainer";
 import { motion } from "framer-motion";
-import * as PurpleTheme from "@/enums/themes/list/PurpleTheme";
+import { useRole } from "@/contexts/AuthContext";
+import { useCollection } from "@/contexts/CollectionContext";
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState<AppTab>("play");
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
-
+  const { isAdmin } = useRole();
+  const { getCurrentTheme } = useCollection();
   // Define all tabs with their content (all tabs stay mounted for smooth transitions)
   const appTabs = useMemo(
     () => [
@@ -35,8 +38,16 @@ function DashboardContent() {
         id: "profile" as AppTab,
         content: <ProfileTab isActive={activeTab === "profile"} />,
       },
+      ...(isAdmin
+        ? [
+            {
+              id: "admin" as AppTab,
+              content: <AdminTab />,
+            },
+          ]
+        : []),
     ],
-    [activeTab]
+    [activeTab, isAdmin]
   );
 
   const handleTabChange = (tab: AppTab) => {
@@ -59,7 +70,7 @@ function DashboardContent() {
   return (
     <>
       <div
-        className={`min-h-screen ${PurpleTheme.getGradient(PurpleTheme.GradientType.BACKGROUND_MAIN, "to-br")} font-['MT'] relative`}
+        className={`min-h-screen ${getCurrentTheme().getGradient(getCurrentTheme().GradientType.BACKGROUND_MAIN, "to-br")} font-['MT'] relative`}
       >
         {/* Loading overlay */}
         {isLoading && (

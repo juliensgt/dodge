@@ -36,7 +36,10 @@ export interface Player {
   name: string;
   points: number;
   currentTime: number;
-  skinCards: string;
+  collection: {
+    skin: string;
+    theme: string;
+  };
   ready: boolean;
   actionPoints: number;
 }

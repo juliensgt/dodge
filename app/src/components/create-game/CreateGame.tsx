@@ -15,7 +15,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGradient } from "@/hooks/useGradient";
 import ActionButton from "@/components/utils/buttons/ActionButton";
-import { ColorType } from "@/enums/themes/list/PurpleTheme";
 import { httpService } from "@/services/http/http.service";
 import { GameOptionsBo } from "@/types/game/game.types";
 import CreateGameStepNavigation from "./CreateGameStepNavigation";
@@ -25,6 +24,7 @@ import Step2GameConfig from "./steps/Step2GameConfig";
 import Step3Summary from "./steps/Step3Summary";
 import { FormData, GameMode } from "./types";
 import { defaultFormData } from "./constants";
+import { ColorType } from "@/enums/themes/ITheme";
 
 export default function CreateGame() {
   const { t } = useTranslation();

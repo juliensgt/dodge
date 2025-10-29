@@ -5,21 +5,28 @@ import {
   getDeckContainerClasses,
   getPlayerLayout,
 } from "@/scripts/references/playerLayouts";
-import { getGradient, GradientType } from "@/enums/themes/list/PurpleTheme";
+import { GradientType } from "@/enums/themes/list/PurpleTheme";
 import DeckContainer from "../game/cards/DeckContainer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { Player } from "@/store/game/types";
+import { useCollection } from "@/contexts/CollectionContext";
 export default function SkeletonDemo() {
   const [maxPlayers, setMaxPlayers] = useState(6);
   const [actualPlayers, setActualPlayers] = useState(3);
   const isMobile = useIsMobile();
+  const { getCurrentTheme } = useCollection();
   // Simuler des joueurs avec des valeurs fixes pour éviter l'erreur d'hydratation
   const mockPlayers = Array.from({ length: actualPlayers }, (_, index) => ({
     id: `player-${index}`,
     name: `Joueur ${index + 1}`,
     points: 50 + index * 10, // Valeurs fixes au lieu de Math.random()
     currentTime: 15 + index * 5, // Valeurs fixes au lieu de Math.random()
-    skinCards: "default",
+    collection: {
+      skin: "default",
+      theme: "purple",
+    },
+    ready: false,
+    actionPoints: 0,
   }));
 
   const playerLayout = getPlayerLayout(maxPlayers);
@@ -69,7 +76,7 @@ export default function SkeletonDemo() {
       </div>
 
       <div
-        className={`relative w-full h-192 rounded-lg border-2 border-gray-300 overflow-hidden ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")}`}
+        className={`relative w-full h-192 rounded-lg border-2 border-gray-300 overflow-hidden ${getCurrentTheme().getGradient(GradientType.BACKGROUND_MAIN, "to-br")}`}
       >
         {/* Container principal avec CSS Grid */}
         <div className={playerLayout.container}>

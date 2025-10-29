@@ -10,6 +10,7 @@ import { WebSocketModule } from './websocket/websocket.module';
 import { PlayerModule } from './routes/players/player.module';
 import { PlayerHandModule } from './routes/players/hand/player-hand.module';
 import { CommonModule } from './common/common.module';
+import { CollectionModule } from './routes/collections/collection.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CommonModule } from './common/common.module';
     PlayerModule,
     PlayerHandModule,
     MessageModule,
+    CollectionModule,
     WebSocketModule,
   ],
 })

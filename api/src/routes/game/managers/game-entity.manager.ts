@@ -5,6 +5,7 @@ import { Game } from '../game.schema';
 import { ErrorEnum } from 'src/enums/errors/error.enum';
 import { Player } from 'src/routes/players/player.schema';
 import { User } from 'src/routes/user/user.schema';
+import { Collection } from 'src/routes/collections/collection.schema';
 import { defaultGameCreateDto, GameCreateDto } from '../dto/game-create.dto';
 
 @Injectable()
@@ -20,6 +21,10 @@ export class GameEntityManager {
         populate: {
           path: 'user',
           model: User.name,
+          populate: {
+            path: 'collection',
+            model: Collection.name,
+          },
         },
       })
       .exec();
@@ -47,6 +52,10 @@ export class GameEntityManager {
         populate: {
           path: 'user',
           model: User.name,
+          populate: {
+            path: 'collection',
+            model: Collection.name,
+          },
         },
       })
       .exec();
@@ -65,7 +74,14 @@ export class GameEntityManager {
       .populate({
         path: 'players',
         model: Player.name,
-        populate: { path: 'user', model: User.name },
+        populate: {
+          path: 'user',
+          model: User.name,
+          populate: {
+            path: 'collection',
+            model: Collection.name,
+          },
+        },
       })) as Game;
   }
 
@@ -81,7 +97,14 @@ export class GameEntityManager {
       .populate({
         path: 'players',
         model: Player.name,
-        populate: { path: 'user', model: User.name },
+        populate: {
+          path: 'user',
+          model: User.name,
+          populate: {
+            path: 'collection',
+            model: Collection.name,
+          },
+        },
       })) as Game;
   }
 

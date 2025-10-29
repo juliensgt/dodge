@@ -1,13 +1,14 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faUserShield } from "@fortawesome/free-solid-svg-icons";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { motion, AnimatePresence } from "framer-motion";
 import CrownCounter from "./counter/CrownCounter";
 import CoinsCounter from "./counter/CoinsCounter";
+import { useRole } from "@/contexts/AuthContext";
 
-export type AppTab = "play" | "shop" | "collection" | "profile";
+export type AppTab = "play" | "shop" | "collection" | "profile" | "admin";
 
 export interface AppCategory {
   id: AppTab;
@@ -25,10 +26,10 @@ export default function AppHeader({
   onTabChange,
   activeTab,
   setActiveTab,
-  setActiveTabContent,
 }: AppHeaderProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const { isAdmin } = useRole();
   const tabs: AppCategory[] = [
     {
       id: "shop",
@@ -74,6 +75,15 @@ export default function AppHeader({
       label: t("Profil"),
       icon: <FontAwesomeIcon icon={faUser} size="lg" />,
     },
+    ...(isAdmin
+      ? [
+          {
+            id: "admin" as AppTab,
+            label: t("Admin"),
+            icon: <FontAwesomeIcon icon={faUserShield} size="lg" />,
+          },
+        ]
+      : []),
   ];
 
   const handleTabClick = (tab: AppCategory) => {

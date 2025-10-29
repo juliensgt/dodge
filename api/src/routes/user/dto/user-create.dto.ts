@@ -17,10 +17,6 @@ export class UserCreateDto {
   language?: string;
 
   @IsOptional()
-  @IsString()
-  skinCards?: string;
-
-  @IsOptional()
   @IsObject()
   userMetadata?: Record<string, any>;
 

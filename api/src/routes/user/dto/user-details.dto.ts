@@ -5,7 +5,6 @@ export class UserDetailsDto {
   supabaseId: string;
   name: string;
   email?: string;
-  skinCards: string;
   language: string;
   role: UserRole;
   createdAt: Date;

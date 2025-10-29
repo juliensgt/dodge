@@ -1,22 +1,23 @@
 import React, { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
 import { ThemeType } from "@/enums/themes/Theme";
 import ShopTabTitle from "./tabs/shop-tab-title";
 import { CardSkinRarity } from "@/enums/skins/SkinRarity";
 import { getRarityBadge } from "@/types/items/items.type";
 import ShopCard from "./cards/ShopCard";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { getAllThemes } from "@/enums/themes/ThemeManager";
 
 export default function MyThemes() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const { currentTheme, setTheme, availableThemes } = useTheme();
+  const { getCurrentTheme, setTheme } = useCollection();
   const [filter, setFilter] = useState<string>("all");
   const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
 
   // In a real app, this would come from user data
-  const allThemes = availableThemes;
+  const allThemes = getAllThemes();
 
   // Filter skins based on selected filter
   const filteredThemes =
@@ -147,7 +148,7 @@ export default function MyThemes() {
           return (
             <ShopCard
               key={theme.id}
-              selectedItem={currentTheme}
+              selectedItem={getCurrentTheme().getThemeType()}
               item={theme}
               hoveredItem={hoveredTheme}
               setHoveredItem={setHoveredTheme}

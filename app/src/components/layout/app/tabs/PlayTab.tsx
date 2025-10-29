@@ -6,23 +6,21 @@ import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import ChestSystem from "./play/components/ChestSystem";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
 import PlayButtons from "./play/buttons/PlayButtons";
 import PlayerProfileCard from "./play/components/PlayerProfileCard";
 import MissionsBubble from "./play/components/MissionsBubble";
 import LeaderboardBubble from "./play/components/LeaderboardBubble";
 import BattlePassCard from "./play/components/BattlePassCard";
 import ArsenalDisplay from "./play/components/ArsenalDisplay";
-import { THEMES } from "@/enums/themes/ThemeManager";
 
 export default function PlayTab() {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { selectedSkinId, currentTheme } = useTheme();
+  const { getCurrentSkin, getCurrentTheme } = useCollection();
   const [showMissions, setShowMissions] = useState(false);
 
   // Récupération du thème sélectionné
-  const theme = THEMES[currentTheme];
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [currentTime, setCurrentTime] = useState(dayjs());
 
@@ -150,7 +148,10 @@ export default function PlayTab() {
                   userRank={leaderboard.find((p) => p.name === "You")?.rank}
                 />
               </div>
-              <ArsenalDisplay theme={theme} selectedSkinId={selectedSkinId} />
+              <ArsenalDisplay
+                theme={getCurrentTheme()}
+                selectedSkinId={getCurrentSkin().id}
+              />
             </>
           ) : (
             <>

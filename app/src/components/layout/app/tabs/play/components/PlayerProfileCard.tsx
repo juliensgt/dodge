@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useCollection } from "@/contexts/CollectionContext";
 import Card, { CardState } from "@/components/game/cards/card/Card";
 import { THEMES } from "@/enums/themes/ThemeManager";
 import { GradientType } from "@/enums/themes/list/PurpleTheme";
@@ -19,11 +19,11 @@ export default function PlayerProfileCard({
   const router = useRouter();
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { currentTheme, selectedSkinId, getCardSkin } = useTheme();
+  const { getCurrentTheme, getCurrentSkin } = useCollection();
 
   // Récupération du skin et du thème sélectionnés
-  const cardSkin = getCardSkin(selectedSkinId);
-  const theme = THEMES[currentTheme];
+  const cardSkin = getCurrentSkin();
+  const theme = getCurrentTheme();
 
   return (
     <div className={`${padding} h-full`}>
@@ -68,7 +68,7 @@ export default function PlayerProfileCard({
                   <Card
                     cardState={CardState.CARD_BACK}
                     size="xsmall"
-                    skinId={selectedSkinId}
+                    skinId={getCurrentSkin().id}
                   />
                 </div>
               </div>
@@ -89,7 +89,7 @@ export default function PlayerProfileCard({
             <div className="flex items-center gap-2">
               <div className="relative group">
                 <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${theme.preview} border-2 border-white/30 shadow-lg group-hover:scale-105 transition-transform duration-300`}
+                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${theme.getGradient(theme.GradientType.PRIMARY, "to-r")} border-2 border-white/30 shadow-lg group-hover:scale-105 transition-transform duration-300`}
                 >
                   <div className="absolute inset-0 bg-white/10 rounded-lg group-hover:bg-white/20 transition-all" />
                 </div>
@@ -98,7 +98,9 @@ export default function PlayerProfileCard({
                 <span className="text-xs font-passionone text-white/60">
                   Thème
                 </span>
-                <span className="text-sm font-lucky">{theme.name}</span>
+                <span className="text-sm font-lucky">
+                  {theme.getThemeType()}
+                </span>
               </div>
             </div>
           </>

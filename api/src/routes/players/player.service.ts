@@ -5,6 +5,7 @@ import { ErrorEnum } from '../../enums/errors/error.enum';
 import { Player } from './player.schema';
 import { PlayerCreateDto } from './dto/player-create.dto';
 import { User } from '../user/user.schema';
+import { Collection } from '../collections/collection.schema';
 
 @Injectable()
 export class PlayerService {
@@ -15,7 +16,6 @@ export class PlayerService {
       ...playerCreateDto,
       points: 0,
       currentTime: 0,
-      skinCards: '',
       actionPoints: 0,
     });
     return await player.save();
@@ -32,7 +32,17 @@ export class PlayerService {
   }
 
   async findOne(id: string): Promise<Player> {
-    const player = await this.playerModel.findById(new Types.ObjectId(id)).populate('user').exec();
+    const player = await this.playerModel
+      .findById(new Types.ObjectId(id))
+      .populate({
+        path: 'user',
+        model: User.name,
+        populate: {
+          path: 'collection',
+          model: Collection.name,
+        },
+      })
+      .exec();
 
     if (!player) {
       throw new NotFoundException('Player not found', ErrorEnum['player/not-found']);
@@ -50,7 +60,14 @@ export class PlayerService {
   async findByGameAndUser(gameId: string, userId: string): Promise<Player | null> {
     const player = await this.playerModel
       .findOne({ game: new Types.ObjectId(gameId), user: new Types.ObjectId(userId) })
-      .populate({ path: 'user', model: User.name })
+      .populate({
+        path: 'user',
+        model: User.name,
+        populate: {
+          path: 'collection',
+          model: Collection.name,
+        },
+      })
       .exec();
 
     return player;

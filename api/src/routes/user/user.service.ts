@@ -54,7 +54,6 @@ export class UserService {
         name: userData?.name || 'Guest',
         email: userData?.email,
         language: userData?.language || 'en',
-        skinCards: userData?.skinCards || '',
         userMetadata: userData?.userMetadata,
         appMetadata: userData?.appMetadata,
       };
