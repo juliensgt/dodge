@@ -15,6 +15,7 @@ export default function PlayerName({
     medium: "text-base",
     large: "text-lg",
     xsmall: "text-xs",
+    xxsmall: "text-xs",
   };
 
   return (

@@ -58,6 +58,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
             setUser(await userService.getUser(userId));
           } catch (error) {
             console.error("Error fetching user data:", error);
+            console.error("Error type:", typeof error);
+            console.error("Error message:", (error as Error).message);
+            console.error("Error stack:", (error as Error).stack);
+            console.error("Full error object:", JSON.stringify(error, null, 2));
             // If user fetch fails, consider user as not authenticated
             setIsAuthenticated(false);
             setUser(null);

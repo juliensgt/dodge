@@ -3,8 +3,13 @@ import { KeyboardResize, KeyboardStyle } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
   appId: "com.dodge.app",
-  appName: "DodgeApp",
+  appName: "Dodge",
   webDir: "app/out",
+  server: {
+    url: "http://192.168.1.8:3000",
+    cleartext: true,
+    allowNavigation: ["192.168.1.8", "localhost"],
+  },
   ios: {
     path: "mobile/ios",
   },

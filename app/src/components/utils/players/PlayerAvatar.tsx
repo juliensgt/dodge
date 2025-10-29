@@ -12,6 +12,7 @@ interface PlayerAvatarProps {
 }
 
 const SIZE_CONFIG = {
+  xxsmall: { avatarSize: 24, fontSize: "text-xs", badgeText: "text-[8px]" },
   xsmall: { avatarSize: 32, fontSize: "text-xs", badgeText: "text-[8px]" },
   small: { avatarSize: 40, fontSize: "text-sm", badgeText: "text-[9px]" },
   medium: { avatarSize: 56, fontSize: "text-lg", badgeText: "text-xs" },

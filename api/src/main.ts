@@ -30,7 +30,7 @@ async function bootstrap() {
     new HttpExceptionFilter(loggerService),
   );
 
-  await app.listen(process.env.API_PORT || 3000);
+  await app.listen(process.env.API_PORT || 3000, '0.0.0.0');
   loggerService.log(`Application is running on: ${await app.getUrl()}`, 'Bootstrap');
 }
 
