@@ -12,9 +12,11 @@ import {
 } from "@/types/game/game.types";
 import { Player } from "@/store/game/types";
 import { useGameStore } from "@/store/game/game";
+import { applyClickabilityForState } from "@/store/cards/clickability.rules";
 import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
 import { Card, CardState } from "@/store/cards/cards.type";
+import { addActionPoints } from "@/services/game/game.setters";
 
 class GameService {
   constructor() {}
@@ -56,6 +58,13 @@ class GameService {
       const gameState = data.gameData!.state as GameState;
       console.log("Game state changed:", gameState);
       game.setGameState(gameState);
+
+      if (gameState === GameState.COUP_OEIL) {
+        addActionPoints(game.options.nbSeeFirstCards || 0);
+      }
+
+      // Apply centralized clickability rules after state change
+      applyClickabilityForState(gameState, useGameStore.getState());
     });
 
     client.on(GameEvents.GAME_STARTED, () => {

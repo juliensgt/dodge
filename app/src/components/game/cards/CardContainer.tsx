@@ -7,7 +7,6 @@ import {
   getOtherPlayersSizes,
   getCardLayouts,
 } from "@/scripts/references/playerLayouts";
-import { useCardSkin } from "@/hooks/useCardSkin";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import PlayerAvatar from "@/components/utils/players/PlayerAvatar";
 import PlayerName from "@/components/utils/players/PlayerName";
@@ -15,6 +14,8 @@ import PlayerPoints from "@/components/utils/players/PlayerPoints";
 import { gameService } from "@/services/game/game.service";
 import { ActionType } from "@/enums/action-type.enum";
 import { useGameStore } from "@/store/game/game";
+import { useCardStore } from "@/store/cards/cards.store";
+import { useCollection } from "@/contexts/CollectionContext";
 
 interface CardContainerProps {
   player: Player;
@@ -55,7 +56,7 @@ export default function CardContainer({
 }: CardContainerProps) {
   const isMobile = useIsMobile();
   const playerClasses = getPlayerClasses(maxPlayers, position, isMobile);
-  const { selectedSkinId } = useCardSkin();
+  const { getCurrentSkin } = useCollection();
   const { choices, currentPlayerId } = useGameStore();
   const isCurrentPlayer = player.id === currentPlayerId;
   // Récupération des tailles selon la position du joueur
@@ -122,9 +123,11 @@ export default function CardContainer({
               <Card
                 cardState={card.cardState}
                 cardValue={card.cardValue}
-                cliquable={isCurrentPlayer}
+                cliquable={useCardStore
+                  .getState()
+                  .isCardCliquable(player.id, index)}
                 size={sizes.card}
-                skinId={selectedSkinId}
+                skinId={getCurrentSkin().id}
                 onClick={() => handleCardClick(index)}
               />
             </div>

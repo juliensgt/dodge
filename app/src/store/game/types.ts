@@ -41,7 +41,6 @@ export interface Player {
     theme: string;
   };
   ready: boolean;
-  actionPoints: number;
 }
 
 export interface Game {
@@ -52,6 +51,7 @@ export interface Game {
   options: GameOptions;
   currentPlayerId: string | undefined;
   playerWhoPlays: Player;
+  actionPoints: number;
   focusMode: boolean;
   actionQueue: ActionQueueItem[];
   currentAction: ActionPlayer;

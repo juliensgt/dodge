@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
 import { Size } from "@/scripts/references/playerLayouts";
@@ -31,6 +31,7 @@ export default function Card({
   className = "",
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const activatedRef = useRef(false);
 
   const sizeClasses = {
     small: "w-16 h-20", // 64px x 80px
@@ -40,10 +41,17 @@ export default function Card({
     xxsmall: "w-8 h-11", // 32px x 44px
   };
 
-  const handleClick = () => {
-    if (cliquable && onClick) {
-      onClick();
-    }
+  const handleActivate = (e?: React.SyntheticEvent) => {
+    if (!cliquable || !onClick) return;
+    if (e) e.preventDefault();
+    // avoid double fire between pointer and click
+    if (activatedRef.current) return;
+    activatedRef.current = true;
+    onClick();
+    // reset flag shortly after
+    setTimeout(() => {
+      activatedRef.current = false;
+    }, 0);
   };
 
   const handleMouseEnter = () => {
@@ -62,12 +70,23 @@ export default function Card({
     );
   }
 
+  const glowClasses = cliquable
+    ? "ring-2 ring-yellow-400/70 shadow-yellow-400/40 shadow-lg animate-pulse rounded-lg"
+    : "";
+
   return (
     <div
-      className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none transition-all duration-200 ${
+      className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none transition-all duration-200 ${glowClasses} ${
         isHovered && cliquable ? "transform scale-105" : ""
       }`}
-      onClick={handleClick}
+      style={{ touchAction: "manipulation" }}
+      role={cliquable ? "button" : undefined}
+      tabIndex={cliquable ? 0 : undefined}
+      onPointerUp={handleActivate}
+      onClick={handleActivate}
+      onKeyDown={(e) =>
+        (e.key === "Enter" || e.key === " ") && handleActivate(e)
+      }
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

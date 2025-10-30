@@ -36,8 +36,8 @@ const useGameStore = create<GameStore>((set, get, store) => {
         theme: "purple",
       },
       ready: false,
-      actionPoints: 0,
     },
+    actionPoints: 0,
     focusMode: false,
     actionQueue: [],
     currentAction: {
