@@ -1,11 +1,17 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface CyberSkinProps {
   size?: Size;
 }
 
 export default function CyberSkin({ size = "small" }: CyberSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -75,7 +81,7 @@ export default function CyberSkin({ size = "small" }: CyberSkinProps) {
         <div className="relative">
           {/* Glow externe */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-cyan-400 opacity-60`}
+            className={`absolute ${textSizeClass} font-black text-cyan-400 opacity-60`}
             style={{
               textShadow:
                 "0 0 16px #00ffcc, 0 0 32px #00ffcc, 0 0 48px #fff, 0 0 64px #00ffcc",
@@ -83,17 +89,17 @@ export default function CyberSkin({ size = "small" }: CyberSkinProps) {
               fontFamily: "'Orbitron', sans-serif",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-white`}
+            className={`relative ${textSizeClass} font-black text-white`}
             style={{
               textShadow: "0 0 8px #00ffcc, 0 0 16px #fff, 0 0 32px #00ffcc",
               fontFamily: "'Orbitron', sans-serif",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

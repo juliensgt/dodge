@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
 import { Size } from "@/scripts/references/playerLayouts";
+import { useCollection } from "@/contexts/CollectionContext";
 
 export enum CardState {
   CARD_BACK = "CARD_BACK",
@@ -32,11 +33,14 @@ export default function Card({
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const activatedRef = useRef(false);
+  const { getCurrentTheme } = useCollection();
+  const theme = getCurrentTheme();
+  const glowHex = theme.getGlowHex();
 
   const sizeClasses = {
-    small: "w-16 h-20", // 64px x 80px
-    medium: "w-20 h-28", // 80px x 112px
     large: "w-24 h-32", // 96px x 128px
+    medium: "w-20 h-28", // 80px x 112px
+    small: "w-16 h-20", // 64px x 80px
     xsmall: "w-10 h-14", // 40px x 56px
     xxsmall: "w-8 h-11", // 32px x 44px
   };
@@ -70,16 +74,24 @@ export default function Card({
     );
   }
 
-  const glowClasses = cliquable
-    ? "ring-2 ring-yellow-400/70 shadow-yellow-400/40 shadow-lg animate-pulse rounded-lg"
-    : "";
+  const glowClasses = cliquable ? "rounded-lg border-2" : "";
+  const baseGlowShadow = `0 0 12px ${glowHex}80`;
+  const hoverGlowShadow = `0 0 16px ${glowHex}B3`;
 
   return (
     <div
       className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none transition-all duration-200 ${glowClasses} ${
         isHovered && cliquable ? "transform scale-105" : ""
       }`}
-      style={{ touchAction: "manipulation" }}
+      style={{
+        touchAction: "manipulation",
+        borderColor: cliquable ? glowHex : undefined,
+        boxShadow: cliquable
+          ? isHovered
+            ? hoverGlowShadow
+            : baseGlowShadow
+          : undefined,
+      }}
       role={cliquable ? "button" : undefined}
       tabIndex={cliquable ? 0 : undefined}
       onPointerUp={handleActivate}

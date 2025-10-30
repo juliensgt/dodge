@@ -55,6 +55,10 @@ export const NeonTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.NEON;
   },
+  getGlowHex(): string {
+    // Hot pink to contrast neon green/blue
+    return "#ec4899";
+  },
 };
 
 // Export par défaut pour compatibilité

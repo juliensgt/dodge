@@ -6,7 +6,11 @@ import {
   faTriangleExclamation,
   faCircleExclamation,
   faCode,
+  faMobileScreen,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import { useGameStore } from "@/store/game/game";
+import { Player } from "@/store/game/types";
 
 type LogLevel = "log" | "info" | "warn" | "error";
 
@@ -23,6 +27,15 @@ export default function AdminTab() {
   const [filter, setFilter] = useState<LogLevel | "all">("all");
   const logsEndRef = useRef<HTMLDivElement>(null);
   const logIdCounter = useRef(0);
+
+  // Simulation layout mobile
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulatedPlayerCount, setSimulatedPlayerCount] = useState(2);
+  const originalStateRef = useRef<{
+    maxPlayers: number;
+    players: Player[];
+  } | null>(null);
+  const { options, players, setOptions, setPlayers } = useGameStore();
 
   useEffect(() => {
     // Store original console methods
@@ -93,6 +106,20 @@ export default function AdminTab() {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
+  // Cleanup: restaurer l'état original quand le composant est démonté
+  useEffect(() => {
+    return () => {
+      if (originalStateRef.current) {
+        setOptions({
+          ...options,
+          maxPlayers: originalStateRef.current.maxPlayers,
+        });
+        setPlayers(originalStateRef.current.players);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const clearLogs = () => {
     setLogs([]);
   };
@@ -135,6 +162,65 @@ export default function AdminTab() {
     }
   };
 
+  // Fonction pour démarrer la simulation
+  const startSimulation = () => {
+    // Sauvegarder l'état original
+    originalStateRef.current = {
+      maxPlayers: options.maxPlayers,
+      players: [...players],
+    };
+
+    // Créer des joueurs fictifs si nécessaire
+    const currentPlayerCount = players.length;
+    const neededPlayers = simulatedPlayerCount;
+    const mockPlayers: Player[] = [];
+
+    if (currentPlayerCount < neededPlayers) {
+      // Utiliser les joueurs existants
+      const existingPlayers = [...players];
+
+      // Créer des joueurs fictifs pour compléter
+      for (let i = currentPlayerCount; i < neededPlayers; i++) {
+        mockPlayers.push({
+          id: `simulated-player-${i}`,
+          name: `Joueur ${i + 1}`,
+          points: 50 + i * 10,
+          currentTime: 0,
+          collection: {
+            skin: "default",
+            theme: "purple",
+          },
+          ready: false,
+        });
+      }
+
+      // Combiner les joueurs existants et fictifs
+      const allPlayers = [...existingPlayers, ...mockPlayers];
+      setPlayers(allPlayers);
+    }
+
+    // Modifier maxPlayers
+    setOptions({
+      ...options,
+      maxPlayers: simulatedPlayerCount,
+    });
+
+    setIsSimulating(true);
+  };
+
+  // Fonction pour arrêter la simulation et restaurer l'état
+  const stopSimulation = () => {
+    if (originalStateRef.current) {
+      setOptions({
+        ...options,
+        maxPlayers: originalStateRef.current.maxPlayers,
+      });
+      setPlayers(originalStateRef.current.players);
+      originalStateRef.current = null;
+    }
+    setIsSimulating(false);
+  };
+
   const filteredLogs = logs.filter(
     (log) => filter === "all" || log.level === filter
   );
@@ -158,6 +244,60 @@ export default function AdminTab() {
           <FontAwesomeIcon icon={faTrash} />
           Clear
         </button>
+      </div>
+
+      {/* Section Simulation Layout Mobile */}
+      <div className="p-3 bg-[#1f1f1f] border-b border-gray-700">
+        <div className="flex items-center gap-2 mb-2">
+          <FontAwesomeIcon
+            icon={faMobileScreen}
+            className="text-[var(--text-color)]"
+          />
+          <h3 className="text-sm font-semibold text-[var(--text-color)]">
+            Simulation Layout Mobile
+          </h3>
+          {isSimulating && (
+            <span className="px-2 py-0.5 text-xs rounded bg-yellow-600 text-white">
+              ACTIVE
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={simulatedPlayerCount}
+            onChange={(e) => setSimulatedPlayerCount(Number(e.target.value))}
+            disabled={isSimulating}
+            className="px-3 py-1 text-xs rounded bg-[#2a2a2a] text-[var(--text-color)] border border-gray-600 hover:bg-[#333333] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {[2, 3, 4, 5, 6].map((count) => (
+              <option key={count} value={count}>
+                {count} joueurs
+              </option>
+            ))}
+          </select>
+          {!isSimulating ? (
+            <button
+              onClick={startSimulation}
+              className="px-3 py-1 text-xs rounded bg-[var(--secondary-color)] hover:bg-[var(--secondary-color)]/80 text-white transition-colors flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faMobileScreen} />
+              Démarrer simulation
+            </button>
+          ) : (
+            <button
+              onClick={stopSimulation}
+              className="px-3 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faRotateLeft} />
+              Réinitialiser
+            </button>
+          )}
+        </div>
+        {isSimulating && (
+          <p className="text-xs text-yellow-400 mt-2">
+            Simulation active : {simulatedPlayerCount} joueurs configurés
+          </p>
+        )}
       </div>
 
       {/* Filter buttons */}

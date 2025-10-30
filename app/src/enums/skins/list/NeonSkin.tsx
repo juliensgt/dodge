@@ -1,11 +1,19 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  getCardShadowTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface NeonSkinProps {
   size?: Size;
 }
 
 export default function NeonSkin({ size = "small" }: NeonSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
+  const shadowTextSizeClass = getCardShadowTextSizeClass(isSmall);
 
   return (
     <div
@@ -50,7 +58,7 @@ export default function NeonSkin({ size = "small" }: NeonSkinProps) {
         <div className="relative">
           {/* Glow externe */}
           <div
-            className={`absolute ${isSmall ? "text-4xl" : "text-xl"} font-black text-black/75 opacity-50`}
+            className={`absolute ${shadowTextSizeClass} font-black text-black/75 opacity-50`}
             style={{
               textShadow:
                 "0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff",
@@ -58,18 +66,18 @@ export default function NeonSkin({ size = "small" }: NeonSkinProps) {
               animation: "neonGlow 2s ease-in-out infinite alternate",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-black/75`}
+            className={`relative ${textSizeClass} font-black text-black/75`}
             style={{
               textShadow:
                 "0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff",
               filter: "drop-shadow(0 0 5px #00ffff)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

@@ -55,6 +55,10 @@ export const OceanTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.OCEAN;
   },
+  getGlowHex(): string {
+    // Warm amber contrasts well on blue/cyan
+    return "#fbbf24";
+  },
 };
 
 // Export par défaut pour compatibilité

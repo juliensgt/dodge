@@ -6,7 +6,6 @@ import {
   getDeckContainerClasses,
 } from "@/scripts/references/playerLayouts";
 import { getMobilePlayerLayout } from "@/scripts/references/mobilePlayerLayouts";
-import GameVersion from "@/components/utils/GameVersion";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import AnimatedBanner from "@/components/utils/animations/AnimatedBanner";
 import { useEffect } from "react";
@@ -15,7 +14,7 @@ export default function InGameBoard() {
   const { getPlayers, options, playerTimer, playerWhoPlays } = useGameStore();
   const isMobile = useIsMobile();
   const nbPlayers = options.maxPlayers;
-
+  const round = useGameStore((state) => state.round);
   const playerLayout = isMobile
     ? getMobilePlayerLayout(nbPlayers)
     : getPlayerLayout(nbPlayers);
@@ -45,13 +44,28 @@ export default function InGameBoard() {
             />
           );
         })}
-
+        {!isMobile ? (
+          <div className="absolute top-[36vh] left-0 right-0 w-full text-center">
+            <span
+              className={`text-white/95 ${isMobile ? "text-lg" : "text-2xl"} font-lucky`}
+            >
+              Manche {round}
+            </span>
+          </div>
+        ) : (
+          <div className="absolute top-0 left-0 right-0 w-full text-center pt-2">
+            <span
+              className={`text-white/95 ${isMobile ? "text-lg" : "text-2xl"} font-lucky`}
+            >
+              Manche {round}
+            </span>
+          </div>
+        )}
         <DeckContainer
           className={getDeckContainerClasses(nbPlayers, isMobile)}
         />
       </div>
 
-      <GameVersion />
       <AnimatedBanner />
     </div>
   );

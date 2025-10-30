@@ -9,6 +9,24 @@ import BarbieSkin from "./list/BarbieSkin";
 import { CardSkinRarity } from "./SkinRarity";
 import { Size } from "@/scripts/references/playerLayouts";
 
+// Texte affiché sur les cartes
+export const CARD_TEXT = "D";
+
+// Fonction pour déterminer si une carte est petite
+export function isSmallCard(size?: Size): boolean {
+  return size === "small" || size === "xsmall" || size === "xxsmall";
+}
+
+// Fonction pour obtenir la classe de taille de texte principale
+export function getCardTextSizeClass(isSmall: boolean): string {
+  return isSmall ? "text-3xl" : "text-5xl";
+}
+
+// Fonction pour obtenir la classe de taille de texte pour l'ombre (légèrement plus grande)
+export function getCardShadowTextSizeClass(isSmall: boolean): string {
+  return isSmall ? "text-3xl" : "text-5xl";
+}
+
 export interface CardSkin {
   id: string;
   type: "skin" | "theme";

@@ -1,11 +1,19 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  getCardShadowTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface BarbieSkinProps {
   size?: Size;
 }
 
 export default function BarbieSkin({ size = "small" }: BarbieSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
+  const shadowTextSizeClass = getCardShadowTextSizeClass(isSmall);
 
   return (
     <div
@@ -51,24 +59,24 @@ export default function BarbieSkin({ size = "small" }: BarbieSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${isSmall ? "text-4xl" : "text-xl"} font-black text-pink-300 opacity-60`}
+            className={`absolute ${shadowTextSizeClass} font-black text-pink-300 opacity-60`}
             style={{
               textShadow: "4px 4px 0 #fff, 8px 8px 0 #ff69b4",
               fontFamily: "'Pacifico', cursive",
               transform: "translate(3px, 3px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-4xl" : "text-xl"} font-black text-pink-600`}
+            className={`relative ${textSizeClass} font-black text-pink-600`}
             style={{
               textShadow: "2px 2px 0 #fff, 4px 4px 0 #ffb6e9",
               fontFamily: "'Pacifico', cursive",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

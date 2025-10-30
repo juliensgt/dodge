@@ -45,4 +45,6 @@ export interface ITheme {
   getGradient(gradientType: string, direction?: GradientDirection): string;
   getGradientHover(gradientType: string, direction?: GradientDirection): string;
   getThemeType(): ThemeType;
+  // New: strong accent color for glows/high-contrast borders
+  getGlowHex(): string;
 }

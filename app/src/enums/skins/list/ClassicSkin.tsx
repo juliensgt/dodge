@@ -1,11 +1,17 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface ClassicSkinProps {
   size?: Size;
 }
 
 export default function ClassicSkin({ size = "small" }: ClassicSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -33,24 +39,24 @@ export default function ClassicSkin({ size = "small" }: ClassicSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-200 opacity-40`}
+            className={`absolute ${textSizeClass} font-black text-yellow-200 opacity-40`}
             style={{
               textShadow: "3px 3px 6px rgba(0,0,0,0.5)",
               transform: "translate(3px, 3px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-100`}
+            className={`relative ${textSizeClass} font-black text-yellow-100`}
             style={{
               textShadow:
                 "1px 1px 2px rgba(0,0,0,0.8), 0 0 10px rgba(255,215,0,0.3)",
               filter: "drop-shadow(0 0 5px rgba(255,215,0,0.5))",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

@@ -55,6 +55,10 @@ export const MonochromeTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.MONOCHROME;
   },
+  getGlowHex(): string {
+    // Amber stands out on grayscale
+    return "#f59e0b";
+  },
 };
 
 // Export par défaut pour compatibilité

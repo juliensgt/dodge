@@ -1,11 +1,17 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface GalaxySkinProps {
   size?: Size;
 }
 
 export default function GalaxySkin({ size = "small" }: GalaxySkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -37,23 +43,23 @@ export default function GalaxySkin({ size = "small" }: GalaxySkinProps) {
         <div className="relative">
           {/* Glow externe */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-indigo-300 opacity-60`}
+            className={`absolute ${textSizeClass} font-black text-indigo-300 opacity-60`}
             style={{
               textShadow:
                 "0 0 16px #a18fff, 0 0 32px #4e54c8, 0 0 48px #fff, 0 0 64px #a18fff",
               transform: "translate(3px, 3px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-white`}
+            className={`relative ${textSizeClass} font-black text-white`}
             style={{
               textShadow: "0 0 8px #a18fff, 0 0 16px #fff, 0 0 32px #4e54c8",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

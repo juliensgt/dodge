@@ -1,4 +1,3 @@
-import { getCardSkin } from "../../../../enums/skins/SkinManager";
 import { useCardSkin } from "../../../../hooks/useCardSkin";
 import { Size } from "@/scripts/references/playerLayouts";
 
@@ -8,10 +7,8 @@ interface CardBackProps {
 }
 
 export default function CardBack({ size = "small", skinId }: CardBackProps) {
-  const { selectedSkinId } = useCardSkin();
-  const actualSkinId = skinId || selectedSkinId;
-  const skin = getCardSkin(actualSkinId);
-  const SkinComponent = skin.component;
+  const { getSkin } = useCardSkin();
+  const skin = getSkin(skinId || "default");
 
-  return <SkinComponent size={size} />;
+  return <skin.component size={size} />;
 }

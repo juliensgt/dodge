@@ -55,6 +55,10 @@ export const SunsetTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.SUNSET;
   },
+  getGlowHex(): string {
+    // Cyan glow pops against warm sunset tones
+    return "#22d3ee";
+  },
 };
 
 // Export par défaut pour compatibilité

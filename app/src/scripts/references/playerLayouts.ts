@@ -5,6 +5,9 @@ import { getMobilePlayerLayout } from "./mobilePlayerLayouts";
 
 export type Size = "xxsmall" | "xsmall" | "small" | "medium" | "large";
 
+export type ProfileLayout = "default" | "inline"; // default: normal, inline: nom/points sur même ligne
+export type ProfilePosition = "before" | "after"; // before: avant les cartes, after: après les cartes
+
 export type PlayerLayout = {
   container: string; // Classes CSS pour le conteneur principal
   positions: string[]; // Classes CSS pour chaque position de joueur
@@ -13,6 +16,16 @@ export type PlayerLayout = {
   cardLayouts: {
     mainPlayer: string; // Classes CSS pour le layout des cartes du joueur principal
     otherPlayers: string; // Classes CSS pour le layout des cartes des autres joueurs
+  };
+  profileLayouts?: {
+    mainPlayer?: {
+      layout?: ProfileLayout; // Layout du profil pour le joueur principal
+      position?: ProfilePosition; // Position du profil (before/after cards)
+    };
+    otherPlayers?: {
+      layout?: ProfileLayout; // Layout du profil pour les autres joueurs
+      position?: ProfilePosition; // Position du profil (before/after cards)
+    };
   };
   sizes: {
     mainPlayer: {
@@ -35,30 +48,30 @@ export type PlayerLayout = {
 
 export const playerLayouts: Record<number, PlayerLayout> = {
   2: {
-    container: "grid grid-cols-3 grid-rows-3 gap-4 h-full w-full p-8",
+    container: "grid grid-cols-3 grid-rows-3 gap-4 h-full w-full p-4",
     positions: [
-      "col-start-2 row-start-3 flex items-center justify-center", // Joueur 1 (joueur courant - bas)
-      "col-start-2 row-start-1 flex items-center justify-center", // Joueur 2 (haut-milieu)
+      "col-start-2 row-start-3 flex items-center justify-center", // Joueur 1 (joueur courant - bas, ne change jamais)
+      "col-start-2 row-start-1 flex items-start justify-center", // Joueur 2 (haut-milieu, collé en haut)
     ],
-    profileAlignments: ["justify-center", "justify-start"],
+    profileAlignments: ["justify-start", "justify-start"],
     deckContainer:
       "flex items-center justify-center gap-4 col-start-2 row-start-2",
     cardLayouts: {
       mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "grid grid-cols-2 gap-2 w-fit",
+      otherPlayers: "flex gap-2 w-fit", // 4 cartes en ligne pour l'autre joueur
     },
     sizes: {
       mainPlayer: {
-        card: "large",
+        card: "medium",
         avatar: "medium",
         name: "medium",
         points: "medium",
       },
       otherPlayers: {
         card: "medium",
-        avatar: "small",
-        name: "small",
-        points: "small",
+        avatar: "medium",
+        name: "medium",
+        points: "medium",
       },
       deck: {
         card: "large",
@@ -282,4 +295,36 @@ export function getOtherPlayersSizes(
 export function getDeckSizes(numPlayers: number, isMobile: boolean = false) {
   const sizes = getElementSizes(numPlayers, isMobile);
   return sizes.deck;
+}
+
+// Fonction utilitaire pour obtenir le layout du profil
+export function getProfileLayout(
+  numPlayers: number,
+  position: number,
+  isMobile: boolean = false
+): "default" | "inline" {
+  const layout = isMobile
+    ? getMobilePlayerLayout(numPlayers)
+    : getPlayerLayout(numPlayers);
+  const isMainPlayer = position === 0;
+  const profileConfig = isMainPlayer
+    ? layout.profileLayouts?.mainPlayer
+    : layout.profileLayouts?.otherPlayers;
+  return profileConfig?.layout || "default";
+}
+
+// Fonction utilitaire pour obtenir la position du profil
+export function getProfilePosition(
+  numPlayers: number,
+  position: number,
+  isMobile: boolean = false
+): "before" | "after" {
+  const layout = isMobile
+    ? getMobilePlayerLayout(numPlayers)
+    : getPlayerLayout(numPlayers);
+  const isMainPlayer = position === 0;
+  const profileConfig = isMainPlayer
+    ? layout.profileLayouts?.mainPlayer
+    : layout.profileLayouts?.otherPlayers;
+  return profileConfig?.position || (isMainPlayer ? "after" : "before");
 }

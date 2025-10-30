@@ -55,6 +55,10 @@ export const ForestTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.FOREST;
   },
+  getGlowHex(): string {
+    // Bright lime for contrast on dark greens
+    return "#a3e635";
+  },
 };
 
 // Export par défaut pour compatibilité

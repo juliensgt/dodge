@@ -1,11 +1,17 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface PixelArtSkinProps {
   size?: Size;
 }
 
 export default function PixelArtSkin({ size = "small" }: PixelArtSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -34,24 +40,24 @@ export default function PixelArtSkin({ size = "small" }: PixelArtSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-700 opacity-40`}
+            className={`absolute ${textSizeClass} font-black text-yellow-700 opacity-40`}
             style={{
               textShadow: "2px 2px 0 #bfae6a, 4px 4px 0 #fffbe6",
               fontFamily: "'Press Start 2P', monospace",
               transform: "translate(2px, 2px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-yellow-900`}
+            className={`relative ${textSizeClass} font-black text-yellow-900`}
             style={{
               textShadow: "1px 1px 0 #fffbe6, 2px 2px 0 #bfae6a",
               fontFamily: "'Press Start 2P', monospace",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

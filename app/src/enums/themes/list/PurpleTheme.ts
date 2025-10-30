@@ -55,6 +55,10 @@ export const PurpleTheme: ITheme = {
   getThemeType(): ThemeType {
     return ThemeType.PURPLE;
   },
+  getGlowHex(): string {
+    // High-contrast amber over purple
+    return "#f59e0b";
+  },
 };
 
 // Export par défaut pour compatibilité

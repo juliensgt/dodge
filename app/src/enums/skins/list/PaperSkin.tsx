@@ -1,11 +1,17 @@
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface PaperSkinProps {
   size?: Size;
 }
 
 export default function PaperSkin({ size = "small" }: PaperSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -48,24 +54,24 @@ export default function PaperSkin({ size = "small" }: PaperSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-gray-400 opacity-50`}
+            className={`absolute ${textSizeClass} font-black text-gray-400 opacity-50`}
             style={{
               textShadow: "2px 2px 0 #e0e0c0",
               fontFamily: "'Indie Flower', cursive",
               transform: "translate(2px, 2px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-gray-700`}
+            className={`relative ${textSizeClass} font-black text-gray-700`}
             style={{
               textShadow: "1px 1px 0 #fff, 2px 2px 0 #e0e0c0",
               fontFamily: "'Indie Flower', cursive",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>

@@ -1,13 +1,19 @@
 import { GradientType } from "@/enums/themes/list/PurpleTheme";
 import { useGradient } from "@/hooks/useGradient";
 import { Size } from "@/scripts/references/playerLayouts";
+import {
+  isSmallCard,
+  getCardTextSizeClass,
+  CARD_TEXT,
+} from "@/enums/skins/SkinManager";
 
 interface DefaultSkinProps {
   size?: Size;
 }
 
 export default function DefaultSkin({ size = "small" }: DefaultSkinProps) {
-  const isSmall = size === "small" || size === "xsmall" || size === "xxsmall";
+  const isSmall = isSmallCard(size);
+  const textSizeClass = getCardTextSizeClass(isSmall);
 
   return (
     <div
@@ -18,24 +24,24 @@ export default function DefaultSkin({ size = "small" }: DefaultSkinProps) {
         <div className="relative">
           {/* Ombre de la lettre */}
           <div
-            className={`absolute ${isSmall ? "text-3xl" : "text-lg"} font-black text-white opacity-30`}
+            className={`absolute ${textSizeClass} font-black text-white opacity-30`}
             style={{
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
               transform: "translate(2px, 2px)",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
           {/* Lettre principale */}
           <div
-            className={`relative ${isSmall ? "text-3xl" : "text-lg"} font-black text-white`}
+            className={`relative ${textSizeClass} font-black text-white`}
             style={{
               textShadow:
                 "0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.3)",
               filter: "drop-shadow(0 0 10px rgba(255,255,255,0.8))",
             }}
           >
-            {isSmall ? "D" : "DODGE"}
+            {CARD_TEXT}
           </div>
         </div>
       </div>
