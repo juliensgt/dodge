@@ -1,7 +1,7 @@
 export class CollectionDto {
   id: string;
   userId: string;
-  selectedCollection: {
+  collection: {
     skin: string;
     theme: string;
   };

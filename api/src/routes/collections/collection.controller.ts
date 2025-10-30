@@ -18,7 +18,7 @@ export class CollectionController {
     return {
       id: collection._id.toString(),
       userId: user._id.toString(),
-      selectedCollection: collection.selectedCollection,
+      collection: collection.collection,
       ownedSkins: collection.ownedSkins,
       ownedThemes: collection.ownedThemes,
       createdAt: collection.createdAt,
@@ -36,7 +36,7 @@ export class CollectionController {
     return {
       id: collection._id.toString(),
       userId: user._id.toString(),
-      selectedCollection: collection.selectedCollection,
+      collection: collection.collection,
       ownedSkins: collection.ownedSkins,
       ownedThemes: collection.ownedThemes,
       createdAt: collection.createdAt,

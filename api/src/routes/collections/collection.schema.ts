@@ -17,7 +17,7 @@ export class Collection {
     },
     default: { skin: 'default', theme: 'purple' },
   })
-  selectedCollection: {
+  collection: {
     skin: string;
     theme: string;
   };

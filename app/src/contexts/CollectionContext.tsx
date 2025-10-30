@@ -49,8 +49,8 @@ export function CollectionProvider({ children }: CollectionProviderProps) {
 
       try {
         const collection = await collectionService.getCollection();
-        setCurrentTheme(collection?.selectedCollection?.theme as ThemeType);
-        setCurrentSkin(collection?.selectedCollection?.skin);
+        setCurrentTheme(collection?.collection?.theme as ThemeType);
+        setCurrentSkin(collection?.collection?.skin);
       } catch (error) {
         console.error("Error loading collection:", error);
       }

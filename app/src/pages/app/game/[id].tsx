@@ -63,23 +63,10 @@ export default function Game() {
     };
   }, [router.events]);
 
-  // Show loading state while joining or if there's an error
-  if (isLoading) {
-    return (
-      <div
-        className={`w-full min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} flex items-center justify-center`}
-      >
-        <div className="text-white text-xl">
-          {t("Connexion à la partie...")}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <AuthGuard level={AuthLevel.USER}>
       <div
-        className={`w-full min-h-screen ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} relative`}
+        className={`w-full h-screen overflow-hidden ${getGradient(GradientType.BACKGROUND_MAIN, "to-br")} relative`}
       >
         <BoardGame />
       </div>

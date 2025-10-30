@@ -1,7 +1,7 @@
 import { IsOptional, IsObject, IsString, IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class SelectedCollectionDto {
+class CollectionDto {
   @IsOptional()
   @IsString()
   skin?: string;
@@ -31,8 +31,8 @@ export class UpdateCollectionDto {
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => SelectedCollectionDto)
-  selectedCollection?: SelectedCollectionDto;
+  @Type(() => CollectionDto)
+  collection?: CollectionDto;
 
   @IsOptional()
   @IsArray()

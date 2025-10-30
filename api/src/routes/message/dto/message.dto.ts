@@ -22,7 +22,7 @@ export class MessageDto {
       placeholderPlayer.name = 'Unknown Player';
       placeholderPlayer.points = 0;
       placeholderPlayer.currentTime = 0;
-      placeholderPlayer.selectedCollection = { skin: 'default', theme: 'purple' };
+      placeholderPlayer.collection = { skin: 'default', theme: 'purple' };
       dto.player = placeholderPlayer;
     }
     dto.message = message.message;

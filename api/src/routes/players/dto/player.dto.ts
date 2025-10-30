@@ -7,7 +7,7 @@ export class PlayerDto {
   name: string;
   points: number;
   currentTime: number;
-  selectedCollection: {
+  collection: {
     skin: string;
     theme: string;
   };
@@ -18,7 +18,7 @@ export class PlayerDto {
     dto.id = player._id.toString();
     if (user) {
       dto.name = user.name;
-      dto.selectedCollection = user?.collection?.selectedCollection || {
+      dto.collection = user?.collection?.collection || {
         skin: 'default',
         theme: 'purple',
       };

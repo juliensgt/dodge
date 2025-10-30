@@ -15,7 +15,7 @@ export class CollectionService {
     if (!collection) {
       collection = new this.collectionModel({
         user: userObjectId,
-        selectedCollection: {
+        collection: {
           skin: 'default',
           theme: 'purple',
         },
@@ -34,32 +34,25 @@ export class CollectionService {
   }
 
   async updateEquipped(userId: string, skinId?: string, themeId?: string): Promise<Collection> {
-    const collection = await this.findOrCreate(userId);
-    const updateData: Partial<{ selectedCollection: { skin?: string; theme?: string } }> = {};
+    const collectionActual = await this.findOrCreate(userId);
+    const updateData: Partial<{ collection: { skin?: string; theme?: string } }> = {};
 
     if (skinId !== undefined) {
-      updateData.selectedCollection = {
-        ...collection.selectedCollection,
+      updateData.collection = {
+        ...collectionActual.collection,
         skin: skinId,
       };
     }
 
     if (themeId !== undefined) {
-      updateData.selectedCollection = {
-        ...collection.selectedCollection,
+      updateData.collection = {
+        ...collectionActual.collection,
         theme: themeId,
       };
     }
 
-    if (updateData.selectedCollection) {
-      collection.selectedCollection = {
-        ...collection.selectedCollection,
-        ...updateData.selectedCollection,
-      };
-    }
-
-    collection.updatedAt = new Date();
-    return collection.save();
+    collectionActual.updatedAt = new Date();
+    return collectionActual.save();
   }
 
   async addFragments(
@@ -93,27 +86,26 @@ export class CollectionService {
   }
 
   async update(userId: string, updateData: UpdateCollectionDto): Promise<Collection> {
-    const collection = await this.findOrCreate(userId);
+    const collectionActual = await this.findOrCreate(userId);
 
-    if (updateData.selectedCollection) {
-      // Only update properties that are explicitly provided
-      if (updateData.selectedCollection.skin !== undefined) {
-        collection.selectedCollection.skin = updateData.selectedCollection.skin;
+    if (updateData.collection) {
+      if (updateData.collection.skin !== undefined) {
+        collectionActual.collection.skin = updateData.collection.skin;
       }
-      if (updateData.selectedCollection.theme !== undefined) {
-        collection.selectedCollection.theme = updateData.selectedCollection.theme;
+      if (updateData.collection.theme !== undefined) {
+        collectionActual.collection.theme = updateData.collection.theme;
       }
     }
 
     if (updateData.ownedSkins) {
-      collection.ownedSkins = updateData.ownedSkins;
+      collectionActual.ownedSkins = updateData.ownedSkins;
     }
 
     if (updateData.ownedThemes) {
-      collection.ownedThemes = updateData.ownedThemes;
+      collectionActual.ownedThemes = updateData.ownedThemes;
     }
 
-    collection.updatedAt = new Date();
-    return collection.save();
+    collectionActual.updatedAt = new Date();
+    return collectionActual.save();
   }
 }

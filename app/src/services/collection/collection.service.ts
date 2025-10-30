@@ -3,7 +3,7 @@ import { httpService } from "../http/http.service";
 export interface Collection {
   id: string;
   userId: string;
-  selectedCollection: {
+  collection: {
     skin: string;
     theme: string;
   };
@@ -14,7 +14,7 @@ export interface Collection {
 }
 
 export interface UpdateCollectionDto {
-  selectedCollection?: {
+  collection?: {
     skin?: string;
     theme?: string;
   };
@@ -30,12 +30,12 @@ class CollectionService {
     const updateData: UpdateCollectionDto = {};
 
     if (skinId !== undefined || themeId !== undefined) {
-      updateData.selectedCollection = {};
+      updateData.collection = {};
       if (skinId !== undefined) {
-        updateData.selectedCollection.skin = skinId;
+        updateData.collection.skin = skinId;
       }
       if (themeId !== undefined) {
-        updateData.selectedCollection.theme = themeId;
+        updateData.collection.theme = themeId;
       }
     }
 

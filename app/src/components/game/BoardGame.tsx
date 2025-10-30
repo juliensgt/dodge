@@ -19,7 +19,9 @@ export default function BoardGame() {
         <MobileSidebarButton isOpen={false} onToggle={handleSidebarToggle} />
       )}
 
-      <div className={`flex flex-row gap-2.5 p-2.5 h-full`}>
+      <div
+        className={`flex flex-row gap-2.5 ${isMobile ? "" : "p-2.5"} h-full`}
+      >
         <div className="flex flex-1 min-w-0">
           <Board />
         </div>

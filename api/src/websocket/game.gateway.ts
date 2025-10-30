@@ -28,6 +28,7 @@ import { MessageDto } from 'src/routes/message/dto/message.dto';
 import { PlayerService } from 'src/routes/players/player.service';
 import { GameState } from 'src/enums/game-state.enum';
 import { WsExceptionFilter, WsAllExceptionsFilter } from 'src/common/filters/ws-exception.filter';
+import { User } from 'src/routes/user/user.schema';
 
 @WebSocketGateway({
   cors: {
@@ -118,9 +119,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       client.data.playerId = response.playerData!._id.toString();
 
       // Send the player data to the client
+      // Use player.user instead of user to ensure collection is populated
+      const playerUser = response.playerData!.user as User & { collection?: any };
       socketService.broadcastToGame(gameId, GameEvents.PLAYER_JOINED, {
         gameData: GameDto.fromGame(response.gameData!),
-        playerData: PlayerDto.fromPlayer(response.playerData!, user),
+        playerData: PlayerDto.fromPlayer(response.playerData!, playerUser),
       });
 
       // If the game is full, change the game state to STARTED
