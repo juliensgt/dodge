@@ -18,33 +18,33 @@ export default function TipsCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTipIndex((prev) => (prev + 1) % tips.length);
-    }, 3000); // Change tip every 3 seconds
+    }, 5000); // Change tip every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl ${isMobile ? "mx-4" : "mx-4 my-2"}`}
+      className={`relative overflow-hidden rounded-2xl ${isMobile ? "mx-2" : "mx-4 my-2"}`}
     >
-      {/* Clash Royale style border effects - same as BattlePassCard */}
+      {/* Borders effects */}
       <div className="absolute inset-0 rounded-2xl border-2 border-yellow-300/60"></div>
       <div className="absolute inset-1 rounded-xl border border-yellow-200/40"></div>
 
       {/* Content container */}
-      <div className={`relative z-10 ${isMobile ? "p-3" : "p-4"}`}>
+      <div className={`relative z-10 ${isMobile ? "p-2" : "p-4"}`}>
         {/* Background pattern */}
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-orange-500/15 to-yellow-400/20 rounded-2xl"></div>
 
         {/* Title */}
         <div className="text-center mb-2">
           <span
-            className={`text-yellow-200 ${isMobile ? "text-xs" : "text-sm"} font-bold uppercase tracking-wider drop-shadow-lg`}
+            className={`text-yellow-200 ${isMobile ? "text-xl" : "text-2xl"} font-passionone font-bold uppercase tracking-wider drop-shadow-lg`}
             style={{
               textShadow: "0 0 10px rgba(254, 240, 138, 0.5)",
             }}
           >
-            💡 Conseils
+            Conseils
           </span>
         </div>
 
@@ -62,7 +62,7 @@ export default function TipsCarousel() {
               className="text-center"
             >
               <span
-                className={`text-yellow-100 ${isMobile ? "text-xs" : "text-sm"} font-medium drop-shadow-lg`}
+                className={`text-yellow-100 ${isMobile ? "text-xs" : "text-lg"} leading-snug font-medium drop-shadow-lg`}
               >
                 {tips[currentTipIndex]}
               </span>

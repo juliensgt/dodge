@@ -12,14 +12,14 @@ export default function CoinsCounter() {
     router.push("/shop");
   };
   return (
-    <div className="flex items-center relative">
+    <div className="flex items-center relative pt-1">
       <Counter value={playerStats.coins} onClick={handleIncrement} />
       {/* Coins Logo */}
       <Image
         src="/images/icons/coins.png"
         alt="Coins"
-        width={isMobile ? 25 : 35}
-        height={isMobile ? 25 : 35}
+        width={isMobile ? 30 : 35}
+        height={isMobile ? 30 : 35}
         className={`absolute ${isMobile ? "-right-4" : "-right-4"} drop-shadow-lg rotate-45 z-0`}
       />
     </div>

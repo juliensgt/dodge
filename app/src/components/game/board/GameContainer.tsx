@@ -42,17 +42,10 @@ export default function GameContainer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{
-              duration: 0.2,
-            }}
-            className="absolute inset-0"
+            transition={{ duration: 0.2 }}
+            className="h-full w-full"
           >
-            <div
-              className="h-full w-full overflow-y-auto scrollbar-hide"
-              style={{ touchAction: "pan-y" }}
-            >
-              {activeTab.content}
-            </div>
+            {activeTab.content}
           </motion.div>
         )}
       </AnimatePresence>

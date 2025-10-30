@@ -183,7 +183,7 @@ export default function AppHeader({
       <AnimatePresence>
         {isMobile && (
           <nav className="fixed bottom-0 left-0 right-0 z-50 bg-blue-900/95 backdrop-blur-md border-t border-white/20">
-            <div className="flex items-stretch h-15">
+            <div className="flex items-stretch h-18">
               {tabs.map((tab, index) => {
                 const isActive = activeTab === tab.id;
                 return (

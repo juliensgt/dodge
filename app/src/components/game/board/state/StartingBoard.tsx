@@ -37,19 +37,18 @@ export default function StartingBoard() {
 
   if (isMobile) {
     return (
-      <div className="relative w-full h-full rounded-5 overflow-hidden">
-        <Countdown visible={true} title={t("Salle d'attente")} time={time} />
+      <div className="relative w-full h-screen rounded-5 overflow-hidden flex flex-col">
+        {/* Top: Countdown */}
+        <div className="shrink-0 px-3 pt-3">
+          <Countdown visible={true} title={t("Salle d'attente")} time={time} />
+        </div>
 
-        {/* Container with fixed height structure */}
-        <div className="h-full flex flex-col">
+        {/* Middle + Bottom container */}
+        <div className="flex-1 min-h-0 flex flex-col">
           {/* Players list - Scrollable center section */}
           <div
-            className="flex-1 overflow-y-auto scrollbar-hide"
+            className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-3"
             style={{
-              paddingTop: "5rem", // Space for Countdown
-              paddingBottom: "180px", // Space for bottom section (Quit button + Tips)
-              paddingLeft: "0.75rem",
-              paddingRight: "0.75rem",
               touchAction: "pan-y",
             }}
           >
@@ -82,13 +81,9 @@ export default function StartingBoard() {
             </div>
           </div>
 
-          {/* Bottom section - Fixed at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 px-3 pt-4 pointer-events-none">
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none" />
-
-            {/* Content */}
-            <div className="relative z-10 flex flex-col gap-3 items-center pointer-events-auto">
+          {/* Bottom: Quit button + Tips */}
+          <div className="shrink-0 flex flex-col gap-3 px-3 pt-4 pb-4">
+            <div className="relative z-10 flex flex-col gap-3 items-center">
               {/* Quit button - Pastel red */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -111,13 +106,6 @@ export default function StartingBoard() {
                 </svg>
                 {t("Quitter")}
               </motion.button>
-
-              {/* Tips carousel */}
-              <div
-                className={`${isMobile ? "mb-3" : "mb-4"} w-full max-w-md mx-auto`}
-              >
-                <TipsCarousel />
-              </div>
             </div>
           </div>
         </div>
@@ -127,18 +115,15 @@ export default function StartingBoard() {
 
   // Desktop version
   return (
-    <div className="relative h-full rounded-5 overflow-hidden">
+    <div className="relative w-full rounded-5">
       <Countdown visible={true} title={t("Salle d'attente")} time={time} />
 
       <div className={`flex flex-col h-full ${padding} pt-24`}>
         {/* Players list */}
-        <div
-          className={`flex-1 ${maxWidth} mx-auto`}
-          style={{
-            paddingBottom: "140px", // Space for bottom section
-          }}
-        >
-          <div className="grid grid-cols-2 gap-2.5">
+        <div className={`${maxWidth} mx-auto`}>
+          <div
+            className={`grid ${maxPlayers > 4 ? "grid-cols-3" : "grid-cols-2"} gap-2.5`}
+          >
             <AnimatePresence mode="popLayout">
               {Array.from({ length: maxPlayers }, (_, index) => {
                 const player = players[index];
@@ -167,42 +152,36 @@ export default function StartingBoard() {
           </div>
         </div>
 
-        {/* Bottom section - Fixed at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 flex flex-col gap-3 px-4 pt-4 pointer-events-none">
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none" />
-
-          {/* Content */}
-          <div className="relative z-10 flex flex-col gap-3 items-center pointer-events-auto">
-            {/* Quit button - Pastel red */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={leaveGame}
-              className="px-4 py-3 bg-red-400/30 hover:bg-red-400/40 backdrop-blur-sm rounded-xl border border-red-300/40 hover:border-red-300/60 text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+        {/* Bottom section - In normal flow */}
+        <div className="flex flex-col gap-3 px-4 pt-4 pb-4 items-center">
+          {/* Quit button - Pastel red */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={leaveGame}
+            className="px-4 py-3 bg-red-400/30 hover:bg-red-400/40 backdrop-blur-sm rounded-xl border border-red-300/40 hover:border-red-300/60 text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              {t("Quitter")}
-            </motion.button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            {t("Quitter")}
+          </motion.button>
 
-            {/* Tips carousel */}
-            <div
-              className={`${isMobile ? "mb-3" : "mb-4"} w-full max-w-md mx-auto`}
-            >
-              <TipsCarousel />
-            </div>
+          {/* Tips carousel */}
+          <div
+            className={`${isMobile ? "mb-3" : "mb-4"} w-full max-w-md mx-auto`}
+          >
+            <TipsCarousel />
           </div>
         </div>
       </div>

@@ -14,12 +14,12 @@ export default function Counter({ value, onClick }: CounterProps) {
       <button
         className={`flex items-center scale-105 hover:scale-110 cursor-pointer justify-center 
             bg-gradient-to-br from-green-400 to-green-600 rounded-md ${
-              isMobile ? "w-5 h-5" : "w-8 h-8"
+              isMobile ? "w-6 h-6" : "w-8 h-8"
             } hover:from-green-500 transition-all duration-200`}
         onClick={onClick}
       >
         <span
-          className={`text-white text-shadow-lg ${isMobile ? "text-xl" : "text-3xl"} font-bold`}
+          className={`text-white text-shadow-lg ${isMobile ? "text-2xl" : "text-3xl"} font-bold`}
         >
           +
         </span>
@@ -27,7 +27,7 @@ export default function Counter({ value, onClick }: CounterProps) {
 
       {/* Coins Counter */}
       <span
-        className={`text-white ${isMobile ? "text-sm min-w-[4ch] pl-2 pr-3" : "text-lg min-w-[4ch] pl-2 pr-5"} font-bold text-right`}
+        className={`text-white ${isMobile ? "min-w-[4ch] pl-2 pr-3" : "text-lg min-w-[4ch] pl-2 pr-5"} font-bold text-right`}
       >
         {value}
       </span>
