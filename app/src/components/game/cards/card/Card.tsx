@@ -1,4 +1,4 @@
-import { useRef, useState, memo } from "react";
+import { useRef, memo } from "react";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
 import { Size } from "@/scripts/references/playerLayouts";
@@ -29,7 +29,7 @@ function Card({
   onClick,
   className = "",
 }: CardProps) {
-  const activatedRef = useRef(false);
+  const isTouchEvent = useRef(false);
   const { getCurrentTheme } = useCollection();
   const theme = getCurrentTheme();
   const glowHex = theme.getGlowHex();
@@ -42,17 +42,37 @@ function Card({
     xxsmall: "w-8 h-11", // 32px x 44px
   };
 
-  const handleActivate = (e?: React.SyntheticEvent) => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     if (!cliquable || !onClick) return;
-    if (e) e.preventDefault();
-    // avoid double fire between pointer and click
-    if (activatedRef.current) return;
-    activatedRef.current = true;
+
+    // Détecter si c'est un événement tactile
+    if (e.pointerType === "touch") {
+      isTouchEvent.current = true;
+      onClick();
+      // Le flag reste actif pour que handleClick puisse le détecter
+    }
+  };
+
+  const handleClick = () => {
+    if (!cliquable || !onClick) return;
+
+    // Si un événement touch a déjà été traité, ignorer ce click
+    if (isTouchEvent.current) {
+      isTouchEvent.current = false;
+      return;
+    }
+
+    // Sur desktop, déclencher l'action normalement
     onClick();
-    // reset flag shortly after
-    setTimeout(() => {
-      activatedRef.current = false;
-    }, 0);
+    isTouchEvent.current = false;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!cliquable || !onClick) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
   };
 
   if (cardState === CardState.CARD_REMOVED) {
@@ -75,11 +95,9 @@ function Card({
       }}
       role={cliquable ? "button" : undefined}
       tabIndex={cliquable ? 0 : undefined}
-      onPointerUp={handleActivate}
-      onClick={handleActivate}
-      onKeyDown={(e) =>
-        (e.key === "Enter" || e.key === " ") && handleActivate(e)
-      }
+      onPointerUp={handlePointerUp}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       {cardState === CardState.CARD_BACK && (
         <CardBack size={size} skinId={skinId} />
