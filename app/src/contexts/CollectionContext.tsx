@@ -27,6 +27,9 @@ interface CollectionContextType {
   getCurrentTheme: () => ITheme;
   getCurrentSkin: () => CardSkin;
   getCurrentThemeColors: () => ThemeColors;
+
+  // Exposer directement le thème actuel pour les hooks React
+  currentTheme: ThemeType;
 }
 
 const CollectionContext = createContext<CollectionContextType | undefined>(
@@ -107,6 +110,8 @@ export function CollectionProvider({ children }: CollectionProviderProps) {
     //setters
     setTheme,
     setSkin,
+    // Exposer directement le thème pour les hooks React
+    currentTheme,
   };
 
   return (

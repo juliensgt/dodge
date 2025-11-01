@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/contexts/ToastContext";
 import ToastContainer from "@/components/utils/toast/ToastContainer";
 import { AuthLevel } from "@/types/auth/auth";
+import { StatusBarComponent } from "@/components/utils/StatusBarComponent";
 config.autoAddCss = true;
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -16,6 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <LanguageProvider>
       <AuthProvider requiredLevel={AuthLevel.PUBLIC}>
         <CollectionProvider>
+          <StatusBarComponent />
           <ToastProvider>
             <Head>
               <link rel="icon" href="/favicon.ico" />
