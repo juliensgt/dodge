@@ -3,6 +3,7 @@ import { getDeckSizes } from "@/scripts/references/playerLayouts";
 import { gameService } from "@/services/game/game.service";
 import { ActionType } from "../../../enums/action-type.enum";
 import { useGameStore } from "@/store/game/game";
+import { useCardStore } from "@/store/cards/cards.store";
 import Card, { CardState } from "./card/Card";
 import { useEffect } from "react";
 
@@ -14,8 +15,8 @@ export default function DeckContainer({ className }: DeckContainerProps) {
   const isMobile = useIsMobile();
   const { options, deck, defausse, choices } = useGameStore();
   const sizes = getDeckSizes(options.maxPlayers, isMobile);
-  const { playerWhoPlays, currentPlayerId } = useGameStore();
-  const isCurrentPlayer = currentPlayerId === playerWhoPlays?.id;
+  const deckCliquable = useCardStore((state) => state.deckCliquable);
+  const defausseCliquable = useCardStore((state) => state.defausseCliquable);
 
   const handleDeckClick = () => {
     if (choices.includes(ActionType.GET_CARD_IN_DECK)) {
@@ -41,12 +42,12 @@ export default function DeckContainer({ className }: DeckContainerProps) {
   return (
     <div className={`${className}`}>
       <div
-        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${isCurrentPlayer ? "cursor-pointer" : "cursor-not-allowed"}`}
+        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${deckCliquable ? "cursor-pointer" : "cursor-not-allowed"}`}
       >
         <Card
           cardState={deck?.cardState || CardState.CARD_BACK}
           size={sizes.card}
-          cliquable={isCurrentPlayer}
+          cliquable={deckCliquable}
           onClick={handleDeckClick}
           cardValue={deck?.valeur ? parseInt(deck.valeur) : undefined}
         />
@@ -55,12 +56,12 @@ export default function DeckContainer({ className }: DeckContainerProps) {
         </span>
       </div>
       <div
-        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${isCurrentPlayer ? "cursor-pointer" : "cursor-not-allowed"}`}
+        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${defausseCliquable ? "cursor-pointer" : "cursor-not-allowed"}`}
       >
         <Card
           cardState={CardState.CARD_FRONT}
           size={sizes.card}
-          cliquable={isCurrentPlayer}
+          cliquable={defausseCliquable}
           cardValue={
             defausse?.[0]?.valeur ? parseInt(defausse[0].valeur) : undefined
           }

@@ -12,7 +12,10 @@ import {
 } from "@/types/game/game.types";
 import { Player } from "@/store/game/types";
 import { useGameStore } from "@/store/game/game";
-import { applyClickabilityForState } from "@/store/cards/clickability.rules";
+import {
+  applyClickabilityForState,
+  applyClickabilityForChoices,
+} from "@/store/cards/clickability.rules";
 import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
 import { Card, CardState } from "@/store/cards/cards.type";
@@ -95,6 +98,9 @@ class GameService {
 
         // Start player timer
         game.startPlayerTimer();
+
+        // UI update
+        applyClickabilityForChoices(data.nextChoices, game);
       }
     );
 
@@ -113,6 +119,9 @@ class GameService {
             game.addDefausse(data.card);
           }
           game.startPlayerTimer();
+
+          // UI update
+          applyClickabilityForChoices(data.nextChoices, game);
         }
       }
     );

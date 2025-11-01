@@ -5,6 +5,8 @@ import { useGameStore } from "../game/game";
 interface CardStore {
   cards: Record<string, Card[]>;
   cliquableByPlayer: Record<string, boolean[]>;
+  deckCliquable: boolean;
+  defausseCliquable: boolean;
 
   // Actions
   initCards: () => void;
@@ -24,6 +26,10 @@ interface CardStore {
     cliquable: boolean
   ) => void;
   isCardCliquable: (playerId: string, cardIndex: number) => boolean;
+  setDeckCliquable: (cliquable: boolean) => void;
+  setDefausseCliquable: (cliquable: boolean) => void;
+  isDeckCliquable: () => boolean;
+  isDefausseCliquable: () => boolean;
   clearAllCliquable: () => void;
 
   clear: () => void;
@@ -32,6 +38,8 @@ interface CardStore {
 const useCardStore = create<CardStore>((set, get) => ({
   cards: {},
   cliquableByPlayer: {},
+  deckCliquable: false,
+  defausseCliquable: false,
 
   initCards: () => {
     const game = useGameStore.getState();
@@ -146,12 +154,37 @@ const useCardStore = create<CardStore>((set, get) => ({
     return !!arr && !!arr[cardIndex];
   },
 
+  setDeckCliquable: (cliquable: boolean) => {
+    set({ deckCliquable: cliquable });
+  },
+
+  setDefausseCliquable: (cliquable: boolean) => {
+    set({ defausseCliquable: cliquable });
+  },
+
+  isDeckCliquable: () => {
+    return get().deckCliquable;
+  },
+
+  isDefausseCliquable: () => {
+    return get().defausseCliquable;
+  },
+
   clearAllCliquable: () => {
-    set((s) => ({ cliquableByPlayer: {} }));
+    set({
+      cliquableByPlayer: {},
+      deckCliquable: false,
+      defausseCliquable: false,
+    });
   },
 
   clear: () => {
-    set({ cards: {}, cliquableByPlayer: {} });
+    set({
+      cards: {},
+      cliquableByPlayer: {},
+      deckCliquable: false,
+      defausseCliquable: false,
+    });
   },
 }));
 
