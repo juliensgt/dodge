@@ -8,7 +8,7 @@ import CrownCounter from "./counter/CrownCounter";
 import CoinsCounter from "./counter/CoinsCounter";
 import { useRole } from "@/contexts/AuthContext";
 
-export type AppTab = "play" | "shop" | "collection" | "profile" | "admin";
+export type AppTab = "shop" | "collection" | "play" | "profile" | "admin";
 
 export interface AppCategory {
   id: AppTab;
@@ -45,19 +45,6 @@ export default function AppHeader({
       ),
     },
     {
-      id: "play",
-      label: t("Jouer"),
-      icon: (
-        <Image
-          src="/images/icons/play.png"
-          alt="Jouer"
-          width={isMobile ? 55 : 65}
-          height={isMobile ? 55 : 65}
-          className="drop-shadow-lg"
-        />
-      ),
-    },
-    {
       id: "collection",
       label: t("Collection"),
       icon: (
@@ -66,6 +53,19 @@ export default function AppHeader({
           alt="Collection"
           width={isMobile ? 50 : 55}
           height={isMobile ? 50 : 55}
+          className="drop-shadow-lg"
+        />
+      ),
+    },
+    {
+      id: "play",
+      label: t("Jouer"),
+      icon: (
+        <Image
+          src="/images/icons/play.png"
+          alt="Jouer"
+          width={isMobile ? 55 : 65}
+          height={isMobile ? 55 : 65}
           className="drop-shadow-lg"
         />
       ),

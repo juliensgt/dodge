@@ -27,12 +27,12 @@ function DashboardContent() {
         content: <ShopTab />,
       },
       {
-        id: "play" as AppTab,
-        content: <PlayTab />,
-      },
-      {
         id: "collection" as AppTab,
         content: <CollectionTab />,
+      },
+      {
+        id: "play" as AppTab,
+        content: <PlayTab />,
       },
       {
         id: "profile" as AppTab,

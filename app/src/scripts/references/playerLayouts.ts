@@ -7,6 +7,12 @@ export type Size = "xxsmall" | "xsmall" | "small" | "medium" | "large";
 
 export type ProfileLayout = "default" | "inline"; // default: normal, inline: nom/points sur même ligne
 export type ProfilePosition = "before" | "after"; // before: avant les cartes, after: après les cartes
+export type CardLayoutType = "inline" | "grid"; // inline: cartes en ligne, grid: cartes en grille 2 colonnes
+
+export type CardLayoutConfig = {
+  type: CardLayoutType;
+  gap?: string; // Classes de gap (gap-1, gap-2, etc.)
+};
 
 export type PlayerLayout = {
   container: string; // Classes CSS pour le conteneur principal
@@ -14,8 +20,8 @@ export type PlayerLayout = {
   profileAlignments: string[]; // Classes d'alignement pour les profils
   deckContainer: string; // Classes CSS pour le DeckContainer
   cardLayouts: {
-    mainPlayer: string; // Classes CSS pour le layout des cartes du joueur principal
-    otherPlayers: string; // Classes CSS pour le layout des cartes des autres joueurs
+    mainPlayer: CardLayoutConfig; // Configuration du layout des cartes du joueur principal
+    otherPlayers: CardLayoutConfig; // Configuration du layout des cartes des autres joueurs
   };
   profileLayouts?: {
     mainPlayer?: {
@@ -57,8 +63,16 @@ export const playerLayouts: Record<number, PlayerLayout> = {
     deckContainer:
       "flex items-center justify-center gap-4 col-start-2 row-start-2",
     cardLayouts: {
-      mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "flex gap-2 w-fit", // 4 cartes en ligne pour l'autre joueur
+      mainPlayer: { type: "inline", gap: "gap-2" },
+      otherPlayers: { type: "inline", gap: "gap-2" },
+    },
+    profileLayouts: {
+      mainPlayer: {
+        position: "after", // Profil après les cartes pour le joueur courant
+      },
+      otherPlayers: {
+        position: "before", // Profil avant les cartes pour l'autre joueur
+      },
     },
     sizes: {
       mainPlayer: {
@@ -82,15 +96,23 @@ export const playerLayouts: Record<number, PlayerLayout> = {
     container: "grid grid-cols-3 grid-rows-3 gap-4 h-full w-full p-8",
     positions: [
       "col-start-1 col-span-3 row-start-3 flex items-center justify-center", // Joueur 1 (joueur courant - bas)
-      "col-start-1 row-start-2 flex items-center justify-start", // Joueur 2 (gauche-bas)
-      "col-start-3 row-start-2 flex items-center justify-end", // Joueur 3 (droite-bas)
+      "col-start-1 row-start-1 flex items-center justify-start", // Joueur 2 (gauche-bas)
+      "col-start-3 row-start-1 flex items-center justify-end", // Joueur 3 (droite-bas)
     ],
-    profileAlignments: ["justify-center", "justify-start", "justify-end"],
+    profileAlignments: ["justify-start", "justify-start", "justify-start"],
     deckContainer:
       "flex items-center justify-center gap-4 col-start-2 row-start-2",
     cardLayouts: {
-      mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "grid grid-cols-2 gap-2 w-fit",
+      mainPlayer: { type: "inline", gap: "gap-2" },
+      otherPlayers: { type: "inline", gap: "gap-2" },
+    },
+    profileLayouts: {
+      mainPlayer: {
+        position: "after", // Profil après les cartes pour le joueur courant
+      },
+      otherPlayers: {
+        position: "before", // Profil avant les cartes pour l'autre joueur
+      },
     },
     sizes: {
       mainPlayer: {
@@ -111,40 +133,50 @@ export const playerLayouts: Record<number, PlayerLayout> = {
     },
   },
   4: {
-    container: "grid grid-cols-3 grid-rows-3 gap-4 h-full w-full p-8",
+    container: "grid grid-cols-3 grid-rows-4 gap-4 h-full w-full p-4",
     positions: [
-      "col-start-1 col-span-3 row-start-3 flex items-center justify-center", // Joueur 1 (joueur courant - bas)
-      "col-start-1 row-start-2 flex items-center justify-start", // Joueur 2 (gauche-bas)
-      "col-start-3 row-start-2 flex items-center justify-end", // Joueur 3 (droite-bas)
-      "col-start-2 row-start-1 flex items-center justify-center", // Joueur 4 (gauche-milieu)
+      "col-start-1 col-span-3 row-start-4 flex items-center justify-center", // Joueur 1 (joueur courant - bas)
+      "col-start-1 row-start-1 row-span-2 flex items-center justify-start", // Joueur 2 (gauche-bas)
+      "col-start-2 row-start-1 flex items-center justify-center", // Joueur 3 (milieu-bas)
+      "col-start-3 row-start-1 row-span-2 flex items-center justify-end", // Joueur 3 (droite-bas)
     ],
     profileAlignments: [
-      "justify-center",
       "justify-start",
-      "justify-end",
-      "justify-center",
+      "justify-start",
+      "justify-start",
+      "justify-start",
     ],
     deckContainer:
-      "flex items-center justify-center gap-4 col-start-2 row-start-2",
+      "flex items-center justify-center gap-4 col-start-2 row-start-2 row-span-2",
     cardLayouts: {
-      mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "grid grid-cols-2 gap-2 w-fit",
+      mainPlayer: { type: "inline", gap: "gap-2" },
+      otherPlayers: { type: "grid", gap: "gap-2" },
+    },
+    profileLayouts: {
+      mainPlayer: {
+        layout: "inline",
+        position: "after", // Profil après les cartes pour le joueur courant
+      },
+      otherPlayers: {
+        layout: "inline", // Nom/points sur la même ligne
+        position: "before", // Profil avant les cartes pour l'autre joueur
+      },
     },
     sizes: {
       mainPlayer: {
-        card: "large",
+        card: "medium",
         avatar: "medium",
         name: "medium",
         points: "medium",
       },
       otherPlayers: {
-        card: "medium",
+        card: "small",
         avatar: "small",
         name: "small",
         points: "small",
       },
       deck: {
-        card: "large",
+        card: "medium",
       },
     },
   },
@@ -167,8 +199,8 @@ export const playerLayouts: Record<number, PlayerLayout> = {
     deckContainer:
       "flex items-center justify-center gap-4 col-start-2 row-start-2",
     cardLayouts: {
-      mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "grid grid-cols-2 gap-2 w-fit",
+      mainPlayer: { type: "inline", gap: "gap-2" },
+      otherPlayers: { type: "grid", gap: "gap-2" },
     },
     sizes: {
       mainPlayer: {
@@ -202,8 +234,8 @@ export const playerLayouts: Record<number, PlayerLayout> = {
     deckContainer:
       "flex items-center justify-center gap-4 col-start-2 row-start-2",
     cardLayouts: {
-      mainPlayer: "flex gap-2 w-fit",
-      otherPlayers: "grid grid-cols-2 gap-2 w-fit",
+      mainPlayer: { type: "inline", gap: "gap-2" },
+      otherPlayers: { type: "grid", gap: "gap-2" },
     },
     sizes: {
       mainPlayer: {
@@ -257,12 +289,25 @@ export function getDeckContainerClasses(
   return layout.deckContainer;
 }
 
+// Fonction helper pour convertir CardLayoutConfig en classes CSS
+function getCardLayoutClasses(config: CardLayoutConfig): string {
+  const gap = config.gap || "gap-2";
+  if (config.type === "inline") {
+    return `flex ${gap} w-fit`;
+  } else {
+    return `grid grid-cols-2 ${gap} w-fit`;
+  }
+}
+
 // Fonction utilitaire pour obtenir les layouts des cartes
 export function getCardLayouts(numPlayers: number, isMobile: boolean = false) {
   const layout = isMobile
     ? getMobilePlayerLayout(numPlayers)
     : getPlayerLayout(numPlayers);
-  return layout.cardLayouts;
+  return {
+    mainPlayer: getCardLayoutClasses(layout.cardLayouts.mainPlayer),
+    otherPlayers: getCardLayoutClasses(layout.cardLayouts.otherPlayers),
+  };
 }
 
 // Fonction utilitaire pour obtenir les tailles des éléments

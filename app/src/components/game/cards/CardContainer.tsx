@@ -105,36 +105,7 @@ export default function CardContainer({
 
   // Composant de profil réutilisable
   const renderProfile = () => {
-    if (!isMobile) {
-      // Desktop : toujours avec avatar
-      return (
-        <div
-          className={`${playerClasses.profileAlignment} text-center flex flex-row gap-2 items-center`}
-        >
-          <div
-            className="flex-shrink-0 relative flex items-center justify-center"
-            style={{
-              width: `${avatarSizePx + 16}px`,
-              height: `${avatarSizePx + 16}px`,
-            }}
-          >
-            <PlayerAvatar
-              player={player}
-              size={sizes.avatar}
-              isPlayerWhoPlays={isPlayerWhoPlays}
-              playerTimer={isPlayerWhoPlays ? playerTimer : 0}
-              maxTime={maxTime}
-            />
-          </div>
-          <div className="flex flex-col items-start">
-            <PlayerName player={player} size={sizes.name} />
-            <PlayerPoints player={player} size={sizes.points} />
-          </div>
-        </div>
-      );
-    }
-
-    // Mobile : selon profileLayout
+    // Layout "inline" : nom et points sur la même ligne (style mobile)
     if (profileLayout === "inline") {
       return (
         <div className="flex flex-row justify-between items-center w-full">
@@ -144,18 +115,42 @@ export default function CardContainer({
       );
     }
 
-    // Default layout
+    // Layout "default" : avec avatar bubble + nom/points en colonne
     return (
-      <div className={`${playerClasses.profileAlignment} flex flex-col`}>
-        <PlayerName player={player} size={sizes.name} />
-        <PlayerPoints player={player} size={sizes.points} />
+      <div
+        className={`${playerClasses.profileAlignment} text-center flex flex-row gap-2 items-center`}
+      >
+        <div
+          className="flex-shrink-0 relative flex items-center justify-center"
+          style={{
+            width: `${avatarSizePx + 16}px`,
+            height: `${avatarSizePx + 16}px`,
+          }}
+        >
+          <PlayerAvatar
+            player={player}
+            size={sizes.avatar}
+            isPlayerWhoPlays={isPlayerWhoPlays}
+            playerTimer={isPlayerWhoPlays ? playerTimer : 0}
+            maxTime={maxTime}
+          />
+        </div>
+        <div className="flex flex-col items-start">
+          <PlayerName player={player} size={sizes.name} />
+          <PlayerPoints player={player} size={sizes.points} />
+        </div>
       </div>
     );
   };
 
-  // Barre de progression timer (mobile uniquement, toujours présente pour garder l'espace)
+  // Barre de progression timer (affichée si profileLayout est "inline" ou si mobile avec mainPlayer)
   const renderTimerBar = () => {
-    if (!isMobile || !isMainPlayer) return null;
+    // Afficher la barre si profileLayout est "inline" (desktop ou mobile) ou si mobile avec mainPlayer
+    const shouldShowTimerBar =
+      profileLayout === "inline" ||
+      (isMobile && isMainPlayer && profileLayout === "default");
+
+    if (!shouldShowTimerBar) return null;
 
     return (
       <div className="w-full h-1 relative bg-white/20 rounded-full">
@@ -213,53 +208,20 @@ export default function CardContainer({
 
   // Construction de l'ordre d'affichage selon profilePosition
   const elements = [];
+  const timerBarElement = renderTimerBar();
+
   if (profilePosition === "before") {
     elements.push(renderProfile());
-    if (isMobile && isMainPlayer) {
-      elements.push(renderTimerBar());
+    if (timerBarElement) {
+      elements.push(timerBarElement);
     }
     elements.push(renderCards());
   } else {
     elements.push(renderCards());
-    if (isMobile && isMainPlayer) {
-      elements.push(renderTimerBar());
+    if (timerBarElement) {
+      elements.push(timerBarElement);
     }
     elements.push(renderProfile());
-  }
-
-  // Pour l'autre joueur en mobile avec layout inline, ajouter la barre de progression après le profil (toujours présente)
-  if (isMobile && !isMainPlayer && profileLayout === "inline") {
-    const profileIndex = profilePosition === "before" ? 0 : elements.length - 1;
-    const timerBar = (
-      <div className="w-full h-1 relative bg-white/20 rounded-full">
-        {isPlayerWhoPlays && playerTimer > 0 && maxTime > 0 && (
-          <>
-            {(() => {
-              const timerPercentage = Math.min(
-                Math.max((playerTimer / maxTime) * 100, 0),
-                100
-              );
-              let timerColor = "#22c55e";
-              if (timerPercentage <= 25) {
-                timerColor = "#ef4444";
-              } else if (timerPercentage <= 50) {
-                timerColor = "#eab308";
-              }
-              return (
-                <motion.div
-                  className="h-full rounded-full absolute top-0 left-0"
-                  style={{ backgroundColor: timerColor }}
-                  initial={{ width: "100%" }}
-                  animate={{ width: `${timerPercentage}%` }}
-                  transition={{ duration: 1, ease: "linear" }}
-                />
-              );
-            })()}
-          </>
-        )}
-      </div>
-    );
-    elements.splice(profileIndex + 1, 0, timerBar);
   }
 
   return (
