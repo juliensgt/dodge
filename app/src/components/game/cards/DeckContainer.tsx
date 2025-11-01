@@ -41,9 +41,7 @@ export default function DeckContainer({ className }: DeckContainerProps) {
 
   return (
     <div className={`${className}`}>
-      <div
-        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${deckCliquable ? "cursor-pointer" : "cursor-not-allowed"}`}
-      >
+      <div data-card-animation-id="deck">
         <Card
           cardState={deck?.cardState || CardState.CARD_BACK}
           size={sizes.card}
@@ -51,13 +49,8 @@ export default function DeckContainer({ className }: DeckContainerProps) {
           onClick={handleDeckClick}
           cardValue={deck?.valeur ? parseInt(deck.valeur) : undefined}
         />
-        <span className="text-white/75 text-sm text-center -bottom-6 left-0 right-0 absolute">
-          Deck
-        </span>
       </div>
-      <div
-        className={`flex flex-col relative hover:scale-105 transition-transform duration-200 ${defausseCliquable ? "cursor-pointer" : "cursor-not-allowed"}`}
-      >
+      <div data-card-animation-id="defausse">
         <Card
           cardState={CardState.CARD_FRONT}
           size={sizes.card}
@@ -67,9 +60,6 @@ export default function DeckContainer({ className }: DeckContainerProps) {
           }
           onClick={handleDefausseClick}
         />
-        <span className="text-white/75 text-sm text-center -bottom-6 left-0 right-0 absolute">
-          Défausse
-        </span>
       </div>
     </div>
   );

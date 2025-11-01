@@ -20,6 +20,8 @@ import { httpService } from "../http/http.service";
 import { useMessagesStore } from "@/store/messages/messages.store";
 import { Card, CardState } from "@/store/cards/cards.type";
 import { addActionPoints } from "@/services/game/game.setters";
+import { useAnimationStore } from "@/store/animations";
+import { CardAnimationType } from "@/enums/card-animation-type.enum";
 
 class GameService {
   constructor() {}
@@ -132,17 +134,39 @@ class GameService {
         console.log("Card switched:", data);
         if (data && data.card && data.choice) {
           const game = useGameStore.getState();
+          const animationStore = useAnimationStore.getState();
 
-          game.resetDeck();
-          game.addDefausse(data.card);
           if (data.choice === ActionType.SWITCH_FROM_DECK_TO_DEFAUSSE) {
-            // animate card going to defausse
+            animationStore.animateCardMovement(
+              "deck",
+              "defausse",
+              {
+                cardValue: data.card.valeur
+                  ? parseInt(data.card.valeur)
+                  : undefined,
+              },
+              [
+                { method: "resetDeck", args: [] },
+                { method: "addDefausse", args: [data.card] },
+              ],
+              CardAnimationType.DECK_TO_DEFAUSSE
+            );
           } else if (
             data.choice === ActionType.SWITCH_FROM_DEFAUSSE_TO_PLAYER
           ) {
             // animate card going to player's main
+            // Pour l'instant, appliquer directement
+            game.resetDeck();
+            game.addDefausse(data.card);
           } else if (data.choice === ActionType.SWITCH_FROM_DECK_TO_PLAYER) {
             // animate card going to player's main
+            // Pour l'instant, appliquer directement
+            game.resetDeck();
+            game.addDefausse(data.card);
+          } else {
+            // Pas d'animation pour ce type de switch, appliquer directement
+            game.resetDeck();
+            game.addDefausse(data.card);
           }
         }
       }

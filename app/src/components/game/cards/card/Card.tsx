@@ -12,7 +12,6 @@ export enum CardState {
 
 interface CardProps {
   cardState: CardState;
-  cardImage?: string;
   cardValue?: number;
   cliquable?: boolean;
   size?: Size;
@@ -23,7 +22,6 @@ interface CardProps {
 
 function Card({
   cardState,
-  cardImage,
   cardValue,
   cliquable = false,
   size = "small",
@@ -31,7 +29,6 @@ function Card({
   onClick,
   className = "",
 }: CardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const activatedRef = useRef(false);
   const { getCurrentTheme } = useCollection();
   const theme = getCurrentTheme();
@@ -58,14 +55,6 @@ function Card({
     }, 0);
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
   if (cardState === CardState.CARD_REMOVED) {
     return (
       <div
@@ -76,21 +65,13 @@ function Card({
 
   const glowClasses = cliquable ? "rounded-lg border-2" : "";
   const baseGlowShadow = `0 0 12px ${glowHex}80`;
-  const hoverGlowShadow = `0 0 16px ${glowHex}B3`;
 
   return (
     <div
-      className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none transition-all duration-200 ${glowClasses} ${
-        isHovered && cliquable ? "transform scale-105" : ""
-      }`}
+      className={`${sizeClasses[size]} ${className} relative cursor-pointer select-none ${glowClasses}`}
       style={{
-        touchAction: "manipulation",
         borderColor: cliquable ? glowHex : undefined,
-        boxShadow: cliquable
-          ? isHovered
-            ? hoverGlowShadow
-            : baseGlowShadow
-          : undefined,
+        boxShadow: cliquable ? baseGlowShadow : undefined,
       }}
       role={cliquable ? "button" : undefined}
       tabIndex={cliquable ? 0 : undefined}
@@ -99,14 +80,12 @@ function Card({
       onKeyDown={(e) =>
         (e.key === "Enter" || e.key === " ") && handleActivate(e)
       }
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {cardState === CardState.CARD_BACK && (
         <CardBack size={size} skinId={skinId} />
       )}
       {cardState === CardState.CARD_FRONT && (
-        <CardFront cardImage={cardImage} cardValue={cardValue} />
+        <CardFront cardValue={cardValue} />
       )}
     </div>
   );

@@ -4,10 +4,12 @@ import CardContainer from "@/components/game/cards/CardContainer";
 import {
   getPlayerLayout,
   getDeckContainerClasses,
+  getDeckSizes,
 } from "@/scripts/references/playerLayouts";
 import { getMobilePlayerLayout } from "@/scripts/references/mobilePlayerLayouts";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import AnimatedBanner from "@/components/utils/animations/AnimatedBanner";
+import CardAnimationLayer from "@/components/utils/animations/CardAnimationLayer";
 import { useEffect } from "react";
 
 export default function InGameBoard() {
@@ -67,6 +69,9 @@ export default function InGameBoard() {
       </div>
 
       <AnimatedBanner />
+      <div className="absolute inset-0 pointer-events-none z-[9998]">
+        <CardAnimationLayer cardSize={getDeckSizes(nbPlayers, isMobile).card} />
+      </div>
     </div>
   );
 }
