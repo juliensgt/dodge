@@ -16,6 +16,7 @@ import { getCardSkin, CardSkin } from "@/enums/skins/SkinManager";
 import { collectionService } from "@/services/collection/collection.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { ITheme } from "@/enums/themes/ITheme";
+import { useSkinPreloader } from "@/hooks/useSkinPreloader";
 
 interface CollectionContextType {
   // setters
@@ -58,6 +59,9 @@ export function CollectionProvider({ children }: CollectionProviderProps) {
 
     loadCollection();
   }, [isAuthenticated]);
+
+  // Précharger le skin actuel de manière non-bloquante
+  useSkinPreloader(currentSkin);
 
   const setTheme = async (theme: ThemeType) => {
     setCurrentTheme(theme);

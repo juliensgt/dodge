@@ -33,7 +33,7 @@ export default function PlayTab() {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle play button click - navigate to loading page
+  // Handle play button click - navigate to game loading page
   const handlePlayGame = () => {
     router.push("/app/game");
   };

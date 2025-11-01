@@ -87,13 +87,14 @@ export default function AppContainer({
             x: `${(index - currentSlide) * 100}%`,
           }}
           transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
+            type: "tween",
+            duration: 0.3,
+            ease: [0.4, 0, 0.2, 1], // ease-out pour animation plus fluide
           }}
-          className="absolute inset-0 will-change-transform"
+          className="absolute inset-0"
           style={{
             pointerEvents: index === currentSlide ? "auto" : "none",
+            willChange: "transform",
           }}
         >
           <div

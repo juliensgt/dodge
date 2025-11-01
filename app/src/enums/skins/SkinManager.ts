@@ -1,13 +1,6 @@
-import DefaultSkin from "./list/DefaultSkin";
-import ClassicSkin from "./list/ClassicSkin";
-import NeonSkin from "./list/NeonSkin";
-import PixelArtSkin from "./list/PixelArtSkin";
-import GalaxySkin from "./list/GalaxySkin";
-import PaperSkin from "./list/PaperSkin";
-import CyberSkin from "./list/CyberSkin";
-import BarbieSkin from "./list/BarbieSkin";
 import { CardSkinRarity } from "./SkinRarity";
 import { Size } from "@/scripts/references/playerLayouts";
+import { getSkinLoader } from "./SkinLoader";
 
 // Texte affiché sur les cartes
 export const CARD_TEXT = "D";
@@ -49,7 +42,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: DefaultSkin,
+    component: getSkinLoader("default"),
     rarity: CardSkinRarity.COMMON,
   },
   neon: {
@@ -60,7 +53,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: NeonSkin,
+    component: getSkinLoader("neon"),
     rarity: CardSkinRarity.RARE,
   },
   classic: {
@@ -71,7 +64,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: ClassicSkin,
+    component: getSkinLoader("classic"),
     rarity: CardSkinRarity.COMMON,
   },
   pixelArt: {
@@ -82,7 +75,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: PixelArtSkin,
+    component: getSkinLoader("pixelArt"),
     rarity: CardSkinRarity.COMMON,
   },
   galaxy: {
@@ -93,7 +86,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: GalaxySkin,
+    component: getSkinLoader("galaxy"),
     rarity: CardSkinRarity.COMMON,
   },
   paper: {
@@ -104,7 +97,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: PaperSkin,
+    component: getSkinLoader("paper"),
     rarity: CardSkinRarity.COMMON,
   },
   cyber: {
@@ -115,7 +108,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: CyberSkin,
+    component: getSkinLoader("cyber"),
     rarity: CardSkinRarity.COMMON,
   },
   barbie: {
@@ -126,7 +119,7 @@ export const cardSkins: Record<string, CardSkin> = {
     price: 100,
     discount: 10,
     originalPrice: 150,
-    component: BarbieSkin,
+    component: getSkinLoader("barbie"),
     rarity: CardSkinRarity.COMMON,
   },
 };

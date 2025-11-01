@@ -1,17 +1,25 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense, useRef, lazy } from "react";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { AuthLevel } from "@/types/auth/auth";
 import AppHeader, { AppTab } from "@/components/layout/app/AppHeader";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import PlayTab from "@/components/layout/app/tabs/PlayTab";
-import ShopTab from "@/components/layout/app/tabs/ShopTab";
-import CollectionTab from "@/components/layout/app/tabs/CollectionTab";
-import ProfileTab from "@/components/layout/app/tabs/ProfileTab";
-import AdminTab from "@/components/layout/app/tabs/AdminTab";
 import AppContainer from "@/components/layout/app/AppContainer";
 import { motion } from "framer-motion";
 import { useRole } from "@/contexts/AuthContext";
 import { useCollection } from "@/contexts/CollectionContext";
+import LoadingOverlay from "@/components/utils/LoadingOverlay";
+
+// Map des imports dynamiques des tabs (React.lazy gère déjà le cache interne)
+const tabImports: Record<
+  AppTab,
+  () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>
+> = {
+  shop: () => import("@/components/layout/app/tabs/ShopTab"),
+  collection: () => import("@/components/layout/app/tabs/CollectionTab"),
+  play: () => import("@/components/layout/app/tabs/PlayTab"),
+  profile: () => import("@/components/layout/app/tabs/ProfileTab"),
+  admin: () => import("@/components/layout/app/tabs/AdminTab"),
+};
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState<AppTab>("play");
@@ -19,53 +27,133 @@ function DashboardContent() {
   const isMobile = useIsMobile();
   const { isAdmin } = useRole();
   const { getCurrentTheme } = useCollection();
-  // Define all tabs with their content (all tabs stay mounted for smooth transitions)
-  const appTabs = useMemo(
-    () => [
+
+  // Référence stable pour les composants lazy (ne jamais recréer)
+  // React.lazy gère déjà le cache interne, donc on peut l'utiliser directement
+  const tabComponentsRef = useRef<
+    Record<string, React.ComponentType<Record<string, unknown>>>
+  >({});
+
+  // Initialiser les composants lazy une seule fois
+  if (!tabComponentsRef.current.shop) {
+    tabComponentsRef.current.shop = lazy(tabImports.shop);
+    tabComponentsRef.current.collection = lazy(tabImports.collection);
+    tabComponentsRef.current.play = lazy(tabImports.play);
+    tabComponentsRef.current.profile = lazy(tabImports.profile);
+    if (isAdmin) {
+      tabComponentsRef.current.admin = lazy(tabImports.admin);
+    }
+  }
+
+  // Précharger les tabs et masquer le loader quand ils sont chargés
+  useEffect(() => {
+    let isMounted = true;
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        setIsLoading(false);
+      }
+    }, 10000); // Timeout de sécurité maximal
+
+    const loadTabs = async () => {
+      try {
+        // Sur mobile, précharger tous les tabs car ils restent montés
+        // Sur desktop, charger juste le tab actif
+        const tabsToLoad: AppTab[] = isMobile
+          ? ["shop", "collection", "play", "profile"]
+          : [activeTab];
+
+        if (isMobile && isAdmin) {
+          tabsToLoad.push("admin");
+        }
+
+        // Attendre que tous les imports soient résolus
+        await Promise.all(tabsToLoad.map((tab) => tabImports[tab]()));
+
+        // Masquer le loader dès que les tabs sont chargés
+        if (isMounted) {
+          setTimeout(() => {
+            clearTimeout(timeoutId);
+            setIsLoading(false);
+          }, 1000);
+        }
+      } catch (error) {
+        console.warn("Error loading tabs:", error);
+      }
+    };
+
+    loadTabs();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [isMobile, isAdmin, activeTab]);
+
+  // Mémoriser le contenu des tabs de manière stable
+  // Le JSX est recréé mais les composants lazy sont stables grâce à useRef
+  const appTabs = useMemo(() => {
+    const ShopTabComponent = tabComponentsRef.current.shop;
+    const CollectionTabComponent = tabComponentsRef.current.collection;
+    const PlayTabComponent = tabComponentsRef.current.play;
+    const ProfileTabComponent = tabComponentsRef.current.profile;
+
+    const tabs: Array<{
+      id: AppTab;
+      content: React.ReactNode;
+    }> = [
       {
         id: "shop" as AppTab,
-        content: <ShopTab />,
+        content: (
+          <Suspense fallback={<TabFallback />}>
+            <ShopTabComponent />
+          </Suspense>
+        ),
       },
       {
         id: "collection" as AppTab,
-        content: <CollectionTab />,
+        content: (
+          <Suspense fallback={<TabFallback />}>
+            <CollectionTabComponent />
+          </Suspense>
+        ),
       },
       {
         id: "play" as AppTab,
-        content: <PlayTab />,
+        content: (
+          <Suspense fallback={<TabFallback />}>
+            <PlayTabComponent />
+          </Suspense>
+        ),
       },
       {
         id: "profile" as AppTab,
-        content: <ProfileTab isActive={activeTab === "profile"} />,
+        content: (
+          <Suspense fallback={<TabFallback />}>
+            <ProfileTabComponent isActive={activeTab === "profile"} />
+          </Suspense>
+        ),
       },
-      ...(isAdmin
-        ? [
-            {
-              id: "admin" as AppTab,
-              content: <AdminTab />,
-            },
-          ]
-        : []),
-    ],
-    [activeTab, isAdmin]
-  );
+    ];
+
+    if (isAdmin && tabComponentsRef.current.admin) {
+      const AdminTabComponent = tabComponentsRef.current.admin;
+      tabs.push({
+        id: "admin" as AppTab,
+        content: (
+          <Suspense fallback={<TabFallback />}>
+            <AdminTabComponent />
+          </Suspense>
+        ),
+      });
+    }
+
+    return tabs;
+  }, [activeTab, isAdmin]);
 
   const handleTabChange = (tab: AppTab) => {
     if (tab === activeTab) return;
     setActiveTab(tab);
   };
-
-  // Ensure all tabs are loaded before showing the app
-  useEffect(() => {
-    // First hide the loading screen
-    const hideLoaderTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => {
-      clearTimeout(hideLoaderTimer);
-    };
-  }, [appTabs]);
 
   return (
     <>
@@ -73,29 +161,7 @@ function DashboardContent() {
         className={`min-h-screen ${getCurrentTheme().getGradient(getCurrentTheme().GradientType.BACKGROUND_MAIN, "to-br")} font-['MT'] relative`}
       >
         {/* Loading overlay */}
-        {isLoading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-purple-800">
-            <div className="flex flex-col items-center gap-8">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                className="w-20 h-20 border-6 border-yellow-400 border-t-transparent rounded-full shadow-2xl"
-              />
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="font-lucky text-4xl text-white drop-shadow-2xl"
-              >
-                DODGE
-              </motion.div>
-            </div>
-          </div>
-        )}
+        <LoadingOverlay isLoading={isLoading} />
 
         {/* App content - hidden during loading, no transitions until loaded */}
         <div
@@ -136,6 +202,26 @@ function DashboardContent() {
         </div>
       </div>
     </>
+  );
+}
+
+// Fallback minimal pour les tabs en chargement
+function TabFallback() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[400px]">
+      <div className="flex flex-col items-center gap-4">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full"
+        />
+        <p className="text-white/60 text-sm">Chargement...</p>
+      </div>
+    </div>
   );
 }
 

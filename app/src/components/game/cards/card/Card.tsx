@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, memo } from "react";
 import CardBack from "./CardBack";
 import CardFront from "./CardFront";
 import { Size } from "@/scripts/references/playerLayouts";
@@ -21,7 +21,7 @@ interface CardProps {
   className?: string;
 }
 
-export default function Card({
+function Card({
   cardState,
   cardImage,
   cardValue,
@@ -111,3 +111,7 @@ export default function Card({
     </div>
   );
 }
+
+// Mémoriser Card pour éviter les re-rendus inutiles
+// Note: isHovered est géré en interne, donc memo fonctionne pour les props externes
+export default memo(Card);
